@@ -2,9 +2,10 @@ import {
     GetByUsernameHandler,
     GetByUsernameQuery,
 } from './get-by-username.handler';
-import { User } from '../domain/user';
-import { UserNotFoundException } from './errors/user-not-found.exception';
-import { UserRepository } from '../persistence/user-repository';
+import { stubGetByUsername } from '../test/utils';
+import { User } from '../../domain/user';
+import { UserNotFoundException } from '../errors/user-not-found.exception';
+import { UserRepositorySpy } from '../test/user-repository.spy';
 
 describe('GetByUsernameHandler', () => {
     let sut: GetByUsernameHandler;
@@ -25,8 +26,10 @@ describe('GetByUsernameHandler', () => {
 
             await sut.execute(query);
 
-            expect(userRepositorySpy.callCounts).toBe(1);
-            expect(userRepositorySpy.callHistory).toContain(username);
+            expect(userRepositorySpy.calls.count.getByUsername).toBe(1);
+            expect(userRepositorySpy.calls.history.getByUsername).toContain(
+                username,
+            );
         });
 
         it('should throw an error when no user has been found using given username', async () => {
@@ -55,27 +58,3 @@ describe('GetByUsernameHandler', () => {
         });
     });
 });
-
-class UserRepositorySpy implements UserRepository {
-    callCounts = 0;
-    callHistory: string[] = [];
-
-    getByUsername(username: string): Promise<User | null> {
-        this.callCounts++;
-        this.callHistory.push(username);
-        return null;
-    }
-}
-
-function stubGetByUsername(
-    userRepositorySpy: UserRepositorySpy,
-    returnedValue: User | null,
-): void {
-    userRepositorySpy.getByUsername = (
-        username: string,
-    ): Promise<User | null> => {
-        userRepositorySpy.callCounts++;
-        userRepositorySpy.callHistory.push(username);
-        return Promise.resolve(returnedValue);
-    };
-}

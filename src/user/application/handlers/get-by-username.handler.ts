@@ -1,7 +1,7 @@
 import { IQuery, IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { User } from '../domain/user';
-import { UserNotFoundException } from './errors/user-not-found.exception';
-import { UserRepository } from '../persistence/user-repository';
+import { User } from '../../domain/user';
+import { UserNotFoundException } from '../errors/user-not-found.exception';
+import { UserRepository } from '../../persistence/user-repository';
 
 export class GetByUsernameQuery implements IQuery {
     constructor(readonly username: string) {}
