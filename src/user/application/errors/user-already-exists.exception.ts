@@ -1,4 +1,4 @@
-import { Exception, ExceptionCode } from 'src/application/exception';
+import { Exception, ExceptionCode } from '../../../application/exception';
 
 export class UserAlreadyExistsException extends Exception {
     readonly message: string;
