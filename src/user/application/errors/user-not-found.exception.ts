@@ -1,11 +1,10 @@
-import { UserErrorCode } from './user-error-code';
+import { Exception, ExceptionCode } from '../../../application/exception';
 
-export class UserNotFoundException extends Error {
-    readonly code = UserErrorCode.NotFound;
+export class UserNotFoundException extends Exception {
     readonly message: string;
 
     constructor(username: string) {
-        super();
+        super(ExceptionCode.UserNotFound);
         this.message = this.formatMessage(username);
     }
 

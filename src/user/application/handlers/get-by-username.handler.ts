@@ -9,7 +9,7 @@ export class GetByUsernameQuery implements IQuery {
 
 @QueryHandler(GetByUsernameQuery)
 export class GetByUsernameHandler implements IQueryHandler<GetByUsernameQuery> {
-    constructor(private readonly repo: UserRepository) {}
+    constructor(private repo: UserRepository) {}
 
     async execute(query: GetByUsernameQuery): Promise<User> {
         const existingUser = await this.repo.getByUsername(query.username);

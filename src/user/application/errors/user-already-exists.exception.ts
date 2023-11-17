@@ -1,11 +1,10 @@
-import { UserErrorCode } from './user-error-code';
+import { Exception, ExceptionCode } from 'src/application/exception';
 
-export class UserAlreadyExistsException extends Error {
-    readonly code = UserErrorCode.AlreadyExists;
+export class UserAlreadyExistsException extends Exception {
     readonly message: string;
 
     constructor(username: string) {
-        super();
+        super(ExceptionCode.UserAlreadyExists);
         this.message = this.formatMessage(username);
     }
 

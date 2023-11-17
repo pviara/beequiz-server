@@ -13,7 +13,7 @@ export class AddUserCommand implements ICommand {
 
 @CommandHandler(AddUserCommand)
 export class AddUserHandler implements ICommandHandler<AddUserCommand> {
-    constructor(private readonly userRepository: UserRepository) {}
+    constructor(private userRepository: UserRepository) {}
 
     async execute(command: AddUserCommand): Promise<void> {
         const existingUser = await this.userRepository.getByUsername(
