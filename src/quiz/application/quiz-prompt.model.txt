@@ -1,0 +1,22 @@
+Génère un code JSON de QQ questions de quiz basées sur le thème de "XXXX". Chacune d'entre elles doit proposer 4 choix de réponses. Une seule d'entre elles doit être correcte.
+Toutes les unités doivent être françaises-friendly et abrégées (pas de miles par exemple, mais plutôt des km).
+
+Le format JSON des questions doit être le suivant :
+
+class Question {
+    label: string;
+    answers: Answer[]
+}
+
+Notes :
+- "label" contient la question en elle-même
+- "answers" est un tableau de réponses qui contient des objets de la forme ci-dessous
+
+class Answer {
+    label: string;
+    isCorrect: boolean;
+}
+
+Notes :
+- "label" contient la réponse en elle-même
+- "isCorrect" indique si la réponse à la question est la bonne

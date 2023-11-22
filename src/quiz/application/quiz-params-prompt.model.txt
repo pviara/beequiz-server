@@ -1,0 +1,10 @@
+Génère une liste de X thèmes pour une application de quiz. Au format JSON suivant :
+{
+    code: string;
+    label: string;
+}
+
+
+Où :
+- "code" contient uniquement le nom du thème en minuscules, sans accent ni caractère spécial et où les espaces doivent être remplacés par des dash "-"
+- "label" contient uniquement le nom du thème en minuscules
