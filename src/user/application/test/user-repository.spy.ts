@@ -23,6 +23,6 @@ export class UserRepositorySpy implements UserRepository {
     getByUsername(username: string): Promise<User | null> {
         this.calls.count.getByUsername++;
         this.calls.history.getByUsername.push(username);
-        return null;
+        return Promise.resolve(null);
     }
 }
