@@ -1,5 +1,5 @@
-import { QuizTheme } from 'src/quiz/domain/quiz-parameters';
+import { QuizTheme } from '../../domain/quiz-parameters';
 
 export interface OpenAIService {
-    generateThemesForQuiz(): QuizTheme[];
+    generateThemesForQuiz(savedQuizThemes: QuizTheme[]): Promise<QuizTheme[]>;
 }
