@@ -8,8 +8,7 @@ answers: est un tableau de réponses qui contient des objets de la forme ci-dess
 label: contient la réponse en elle-même
 isCorrect: indique si la réponse à la question est la bonne
 
-Questions déjà utilisées :
-#
+Questions déjà utilisées : #
 
 Toutes unités mesure en fr et abrégées
 Oublie pas les accents, cédilles etc. dans le label
