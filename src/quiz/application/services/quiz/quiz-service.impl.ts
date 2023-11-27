@@ -1,10 +1,15 @@
 import { DateTimeService } from '../../../../application/datetime-service';
+import { DATE_TIME_SERVICE_TOKEN } from '../../../../application/date-time-service.provider';
+import { Inject } from '@nestjs/common';
 import { OpenAIService } from '../open-ai/open-ai-service';
+import { OPENAI_SERVICE_TOKEN } from '../open-ai/open-ai-service.provider';
 import { QuizParameters } from '../../../domain/quiz-parameters';
 import { QuizQuestion } from '../../../domain/quiz-question';
 import { QuizQuestionRepository } from '../../../persistence/quiz-question-repository/quiz-question-repository';
 import { QuizService } from './quiz-service';
 import { QuizThemeRepository } from '../../../persistence/quiz-theme-repository/quiz-theme-repository';
+import { QUIZ_QUESTION_REPO_TOKEN } from '../../../persistence/quiz-question-repository/quiz-question-repository.provider';
+import { QUIZ_THEME_REPO_TOKEN } from '../../../persistence/quiz-theme-repository/quiz-theme-repository.provider';
 
 export const DEFAULT_NUMBER_OF_QUESTIONS = [5, 10, 15];
 
@@ -13,9 +18,16 @@ export class QuizServiceImpl implements QuizService {
     private lastThemeRequestDate: Date | null = null;
 
     constructor(
+        @Inject(DATE_TIME_SERVICE_TOKEN)
         private dateTimeService: DateTimeService,
+
+        @Inject(OPENAI_SERVICE_TOKEN)
         private openAIService: OpenAIService,
+
+        @Inject(QUIZ_QUESTION_REPO_TOKEN)
         private quizQuestionRepository: QuizQuestionRepository,
+
+        @Inject(QUIZ_THEME_REPO_TOKEN)
         private quizThemeRepository: QuizThemeRepository,
     ) {}
 
