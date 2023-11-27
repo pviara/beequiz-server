@@ -1,1 +1,278 @@
-describe('OpenAIService', () => {});
+import OpenAI from 'openai';
+import { OpenAIServiceImpl } from './open-ai-service.impl';
+import { OpenAIObjectFactory } from '../model/open-ai-object-factory';
+import { PromptService } from './prompt-service';
+import { QuizQuestion } from '../../domain/quiz-question';
+import { QuizTheme } from 'src/quiz/domain/quiz-parameters';
+import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
+import { QuizParser } from '../model/quiz-parser';
+
+const DEFAULT_DUMMY_CHOICE = '{"winner": "Los Angeles Dodgers"}';
+
+describe('OpenAIServiceImpl', () => {
+    let sut: OpenAIServiceImpl;
+
+    let openAIObjectFactorySpy: OpenAIObjectFactorySpy;
+    let promptServiceSpy: PromptServiceSpy;
+    let quizQuestionsParserSpy: QuizQuestionsParserSpy;
+
+    beforeEach(() => {
+        openAIObjectFactorySpy = new OpenAIObjectFactorySpy();
+        promptServiceSpy = new PromptServiceSpy();
+        quizQuestionsParserSpy = new QuizQuestionsParserSpy();
+
+        sut = new OpenAIServiceImpl(
+            openAIObjectFactorySpy,
+            promptServiceSpy,
+            quizQuestionsParserSpy,
+        );
+    });
+
+    describe('generateQuestionsForQuiz', () => {
+        it('should get appropriate prompt from prompt service', async () => {
+            stubCreateOpenAIObject(openAIObjectFactorySpy);
+
+            const savedQuizQuestions: QuizQuestion[] = [];
+            const numberOfQuestions = 10;
+            await sut.generateQuestionsForQuiz(
+                savedQuizQuestions,
+                numberOfQuestions,
+            );
+
+            expect(promptServiceSpy.calls.getQuizQuestionsPrompt.count).toBe(1);
+            expect(
+                promptServiceSpy.calls.getQuizQuestionsPrompt.history,
+            ).toContainEqual([savedQuizQuestions, numberOfQuestions]);
+        });
+
+        it('should call openai API using retrieved prompt', async () => {
+            const prompt = 'prompt';
+            stubGetQuizQuestionsPrompt(promptServiceSpy, prompt);
+
+            stubCreateOpenAIObject(openAIObjectFactorySpy);
+
+            await sut.generateQuestionsForQuiz([], 10);
+
+            expect(openAIObjectFactorySpy.calls.createOpenAIObject.count).toBe(
+                1,
+            );
+            expect(
+                openAIObjectFactorySpy.calls.createOpenAIObject.created.create
+                    .count,
+            ).toBe(1);
+
+            const params: ChatCompletionCreateParamsNonStreaming = {
+                model: 'gpt-3.5-turbo',
+                response_format: { type: 'json_object' },
+                messages: [
+                    {
+                        role: 'user',
+                        content: prompt,
+                    },
+                ],
+            };
+            expect(
+                openAIObjectFactorySpy.calls.createOpenAIObject.created.create
+                    .history,
+            ).toContainEqual(params);
+
+            expect(quizQuestionsParserSpy.calls.parseQuizQuestions.count).toBe(
+                1,
+            );
+            expect(
+                quizQuestionsParserSpy.calls.parseQuizQuestions.history,
+            ).toContain(DEFAULT_DUMMY_CHOICE);
+        });
+    });
+
+    describe('generateThemesForQuiz', () => {
+        it('should get appropriate prompt from prompt service', async () => {
+            stubCreateOpenAIObject(openAIObjectFactorySpy);
+
+            const savedQuizThemes: QuizTheme[] = [];
+            await sut.generateThemesForQuiz(savedQuizThemes);
+
+            expect(promptServiceSpy.calls.getQuizThemesPrompt.count).toBe(1);
+            expect(
+                promptServiceSpy.calls.getQuizThemesPrompt.history,
+            ).toContainEqual(savedQuizThemes);
+        });
+
+        it('should call openai API using retrieved prompt', async () => {
+            const prompt = 'prompt';
+            stubGetQuizThemesPrompt(promptServiceSpy, prompt);
+
+            stubCreateOpenAIObject(openAIObjectFactorySpy);
+
+            await sut.generateThemesForQuiz([]);
+
+            expect(openAIObjectFactorySpy.calls.createOpenAIObject.count).toBe(
+                1,
+            );
+            expect(
+                openAIObjectFactorySpy.calls.createOpenAIObject.created.create
+                    .count,
+            ).toBe(1);
+
+            const params: ChatCompletionCreateParamsNonStreaming = {
+                model: 'gpt-3.5-turbo',
+                response_format: { type: 'json_object' },
+                messages: [
+                    {
+                        role: 'user',
+                        content: prompt,
+                    },
+                ],
+            };
+            expect(
+                openAIObjectFactorySpy.calls.createOpenAIObject.created.create
+                    .history,
+            ).toContainEqual(params);
+
+            expect(quizQuestionsParserSpy.calls.parseQuizThemes.count).toBe(1);
+            expect(
+                quizQuestionsParserSpy.calls.parseQuizThemes.history,
+            ).toContain(DEFAULT_DUMMY_CHOICE);
+        });
+    });
+});
+
+class OpenAIObjectFactorySpy implements OpenAIObjectFactory {
+    calls = {
+        createOpenAIObject: {
+            count: 0,
+
+            created: {
+                create: {
+                    count: 0,
+                    history: [] as ChatCompletionCreateParamsNonStreaming[],
+                },
+            },
+        },
+    };
+
+    createOpenAIObject(): OpenAI {
+        this.calls.createOpenAIObject.count++;
+        return {} as OpenAI;
+    }
+}
+
+class PromptServiceSpy implements PromptService {
+    calls = {
+        getQuizQuestionsPrompt: {
+            count: 0,
+            history: [] as [QuizQuestion[], number][],
+        },
+        getQuizThemesPrompt: {
+            count: 0,
+            history: [] as QuizTheme[][],
+        },
+    };
+
+    getQuizQuestionsPrompt(
+        savedQuizQuestions: QuizQuestion[],
+        numberOfQuestions: number,
+    ): string {
+        this.calls.getQuizQuestionsPrompt.count++;
+        this.calls.getQuizQuestionsPrompt.history.push([
+            savedQuizQuestions,
+            numberOfQuestions,
+        ]);
+        return '';
+    }
+
+    getQuizThemesPrompt(savedQuizThemes: QuizTheme[]): string {
+        this.calls.getQuizThemesPrompt.count++;
+        this.calls.getQuizThemesPrompt.history.push(savedQuizThemes);
+        return '';
+    }
+}
+
+class QuizQuestionsParserSpy implements QuizParser {
+    calls = {
+        parseQuizQuestions: {
+            count: 0,
+            history: [] as string[],
+        },
+        parseQuizThemes: {
+            count: 0,
+            history: [] as string[],
+        },
+    };
+
+    parseQuizQuestions(stringifiedObject: string): QuizQuestion[] {
+        this.calls.parseQuizQuestions.count++;
+        this.calls.parseQuizQuestions.history.push(stringifiedObject);
+        return [];
+    }
+
+    parseQuizThemes(stringifiedObject: string): QuizTheme[] {
+        this.calls.parseQuizThemes.count++;
+        this.calls.parseQuizThemes.history.push(stringifiedObject);
+        return [];
+    }
+}
+
+function stubCreateOpenAIObject(
+    openAIObjectFactorySpy: OpenAIObjectFactorySpy,
+): void {
+    openAIObjectFactorySpy.createOpenAIObject = () => {
+        openAIObjectFactorySpy.calls.createOpenAIObject.count++;
+        return {
+            chat: {
+                completions: {
+                    create: (
+                        params: ChatCompletionCreateParamsNonStreaming,
+                    ) => {
+                        openAIObjectFactorySpy.calls.createOpenAIObject.created
+                            .create.count++;
+                        openAIObjectFactorySpy.calls.createOpenAIObject.created.create.history.push(
+                            params,
+                        );
+
+                        return {
+                            choices: [
+                                {
+                                    message: {
+                                        role: 'assistant',
+                                        content: DEFAULT_DUMMY_CHOICE,
+                                    },
+                                },
+                            ],
+                        };
+                    },
+                },
+            },
+        } as unknown as OpenAI;
+    };
+}
+
+function stubGetQuizQuestionsPrompt(
+    promptServiceSpy: PromptServiceSpy,
+    returnedValue: string,
+): void {
+    promptServiceSpy.getQuizQuestionsPrompt = (
+        savedQuizQuestions: QuizQuestion[],
+        numberOfQuestions: number,
+    ) => {
+        promptServiceSpy.calls.getQuizQuestionsPrompt.count++;
+        promptServiceSpy.calls.getQuizQuestionsPrompt.history.push([
+            savedQuizQuestions,
+            numberOfQuestions,
+        ]);
+        return returnedValue;
+    };
+}
+
+function stubGetQuizThemesPrompt(
+    promptServiceSpy: PromptServiceSpy,
+    returnedValue: string,
+): void {
+    promptServiceSpy.getQuizThemesPrompt = (savedQuizThemes: QuizTheme[]) => {
+        promptServiceSpy.calls.getQuizThemesPrompt.count++;
+        promptServiceSpy.calls.getQuizThemesPrompt.history.push(
+            savedQuizThemes,
+        );
+        return returnedValue;
+    };
+}
