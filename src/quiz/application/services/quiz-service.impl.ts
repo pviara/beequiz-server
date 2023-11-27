@@ -1,53 +1,105 @@
 import { DateTimeService } from '../../../application/datetime-service';
 import { OpenAIService } from './open-ai-service';
 import { QuizParameters } from '../../domain/quiz-parameters';
-import { QuizThemeRepository } from '../../persistence/quiz-theme-repository';
+import { QuizQuestion } from '../../domain/quiz-question';
+import { QuizQuestionRepository } from '../../persistence/quiz-question-repository';
 import { QuizService } from './quiz-service';
+import { QuizThemeRepository } from '../../persistence/quiz-theme-repository';
 
 export const DEFAULT_NUMBER_OF_QUESTIONS = [5, 10, 15];
 
 export class QuizServiceImplement implements QuizService {
-    private lastRequestDate: Date | null = null;
+    private lastQuestionRequestDate: Date | null = null;
+    private lastThemeRequestDate: Date | null = null;
 
     constructor(
         private dateTimeService: DateTimeService,
         private openAIService: OpenAIService,
+        private quizQuestionRepository: QuizQuestionRepository,
         private quizThemeRepository: QuizThemeRepository,
     ) {}
 
     async getQuizParameters(): Promise<QuizParameters> {
         const savedQuizThemes = this.quizThemeRepository.getQuizThemes();
 
-        if (this.hasLastRequestBeenMadeLessThan72HoursAgo()) {
-            return new QuizParameters(
+        if (this.hasLastThemeRequestBeenMadeLessThan72HoursAgo()) {
+            const quizParameters = new QuizParameters(
                 savedQuizThemes,
                 DEFAULT_NUMBER_OF_QUESTIONS,
             );
+            quizParameters.shuffleThemes();
+
+            return quizParameters;
         }
 
         const quizThemes =
             await this.openAIService.generateThemesForQuiz(savedQuizThemes);
+
         this.quizThemeRepository.saveGeneratedThemes(quizThemes);
 
-        this.recordLastRequestDate();
+        this.recordLastThemeRequestDate();
 
         return new QuizParameters(quizThemes, DEFAULT_NUMBER_OF_QUESTIONS);
     }
 
-    private hasLastRequestBeenMadeLessThan72HoursAgo(): boolean {
-        if (!this.lastRequestDate) {
+    async getQuizQuestions(
+        quizThemeId: string,
+        numberOfQuestions: number,
+    ): Promise<QuizQuestion[]> {
+        const savedQuizQuestions =
+            this.quizQuestionRepository.getQuizQuestions(quizThemeId);
+
+        const areEnoughSavedQuestions =
+            savedQuizQuestions.length >= numberOfQuestions;
+
+        if (
+            this.hasLastQuestionRequestBeenMadeLessThan72HoursAgo() &&
+            areEnoughSavedQuestions
+        ) {
+            return savedQuizQuestions;
+        }
+
+        const quizQuestions = await this.openAIService.generateQuestionsForQuiz(
+            savedQuizQuestions,
+            numberOfQuestions,
+        );
+
+        this.quizQuestionRepository.saveGeneratedQuestions(quizQuestions);
+
+        this.recordLastQuestionRequestDate();
+
+        return quizQuestions;
+    }
+
+    private hasLastQuestionRequestBeenMadeLessThan72HoursAgo(): boolean {
+        if (!this.lastQuestionRequestDate) {
             return false;
         }
 
+        return this.isDateIsLessThan72HoursAgo(this.lastQuestionRequestDate);
+    }
+
+    private hasLastThemeRequestBeenMadeLessThan72HoursAgo(): boolean {
+        if (!this.lastThemeRequestDate) {
+            return false;
+        }
+
+        return this.isDateIsLessThan72HoursAgo(this.lastThemeRequestDate);
+    }
+
+    private isDateIsLessThan72HoursAgo(date: Date): boolean {
         const currentDate = this.dateTimeService.getNow();
-        const timeDifference =
-            currentDate.getTime() - this.lastRequestDate.getTime();
+        const timeDifference = currentDate.getTime() - date.getTime();
         const hoursDifference = timeDifference / (1000 * 60 * 60);
 
         return hoursDifference < 72;
     }
 
-    private recordLastRequestDate(): void {
-        this.lastRequestDate = this.dateTimeService.getNow();
+    private recordLastQuestionRequestDate(): void {
+        this.lastQuestionRequestDate = this.dateTimeService.getNow();
+    }
+
+    private recordLastThemeRequestDate(): void {
+        this.lastThemeRequestDate = this.dateTimeService.getNow();
     }
 }
