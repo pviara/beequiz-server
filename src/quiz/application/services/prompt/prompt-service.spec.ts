@@ -1,12 +1,12 @@
 import { NUMBER_OF_THEMES, PromptServiceImpl } from './prompt-service.impl';
-import { QuizQuestion } from '../../domain/quiz-question';
-import { QuizTheme } from '../../domain/quiz-parameters';
+import { QuizQuestion } from '../../../domain/quiz-question';
+import { QuizTheme } from '../../../domain/quiz-parameters';
 import * as fs from 'fs';
 
 jest.mock('fs');
 const fsMock = fs as jest.Mocked<typeof fs>;
 
-describe('PromptService', () => {
+describe('PromptServiceImpl', () => {
     let sut: PromptServiceImpl;
 
     beforeEach(() => {

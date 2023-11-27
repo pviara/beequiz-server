@@ -1,11 +1,11 @@
 import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
 import OpenAI from 'openai';
-import { OpenAIObjectFactory } from '../model/open-ai-object-factory';
+import { OpenAIObjectFactory } from '../../model/open-ai-object-factory/open-ai-object-factory';
 import { OpenAIServiceImpl } from './open-ai-service.impl';
-import { PromptService } from './prompt-service';
-import { QuizParser } from '../model/quiz-parser';
-import { QuizQuestion } from '../../domain/quiz-question';
-import { QuizTheme } from '../../domain/quiz-parameters';
+import { PromptService } from '../prompt/prompt-service';
+import { QuizParser } from '../../model/quiz-parser/quiz-parser';
+import { QuizQuestion } from '../../../domain/quiz-question';
+import { QuizTheme } from '../../../domain/quiz-parameters';
 
 const DEFAULT_DUMMY_CHOICE = '{"winner": "Los Angeles Dodgers"}';
 

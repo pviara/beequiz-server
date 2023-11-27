@@ -1,5 +1,5 @@
-import { QuizQuestion } from '../../domain/quiz-question';
-import { QuizTheme } from '../../domain/quiz-parameters';
+import { QuizQuestion } from '../../../domain/quiz-question';
+import { QuizTheme } from '../../../domain/quiz-parameters';
 
 export interface PromptService {
     getQuizQuestionsPrompt(

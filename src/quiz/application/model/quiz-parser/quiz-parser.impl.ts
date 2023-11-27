@@ -1,6 +1,6 @@
 import { QuizParser } from './quiz-parser';
-import { QuizAnswer, QuizQuestion } from '../../domain/quiz-question';
-import { QuizTheme } from '../../domain/quiz-parameters';
+import { QuizAnswer, QuizQuestion } from '../../../domain/quiz-question';
+import { QuizTheme } from '../../../domain/quiz-parameters';
 
 export class QuizParserImpl implements QuizParser {
     parseQuizQuestions(stringifiedArray: string): QuizQuestion[] {

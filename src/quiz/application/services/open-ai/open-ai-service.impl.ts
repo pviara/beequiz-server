@@ -1,9 +1,9 @@
-import { OpenAIObjectFactory } from '../model/open-ai-object-factory';
+import { OpenAIObjectFactory } from '../../model/open-ai-object-factory/open-ai-object-factory';
 import { OpenAIService } from './open-ai-service';
-import { PromptService } from './prompt-service';
-import { QuizParser } from '../model/quiz-parser';
-import { QuizQuestion } from '../../domain/quiz-question';
-import { QuizTheme } from '../../domain/quiz-parameters';
+import { PromptService } from '../prompt/prompt-service';
+import { QuizParser } from '../../model/quiz-parser/quiz-parser';
+import { QuizQuestion } from '../../../domain/quiz-question';
+import { QuizTheme } from '../../../domain/quiz-parameters';
 
 export class OpenAIServiceImpl implements OpenAIService {
     constructor(

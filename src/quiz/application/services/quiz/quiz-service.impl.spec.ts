@@ -1,16 +1,16 @@
+import { DateTimeService } from '../../../../application/datetime-service';
 import {
     DEFAULT_NUMBER_OF_QUESTIONS,
-    QuizServiceImplement,
+    QuizServiceImpl,
 } from './quiz-service.impl';
-import { DateTimeService } from '../../../application/datetime-service';
-import { OpenAIService } from './open-ai-service';
-import { QuizQuestion } from '../../domain/quiz-question';
-import { QuizQuestionRepository } from '../../persistence/quiz-question-repository';
-import { QuizTheme } from '../../domain/quiz-parameters';
-import { QuizThemeRepository } from '../../persistence/quiz-theme-repository';
+import { OpenAIService } from '../open-ai/open-ai-service';
+import { QuizQuestion } from '../../../domain/quiz-question';
+import { QuizQuestionRepository } from '../../../persistence/quiz-question-repository';
+import { QuizTheme } from '../../../domain/quiz-parameters';
+import { QuizThemeRepository } from '../../../persistence/quiz-theme-repository';
 
-describe('QuizService', () => {
-    let sut: QuizServiceImplement;
+describe('QuizServiceImpl', () => {
+    let sut: QuizServiceImpl;
 
     let dateTimeServiceSpy: DateTimeServiceSpy;
     let openAIServiceSpy: OpenAIServiceSpy;
@@ -23,7 +23,7 @@ describe('QuizService', () => {
         quizQuestionRepositorySpy = new QuizQuestionRepositorySpy();
         quizThemeRepositorySpy = new QuizThemeRepositorySpy();
 
-        sut = new QuizServiceImplement(
+        sut = new QuizServiceImpl(
             dateTimeServiceSpy,
             openAIServiceSpy,
             quizQuestionRepositorySpy,

@@ -1,6 +1,6 @@
-import { QuizAnswer, QuizQuestion } from '../../domain/quiz-question';
+import { QuizAnswer, QuizQuestion } from '../../../domain/quiz-question';
 import { QuizParserImpl } from './quiz-parser.impl';
-import { QuizTheme } from '../../domain/quiz-parameters';
+import { QuizTheme } from '../../../domain/quiz-parameters';
 
 describe('QuizParserImpl', () => {
     let sut: QuizParserImpl;
