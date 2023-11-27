@@ -1,4 +1,4 @@
-import { QuizQuestion } from '../domain/quiz-question';
+import { QuizQuestion } from '../../domain/quiz-question';
 
 export interface QuizQuestionRepository {
     getQuizQuestions(themeId: string): QuizQuestion[];

@@ -2,9 +2,9 @@ import { DateTimeService } from '../../../../application/datetime-service';
 import { OpenAIService } from '../open-ai/open-ai-service';
 import { QuizParameters } from '../../../domain/quiz-parameters';
 import { QuizQuestion } from '../../../domain/quiz-question';
-import { QuizQuestionRepository } from '../../../persistence/quiz-question-repository';
+import { QuizQuestionRepository } from '../../../persistence/quiz-question-repository/quiz-question-repository';
 import { QuizService } from './quiz-service';
-import { QuizThemeRepository } from '../../../persistence/quiz-theme-repository';
+import { QuizThemeRepository } from '../../../persistence/quiz-theme-repository/quiz-theme-repository';
 
 export const DEFAULT_NUMBER_OF_QUESTIONS = [5, 10, 15];
 
