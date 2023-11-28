@@ -1,3 +1,4 @@
+import { isInvalidStructure } from '../../../../utils/utils';
 import { QuizTheme } from '../../../domain/quiz-parameters';
 
 export class QuizThemesParser {
@@ -37,40 +38,11 @@ export class QuizThemesParser {
 
     private isInvalidQuizTheme(checkedObject: Record<string, any>): boolean {
         const objStructRef = this.createObjectStructureRef();
-        return this.isInvalidStructure(checkedObject, objStructRef);
+        return isInvalidStructure(checkedObject, objStructRef);
     }
 
     private createObjectStructureRef(): QuizTheme {
         return new QuizTheme('code', 'label');
-    }
-
-    private isInvalidStructure(
-        checkedObject: Record<string, any>,
-        objStructRef: Record<string, any>,
-    ): boolean {
-        for (let refProp in objStructRef) {
-            const refValue = objStructRef[refProp];
-            const checkedValue = checkedObject[refProp];
-
-            const isRefPropNotInParsedObject = !(refProp in checkedObject);
-            const areObjectPropsDifferentlyTyped =
-                typeof checkedValue !== typeof refValue;
-
-            if (isRefPropNotInParsedObject || areObjectPropsDifferentlyTyped) {
-                return true;
-            }
-
-            if (typeof refValue === 'object' && refValue !== null) {
-                const isInvalidStructure = this.isInvalidStructure(
-                    checkedValue,
-                    refValue,
-                );
-                if (isInvalidStructure) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     private mapQuizThemes(parsedObject: any): QuizTheme[] {
