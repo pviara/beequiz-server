@@ -1,5 +1,5 @@
-import { isInvalidStructure } from '../../../../utils/utils';
-import { QuizTheme } from '../../../domain/quiz-parameters';
+import { isInvalidStructure } from '../../../../../utils/utils';
+import { QuizTheme } from '../../../../domain/quiz-parameters';
 
 export class QuizThemesParser {
     constructor(readonly stringifiedObject: string) {}
