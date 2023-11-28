@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import { OpenAIObjectFactory } from '../../../../open-ai/application/open-ai-object-factory/open-ai-object-factory';
 import { OpenAIServiceImpl } from './open-ai-service.impl';
 import { PromptService } from '../prompt/prompt-service';
-import { QuizParser } from '../../../../quiz/application/model/quiz-parser/quiz-parser';
+import { QuizParser } from '../../../../quiz/application/quiz-parser/quiz-parser';
 import { QuizQuestion } from '../../../../quiz/domain/quiz-question';
 import { QuizTheme } from '../../../../quiz/domain/quiz-parameters';
 

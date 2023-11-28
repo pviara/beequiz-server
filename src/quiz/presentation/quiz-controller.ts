@@ -1,6 +1,6 @@
 import { Controller, Get, Inject } from '@nestjs/common';
-import { QuizService } from '../application/services/quiz/quiz-service';
-import { QUIZ_SERVICE_TOKEN } from '../application/services/quiz/quiz-service.provider';
+import { QuizService } from '../application/quiz-service/quiz-service';
+import { QUIZ_SERVICE_TOKEN } from '../application/quiz-service/quiz-service.provider';
 import { QuizParameters } from '../domain/quiz-parameters';
 
 @Controller()

@@ -1,5 +1,5 @@
-import { isInvalidStructure } from '../../../../../utils/utils';
-import { QuizAnswer, QuizQuestion } from '../../../../domain/quiz-question';
+import { isInvalidStructure } from '../../../../utils/utils';
+import { QuizAnswer, QuizQuestion } from '../../../domain/quiz-question';
 
 export class QuizQuestionsParser {
     constructor(readonly stringifiedObject: string) {}

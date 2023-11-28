@@ -1,13 +1,13 @@
-import { DateTimeService } from '../../../../shared/datetime-service';
+import { DateTimeService } from '../../../shared/data-time-service/datetime-service';
 import {
     DEFAULT_NUMBER_OF_QUESTIONS,
     QuizServiceImpl,
 } from './quiz-service.impl';
-import { OpenAIService } from '../../../../open-ai/application/services/open-ai/open-ai-service';
-import { QuizQuestion } from '../../../domain/quiz-question';
-import { QuizQuestionRepository } from '../../../persistence/quiz-question/repository/quiz-question-repository';
-import { QuizTheme } from '../../../domain/quiz-parameters';
-import { QuizThemeRepository } from '../../../persistence/quiz-theme/repository/quiz-theme-repository';
+import { OpenAIService } from '../../../open-ai/application/services/open-ai/open-ai-service';
+import { QuizQuestion } from '../../domain/quiz-question';
+import { QuizQuestionRepository } from '../../persistence/quiz-question/repository/quiz-question-repository';
+import { QuizTheme } from '../../domain/quiz-parameters';
+import { QuizThemeRepository } from '../../persistence/quiz-theme/repository/quiz-theme-repository';
 
 describe('QuizServiceImpl', () => {
     let sut: QuizServiceImpl;
