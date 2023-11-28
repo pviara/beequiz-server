@@ -46,6 +46,7 @@ describe('QuizServiceImpl', () => {
                 new QuizTheme('', ''),
             ];
             stubGenerateThemesForQuiz(openAIServiceSpy, quizThemes);
+            stubSaveGeneratedThemes(quizThemeRepositorySpy, quizThemes);
 
             const result = await sut.getQuizParameters();
 
@@ -65,6 +66,7 @@ describe('QuizServiceImpl', () => {
 
             stubGenerateThemesForQuiz(openAIServiceSpy, quizThemesA);
             stubGetQuizThemes(quizThemeRepositorySpy, quizThemesA);
+            stubSaveGeneratedThemes(quizThemeRepositorySpy, quizThemesA);
 
             const firstResult = await sut.getQuizParameters();
             const secondResult = await sut.getQuizParameters();
@@ -252,14 +254,15 @@ class QuizThemeRepositorySpy implements QuizThemeRepository {
         },
     };
 
-    getQuizThemes(): QuizTheme[] {
+    async getQuizThemes(): Promise<QuizTheme[]> {
         this.calls.getQuizThemes.count++;
         return [];
     }
 
-    saveGeneratedThemes(quizThemes: QuizTheme[]): void {
+    async saveGeneratedThemes(quizThemes: QuizTheme[]): Promise<QuizTheme[]> {
         this.calls.saveGeneratedThemes.count++;
         this.calls.saveGeneratedThemes.history.push(quizThemes);
+        return [];
     }
 }
 
@@ -317,8 +320,23 @@ function stubGetQuizThemes(
     quizThemeRepositorySpy: QuizThemeRepositorySpy,
     returnedValue: QuizTheme[],
 ): void {
-    quizThemeRepositorySpy.getQuizThemes = (): QuizTheme[] => {
+    quizThemeRepositorySpy.getQuizThemes = (): Promise<QuizTheme[]> => {
         quizThemeRepositorySpy.calls.getQuizThemes.count++;
-        return returnedValue;
+        return Promise.resolve(returnedValue);
+    };
+}
+
+function stubSaveGeneratedThemes(
+    quizThemeRepositorySpy: QuizThemeRepositorySpy,
+    returnedValue: QuizTheme[],
+): void {
+    quizThemeRepositorySpy.saveGeneratedThemes = (
+        quizThemes: QuizTheme[],
+    ): Promise<QuizTheme[]> => {
+        quizThemeRepositorySpy.calls.saveGeneratedThemes.count++;
+        quizThemeRepositorySpy.calls.saveGeneratedThemes.history.push(
+            quizThemes,
+        );
+        return Promise.resolve(returnedValue);
     };
 }

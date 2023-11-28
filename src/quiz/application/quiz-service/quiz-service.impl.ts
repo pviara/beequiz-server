@@ -32,7 +32,7 @@ export class QuizServiceImpl implements QuizService {
     ) {}
 
     async getQuizParameters(): Promise<QuizParameters> {
-        const savedQuizThemes = this.quizThemeRepository.getQuizThemes();
+        let savedQuizThemes = await this.quizThemeRepository.getQuizThemes();
 
         if (this.hasLastThemeRequestBeenMadeLessThan72HoursAgo()) {
             const quizParameters = new QuizParameters(
@@ -47,11 +47,12 @@ export class QuizServiceImpl implements QuizService {
         const quizThemes =
             await this.openAIService.generateThemesForQuiz(savedQuizThemes);
 
-        this.quizThemeRepository.saveGeneratedThemes(quizThemes);
+        savedQuizThemes =
+            await this.quizThemeRepository.saveGeneratedThemes(quizThemes);
 
         this.recordLastThemeRequestDate();
 
-        return new QuizParameters(quizThemes, DEFAULT_NUMBER_OF_QUESTIONS);
+        return new QuizParameters(savedQuizThemes, DEFAULT_NUMBER_OF_QUESTIONS);
     }
 
     async getQuizQuestions(

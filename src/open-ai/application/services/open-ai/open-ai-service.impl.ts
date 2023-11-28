@@ -32,19 +32,25 @@ export class OpenAIServiceImpl implements OpenAIService {
 
         const openAIObject = this.openAIObjectFactory.createOpenAIObject();
 
-        const response = await openAIObject.chat.completions.create({
-            model: 'gpt-3.5-turbo-1106',
-            response_format: { type: 'json_object' },
-            messages: [
-                {
-                    role: 'user',
-                    content: prompt,
-                },
-            ],
-        });
+        try {
+            const response = await openAIObject.chat.completions.create({
+                model: 'gpt-3.5-turbo-1106',
+                response_format: { type: 'json_object' },
+                messages: [
+                    {
+                        role: 'user',
+                        content: prompt,
+                    },
+                ],
+            });
 
-        const [choice] = response.choices;
-        return this.quizParser.parseQuizQuestions(choice.message.content || '');
+            const [choice] = response.choices;
+            return this.quizParser.parseQuizQuestions(
+                choice.message.content || '',
+            );
+        } catch (error: unknown) {
+            throw error;
+        }
     }
 
     async generateThemesForQuiz(

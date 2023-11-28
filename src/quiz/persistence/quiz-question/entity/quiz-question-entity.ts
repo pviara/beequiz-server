@@ -10,7 +10,7 @@ class QuizAnswerDocument extends Document {
     isCorrect!: boolean;
 }
 
-@Schema()
+@Schema({ collection: 'quiz-question' })
 export class QuizQuestionDocument extends Document {
     @Prop({ required: true })
     label!: string;

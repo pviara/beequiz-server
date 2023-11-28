@@ -2,6 +2,6 @@ import { QuizTheme } from '../../../domain/quiz-parameters';
 import { QuizQuestion } from '../../../domain/quiz-question';
 
 export interface QuizThemeRepository {
-    getQuizThemes(): QuizTheme[];
-    saveGeneratedThemes(quizThemes: QuizTheme[]): void;
+    getQuizThemes(): Promise<QuizTheme[]>;
+    saveGeneratedThemes(quizThemes: QuizTheme[]): Promise<QuizTheme[]>;
 }
