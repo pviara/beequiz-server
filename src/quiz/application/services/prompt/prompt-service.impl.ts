@@ -1,7 +1,8 @@
-import { QuizTheme } from 'src/quiz/domain/quiz-parameters';
 import { PromptService } from './prompt-service';
-import { readFileSync } from 'fs';
-import { QuizQuestion } from 'src/quiz/domain/quiz-question';
+import { QuizQuestion } from '../../../domain/quiz-question';
+import { QuizTheme } from '../../../domain/quiz-parameters';
+import { QUIZ_QUESTIONS_PROMPT } from '../../prompts/quiz-questions-prompt.model';
+import { QUIZ_THEMES_PROMPT } from '../../prompts/quiz-themes-prompt.model';
 
 export const NUMBER_OF_THEMES = 15;
 
@@ -10,9 +11,7 @@ export class PromptServiceImpl implements PromptService {
         savedQuizQuestions: QuizQuestion[],
         numberOfQuestions: number,
     ): string {
-        const initialPrompt = readFileSync(
-            '../prompts/quiz-questions-prompt.model.txt',
-        ).toString();
+        const initialPrompt = QUIZ_QUESTIONS_PROMPT;
 
         const questionLabels = savedQuizQuestions.map(
             (quizQuestion) => quizQuestion.label,
@@ -24,9 +23,7 @@ export class PromptServiceImpl implements PromptService {
     }
 
     getQuizThemesPrompt(savedQuizThemes: QuizTheme[]): string {
-        const initialPrompt = readFileSync(
-            '../prompts/quiz-themes-prompt.model.txt',
-        ).toString();
+        const initialPrompt = QUIZ_THEMES_PROMPT;
 
         const themeLabels = savedQuizThemes.map((quizTheme) => quizTheme.label);
 

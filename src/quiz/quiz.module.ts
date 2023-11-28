@@ -1,3 +1,4 @@
+import { AppConfigModule } from '../infrastructure/app-config.module';
 import { DateTimeServiceProvider } from '../application/date-time-service.provider';
 import { Module } from '@nestjs/common';
 import { OpenAIObjectFactoryProvider } from './application/model/open-ai-object-factory/open-ai-object-factory.provider';
@@ -11,6 +12,7 @@ import { QuizServiceProvider } from './application/services/quiz/quiz-service.pr
 
 @Module({
     controllers: [QuizController],
+    imports: [AppConfigModule],
     providers: [
         DateTimeServiceProvider,
         OpenAIObjectFactoryProvider,

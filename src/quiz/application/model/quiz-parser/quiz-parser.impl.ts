@@ -4,34 +4,37 @@ import { QuizTheme } from '../../../domain/quiz-parameters';
 
 export class QuizParserImpl implements QuizParser {
     parseQuizQuestions(stringifiedArray: string): QuizQuestion[] {
-        const parsedArray = JSON.parse(stringifiedArray);
-        if (!Array.isArray(parsedArray)) {
+        const parsedObject = JSON.parse(stringifiedArray);
+        if (!parsedObject.questions || !Array.isArray(parsedObject.questions)) {
             throw new Error('Given data is not an array.');
         }
 
-        const containsInvalidQuizQuestion = parsedArray.some((element) => {
-            const areSomePropsNotDefined = !element.label || !element.answers;
-            const areAnswersNotAnArray = !Array.isArray(element.answers);
-            const isLabelNotAString = typeof element.label !== 'string';
-            const answersContainInvalidAnswer = element.answers.some(
-                (answer: any) => !answer.label || !('isCorrect' in answer),
-            );
+        const containsInvalidQuizQuestion = parsedObject.questions.some(
+            (element: any) => {
+                const areSomePropsNotDefined =
+                    !element.label || !element.answers;
+                const areAnswersNotAnArray = !Array.isArray(element.answers);
+                const isLabelNotAString = typeof element.label !== 'string';
+                const answersContainInvalidAnswer = element.answers.some(
+                    (answer: any) => !answer.label || !('isCorrect' in answer),
+                );
 
-            return (
-                areSomePropsNotDefined ||
-                areAnswersNotAnArray ||
-                isLabelNotAString ||
-                answersContainInvalidAnswer
-            );
-        });
+                return (
+                    areSomePropsNotDefined ||
+                    areAnswersNotAnArray ||
+                    isLabelNotAString ||
+                    answersContainInvalidAnswer
+                );
+            },
+        );
         if (containsInvalidQuizQuestion) {
             throw new Error(
                 'At least one element from given data is not a quiz theme.',
             );
         }
 
-        return parsedArray.map(
-            (quizQuestion) =>
+        return parsedObject.questions.map(
+            (quizQuestion: any) =>
                 new QuizQuestion(
                     quizQuestion.label,
                     quizQuestion.answers.map(
@@ -43,13 +46,13 @@ export class QuizParserImpl implements QuizParser {
     }
 
     parseQuizThemes(stringifiedArray: string): QuizTheme[] {
-        const parsedArray = JSON.parse(stringifiedArray);
-        if (!Array.isArray(parsedArray)) {
+        const parsedObject = JSON.parse(stringifiedArray);
+        if (!parsedObject.themes || !Array.isArray(parsedObject.themes)) {
             throw new Error('Given data is not an array.');
         }
 
-        const containsInvalidQuizTheme = parsedArray.some(
-            (element) =>
+        const containsInvalidQuizTheme = parsedObject.themes.some(
+            (element: any) =>
                 !element.code ||
                 !element.label ||
                 typeof element.code !== 'string' ||
@@ -61,8 +64,8 @@ export class QuizParserImpl implements QuizParser {
             );
         }
 
-        return parsedArray.map(
-            (quizTheme) => new QuizTheme(quizTheme.code, quizTheme.label),
+        return parsedObject.themes.map(
+            (quizTheme: any) => new QuizTheme(quizTheme.code, quizTheme.label),
         );
     }
 }

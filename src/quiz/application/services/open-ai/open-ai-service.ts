@@ -1,4 +1,4 @@
-import { QuizQuestion } from 'src/quiz/domain/quiz-question';
+import { QuizQuestion } from '../../../domain/quiz-question';
 import { QuizTheme } from '../../../domain/quiz-parameters';
 
 export interface OpenAIService {

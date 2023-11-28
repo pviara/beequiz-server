@@ -1,7 +1,9 @@
 import { AppConfigService } from './app-config-service';
 import { ConfigService } from '@nestjs/config';
+import { Injectable } from '@nestjs/common';
 import { OPENAI_API_KEY, OpenAIConfiguration } from './openai-configuration';
 
+@Injectable()
 export class AppConfigServiceImpl implements AppConfigService {
     constructor(private configService: ConfigService) {}
 

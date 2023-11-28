@@ -33,7 +33,7 @@ export class OpenAIServiceImpl implements OpenAIService {
         const openAIObject = this.openAIObjectFactory.createOpenAIObject();
 
         const response = await openAIObject.chat.completions.create({
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-3.5-turbo-1106',
             response_format: { type: 'json_object' },
             messages: [
                 {
@@ -55,7 +55,7 @@ export class OpenAIServiceImpl implements OpenAIService {
         const openAIObject = this.openAIObjectFactory.createOpenAIObject();
 
         const response = await openAIObject.chat.completions.create({
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-3.5-turbo-1106',
             response_format: { type: 'json_object' },
             messages: [
                 {

@@ -62,7 +62,7 @@ describe('OpenAIServiceImpl', () => {
             ).toBe(1);
 
             const params: ChatCompletionCreateParamsNonStreaming = {
-                model: 'gpt-3.5-turbo',
+                model: 'gpt-3.5-turbo-1106',
                 response_format: { type: 'json_object' },
                 messages: [
                     {
@@ -115,7 +115,7 @@ describe('OpenAIServiceImpl', () => {
             ).toBe(1);
 
             const params: ChatCompletionCreateParamsNonStreaming = {
-                model: 'gpt-3.5-turbo',
+                model: 'gpt-3.5-turbo-1106',
                 response_format: { type: 'json_object' },
                 messages: [
                     {

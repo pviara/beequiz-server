@@ -1,4 +1,4 @@
-Génère embedded JSON de X questions de quiz basées sur le thème de "Y". Chacune a 4 choix de réponses dont la longueur ne doit pas dépasser 13 caractères. Une seule doit être correcte.
+export const QUIZ_QUESTIONS_PROMPT = `Génère embedded JSON de X questions de quiz basées sur le thème de "Y". Chacune a 4 choix de réponses dont la longueur ne doit pas dépasser 13 caractères. Une seule doit être correcte.
 
 Le format JSON des questions doit être le suivant :
 
@@ -11,5 +11,4 @@ isCorrect: indique si la réponse à la question est la bonne
 Questions déjà utilisées : #
 
 Toutes unités mesure en fr et abrégées
-Oublie pas les accents, cédilles etc. dans le label
-Pas de texte dans ta réponse
+Oublie pas les accents, cédilles etc. dans le label`;

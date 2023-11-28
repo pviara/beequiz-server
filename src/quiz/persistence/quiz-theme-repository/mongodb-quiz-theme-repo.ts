@@ -5,10 +5,8 @@ import { QuizThemeRepository } from './quiz-theme-repository';
 @Injectable()
 export class MongoDbQuizThemeRepo implements QuizThemeRepository {
     getQuizThemes(): QuizTheme[] {
-        throw new Error('Method not implemented.');
+        return [];
     }
 
-    saveGeneratedThemes(quizThemes: QuizTheme[]): void {
-        throw new Error('Method not implemented.');
-    }
+    saveGeneratedThemes(quizThemes: QuizTheme[]): void {}
 }
