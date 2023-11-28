@@ -1,9 +1,9 @@
 import { AppConfigService } from '../../../../infrastructure/app-config-service';
 import { APP_CONFIG_SERVICE_TOKEN } from '../../../../infrastructure/app-config-service.provider';
+import { Inject } from '@nestjs/common';
 import OpenAI from 'openai';
 import { OpenAIObjectFactory } from './open-ai-object-factory';
 import { OPENAI_API_KEY } from '../../../../infrastructure/openai-configuration';
-import { Inject } from '@nestjs/common';
 
 export class OpenAIObjectFactoryImpl implements OpenAIObjectFactory {
     constructor(

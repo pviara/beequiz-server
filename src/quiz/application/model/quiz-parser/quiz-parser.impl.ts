@@ -1,6 +1,7 @@
-import { QuizParser } from './quiz-parser';
 import { QuizAnswer, QuizQuestion } from '../../../domain/quiz-question';
+import { QuizParser } from './quiz-parser';
 import { QuizTheme } from '../../../domain/quiz-parameters';
+import { QuizThemesParser } from './quiz-themes-parser';
 
 export class QuizParserImpl implements QuizParser {
     parseQuizQuestions(stringifiedArray: string): QuizQuestion[] {
@@ -45,27 +46,7 @@ export class QuizParserImpl implements QuizParser {
         );
     }
 
-    parseQuizThemes(stringifiedArray: string): QuizTheme[] {
-        const parsedObject = JSON.parse(stringifiedArray);
-        if (!parsedObject.themes || !Array.isArray(parsedObject.themes)) {
-            throw new Error('Given data is not an array.');
-        }
-
-        const containsInvalidQuizTheme = parsedObject.themes.some(
-            (element: any) =>
-                !element.code ||
-                !element.label ||
-                typeof element.code !== 'string' ||
-                typeof element.label !== 'string',
-        );
-        if (containsInvalidQuizTheme) {
-            throw new Error(
-                'At least one element from given data is not a quiz theme.',
-            );
-        }
-
-        return parsedObject.themes.map(
-            (quizTheme: any) => new QuizTheme(quizTheme.code, quizTheme.label),
-        );
+    parseQuizThemes(stringifiedObject: string): QuizTheme[] {
+        return new QuizThemesParser(stringifiedObject).parse();
     }
 }
