@@ -5,9 +5,9 @@ import {
 } from './quiz-service.impl';
 import { OpenAIService } from '../open-ai/open-ai-service';
 import { QuizQuestion } from '../../../domain/quiz-question';
-import { QuizQuestionRepository } from '../../../persistence/quiz-question-repository/quiz-question-repository';
+import { QuizQuestionRepository } from '../../../persistence/quiz-question/repository/quiz-question-repository';
 import { QuizTheme } from '../../../domain/quiz-parameters';
-import { QuizThemeRepository } from '../../../persistence/quiz-theme-repository/quiz-theme-repository';
+import { QuizThemeRepository } from '../../../persistence/quiz-theme/repository/quiz-theme-repository';
 
 describe('QuizServiceImpl', () => {
     let sut: QuizServiceImpl;

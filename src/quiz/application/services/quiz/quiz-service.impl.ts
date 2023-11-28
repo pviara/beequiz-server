@@ -5,11 +5,11 @@ import { OpenAIService } from '../open-ai/open-ai-service';
 import { OPENAI_SERVICE_TOKEN } from '../open-ai/open-ai-service.provider';
 import { QuizParameters } from '../../../domain/quiz-parameters';
 import { QuizQuestion } from '../../../domain/quiz-question';
-import { QuizQuestionRepository } from '../../../persistence/quiz-question-repository/quiz-question-repository';
+import { QuizQuestionRepository } from '../../../persistence/quiz-question/repository/quiz-question-repository';
 import { QuizService } from './quiz-service';
-import { QuizThemeRepository } from '../../../persistence/quiz-theme-repository/quiz-theme-repository';
-import { QUIZ_QUESTION_REPO_TOKEN } from '../../../persistence/quiz-question-repository/quiz-question-repository.provider';
-import { QUIZ_THEME_REPO_TOKEN } from '../../../persistence/quiz-theme-repository/quiz-theme-repository.provider';
+import { QuizThemeRepository } from '../../../persistence/quiz-theme/repository/quiz-theme-repository';
+import { QUIZ_QUESTION_REPO_TOKEN } from '../../../persistence/quiz-question/repository/quiz-question-repository.provider';
+import { QUIZ_THEME_REPO_TOKEN } from '../../../persistence/quiz-theme/repository/quiz-theme-repository.provider';
 
 export const DEFAULT_NUMBER_OF_QUESTIONS = [5, 10, 15];
 
