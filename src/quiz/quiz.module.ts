@@ -1,10 +1,6 @@
-import { AppConfigModule } from '../infrastructure/app-config.module';
-import { DateTimeServiceProvider } from '../application/date-time-service.provider';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { OpenAIObjectFactoryProvider } from './application/model/open-ai-object-factory/open-ai-object-factory.provider';
-import { OpenAIServiceProvider } from './application/services/open-ai/open-ai-service.provider';
-import { PromptServiceProvider } from './application/services/prompt/prompt-service.provider';
+import { OpenAIModule } from '../open-ai/open-ai.module';
 import { QuizController } from './presentation/quiz-controller';
 import { QuizParserProvider } from './application/model/quiz-parser/quiz-parser.provider';
 import { QuizQuestionRepoProvider } from './persistence/quiz-question/repository/quiz-question-repository.provider';
@@ -18,23 +14,26 @@ import {
     QUIZ_QUESTION_MODEL,
     quizQuestionSchema,
 } from './persistence/quiz-question/entity/quiz-question-entity';
+import { SharedModule } from '../shared/shared.module';
 
 @Module({
     controllers: [QuizController],
     imports: [
-        AppConfigModule,
+        // // AppConfigModule, // => OpenAIModule
+        OpenAIModule,
         MongooseModule.forFeature([
             { name: QUIZ_QUESTION_MODEL, schema: quizQuestionSchema },
         ]), // => QuizRepositoryModule
         MongooseModule.forFeature([
             { name: QUIZ_THEME_MODEL, schema: quizThemeSchema },
         ]), // => QuizRepositoryModule
+        SharedModule,
     ],
     providers: [
-        DateTimeServiceProvider, // ------- ] => SharedModule
-        OpenAIObjectFactoryProvider, // --- ] => OpenAIModule
-        OpenAIServiceProvider, // --------- ] => OpenAIModule
-        PromptServiceProvider, // --------- ] => OpenAIModule
+        // // DateTimeServiceProvider, // ------- ] => SharedModule
+        // // OpenAIObjectFactoryProvider, // --- ] => OpenAIModule
+        // // OpenAIServiceProvider, // --------- ] => OpenAIModule
+        // // PromptServiceProvider, // --------- ] => OpenAIModule
         QuizParserProvider, // ------------ ] => stays here
         QuizServiceProvider, // ----------- ] => stays here
         QuizQuestionRepoProvider, // ------ ] => QuizRepositoryModule

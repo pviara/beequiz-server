@@ -1,6 +1,6 @@
 import { NUMBER_OF_THEMES, PromptServiceImpl } from './prompt-service.impl';
-import { QuizQuestion } from '../../../domain/quiz-question';
-import { QuizTheme } from '../../../domain/quiz-parameters';
+import { QuizQuestion } from '../../../../quiz/domain/quiz-question';
+import { QuizTheme } from '../../../../quiz/domain/quiz-parameters';
 
 describe('PromptServiceImpl', () => {
     let sut: PromptServiceImpl;

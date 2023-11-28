@@ -1,8 +1,8 @@
-import { DateTimeService } from '../../../../application/datetime-service';
-import { DATE_TIME_SERVICE_TOKEN } from '../../../../application/date-time-service.provider';
+import { DateTimeService } from '../../../../shared/datetime-service';
+import { DATE_TIME_SERVICE_TOKEN } from '../../../../shared/date-time-service.provider';
 import { Inject } from '@nestjs/common';
-import { OpenAIService } from '../open-ai/open-ai-service';
-import { OPENAI_SERVICE_TOKEN } from '../open-ai/open-ai-service.provider';
+import { OpenAIService } from '../../../../open-ai/application/services/open-ai/open-ai-service';
+import { OPENAI_SERVICE_TOKEN } from '../../../../open-ai/application/services/open-ai/open-ai-service.provider';
 import { QuizParameters } from '../../../domain/quiz-parameters';
 import { QuizQuestion } from '../../../domain/quiz-question';
 import { QuizQuestionRepository } from '../../../persistence/quiz-question/repository/quiz-question-repository';

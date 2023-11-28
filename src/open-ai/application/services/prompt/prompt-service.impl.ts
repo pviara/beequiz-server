@@ -1,6 +1,6 @@
 import { PromptService } from './prompt-service';
-import { QuizQuestion } from '../../../domain/quiz-question';
-import { QuizTheme } from '../../../domain/quiz-parameters';
+import { QuizQuestion } from '../../../../quiz/domain/quiz-question';
+import { QuizTheme } from '../../../../quiz/domain/quiz-parameters';
 import { QUIZ_QUESTIONS_PROMPT } from '../../prompts/quiz-questions-prompt.model';
 import { QUIZ_THEMES_PROMPT } from '../../prompts/quiz-themes-prompt.model';
 

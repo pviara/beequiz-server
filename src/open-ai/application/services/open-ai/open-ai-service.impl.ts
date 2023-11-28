@@ -1,13 +1,13 @@
 import { Inject } from '@nestjs/common';
-import { OpenAIObjectFactory } from '../../model/open-ai-object-factory/open-ai-object-factory';
+import { OpenAIObjectFactory } from '../../../../open-ai/application/open-ai-object-factory/open-ai-object-factory';
 import { OpenAIService } from './open-ai-service';
-import { OPENAI_OBJECT_FACTORY_TOKEN } from '../../model/open-ai-object-factory/open-ai-object-factory.provider';
+import { OPENAI_OBJECT_FACTORY_TOKEN } from '../../../../open-ai/application/open-ai-object-factory/open-ai-object-factory.provider';
 import { PromptService } from '../prompt/prompt-service';
 import { PROMPT_SERVICE_TOKEN } from '../prompt/prompt-service.provider';
-import { QuizParser } from '../../model/quiz-parser/quiz-parser';
-import { QuizQuestion } from '../../../domain/quiz-question';
-import { QuizTheme } from '../../../domain/quiz-parameters';
-import { QUIZ_PARSER_TOKEN } from '../../model/quiz-parser/quiz-parser.provider';
+import { QuizParser } from '../../../../quiz/application/model/quiz-parser/quiz-parser';
+import { QuizQuestion } from '../../../../quiz/domain/quiz-question';
+import { QuizTheme } from '../../../../quiz/domain/quiz-parameters';
+import { QUIZ_PARSER_TOKEN } from '../../../../quiz/application/model/quiz-parser/quiz-parser.provider';
 
 export class OpenAIServiceImpl implements OpenAIService {
     constructor(

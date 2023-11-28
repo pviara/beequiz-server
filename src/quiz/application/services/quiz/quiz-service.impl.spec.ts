@@ -1,9 +1,9 @@
-import { DateTimeService } from '../../../../application/datetime-service';
+import { DateTimeService } from '../../../../shared/datetime-service';
 import {
     DEFAULT_NUMBER_OF_QUESTIONS,
     QuizServiceImpl,
 } from './quiz-service.impl';
-import { OpenAIService } from '../open-ai/open-ai-service';
+import { OpenAIService } from '../../../../open-ai/application/services/open-ai/open-ai-service';
 import { QuizQuestion } from '../../../domain/quiz-question';
 import { QuizQuestionRepository } from '../../../persistence/quiz-question/repository/quiz-question-repository';
 import { QuizTheme } from '../../../domain/quiz-parameters';
