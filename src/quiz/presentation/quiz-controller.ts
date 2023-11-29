@@ -2,7 +2,6 @@ import { Controller, Get, Inject } from '@nestjs/common';
 import { QuizService } from '../application/quiz-service/quiz-service';
 import { QUIZ_SERVICE_TOKEN } from '../application/quiz-service/quiz-service.provider';
 import { QuizParameters } from '../domain/quiz-parameters';
-import { QuizQuestion } from '../domain/quiz-question';
 
 @Controller()
 export class QuizController {
@@ -17,10 +16,19 @@ export class QuizController {
     }
 
     @Get('question')
-    async question(): Promise<QuizQuestion[]> {
-        return this.quizService.getQuizQuestions(
-            '6567384ad4343caccd799497',
-            10,
-        );
+    async question(): Promise<any[]> {
+        return (
+            await this.quizService.getQuizQuestions(
+                '6567452ddd9a07af30a1b148',
+                20,
+            )
+        ).map((quizQuestion) => ({
+            id: quizQuestion.id,
+            label: quizQuestion.label,
+            answers: quizQuestion.answers.map((answer) => ({
+                id: answer.id,
+                label: answer.label,
+            })),
+        }));
     }
 }

@@ -11,12 +11,20 @@ import { QuizThemeRepository } from '../../persistence/quiz-theme/repository/qui
 import { QUIZ_QUESTION_REPO_TOKEN } from '../../persistence/quiz-question/repository/quiz-question-repository.provider';
 import { QUIZ_THEME_REPO_TOKEN } from '../../persistence/quiz-theme/repository/quiz-theme-repository.provider';
 import { QuizThemeNotFoundException } from '../errors/quiz-theme-not-found.exception';
+import { readFileSync, writeFileSync } from 'fs';
 
 export const DEFAULT_NUMBER_OF_QUESTIONS = [5, 10, 15];
 
+const lastQuestionRequestDateFilePath =
+    'src/quiz/application/quiz-service/last-question-request-date.json';
+const lastThemeRequestDateFilePath =
+    'src/quiz/application/quiz-service/last-theme-request-date.json';
+
 export class QuizServiceImpl implements QuizService {
-    private lastQuestionRequestDate: Date | null = null;
-    private lastThemeRequestDate: Date | null = null;
+    private lastQuestionRequestDate: Date | null =
+        this.getLastQuestionRequestDateFromJSON();
+    private lastThemeRequestDate: Date | null =
+        this.getLastThemeRequestDateFromJSON();
 
     constructor(
         @Inject(DATE_TIME_SERVICE_TOKEN)
@@ -122,10 +130,42 @@ export class QuizServiceImpl implements QuizService {
     }
 
     private recordLastQuestionRequestDate(): void {
-        this.lastQuestionRequestDate = this.dateTimeService.getNow();
+        const now = this.dateTimeService.getNow();
+        this.lastQuestionRequestDate = now;
+        writeFileSync(
+            lastQuestionRequestDateFilePath,
+            JSON.stringify({ date: now }),
+        );
     }
 
     private recordLastThemeRequestDate(): void {
-        this.lastThemeRequestDate = this.dateTimeService.getNow();
+        const now = this.dateTimeService.getNow();
+        this.lastThemeRequestDate = now;
+        writeFileSync(
+            lastThemeRequestDateFilePath,
+            JSON.stringify({ date: now }),
+        );
+    }
+
+    private getLastQuestionRequestDateFromJSON(): Date | null {
+        const lastRequestDate = JSON.parse(
+            readFileSync(lastQuestionRequestDateFilePath).toString(),
+        );
+        if (!lastRequestDate.date) {
+            return null;
+        }
+
+        return new Date(lastRequestDate.date);
+    }
+
+    private getLastThemeRequestDateFromJSON(): Date | null {
+        const lastRequestDate = JSON.parse(
+            readFileSync(lastThemeRequestDateFilePath).toString(),
+        );
+        if (!lastRequestDate.date) {
+            return null;
+        }
+
+        return new Date(lastRequestDate.date);
     }
 }

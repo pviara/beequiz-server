@@ -11,6 +11,10 @@ import { QuizQuestionRepository } from '../../persistence/quiz-question/reposito
 import { QuizTheme } from '../../domain/quiz-parameters';
 import { QuizThemeNotFoundException } from '../errors/quiz-theme-not-found.exception';
 import { QuizThemeRepository } from '../../persistence/quiz-theme/repository/quiz-theme-repository';
+import * as fs from 'fs';
+
+jest.mock('fs');
+const fsMock = fs as jest.Mocked<typeof fs>;
 
 describe('QuizServiceImpl', () => {
     let sut: QuizServiceImpl;
@@ -25,6 +29,12 @@ describe('QuizServiceImpl', () => {
         openAIServiceSpy = new OpenAIServiceSpy();
         quizQuestionRepositorySpy = new QuizQuestionRepositorySpy();
         quizThemeRepositorySpy = new QuizThemeRepositorySpy();
+
+        jest.resetAllMocks();
+
+        fsMock.readFileSync.mockReturnValue({
+            toString: () => '{}',
+        } as string | Buffer);
 
         sut = new QuizServiceImpl(
             dateTimeServiceSpy,
@@ -60,6 +70,7 @@ describe('QuizServiceImpl', () => {
 
             expect(openAIServiceSpy.calls.generateThemesForQuiz.count).toBe(1);
             expect(result.themes).toEqual(savedQuizThemes);
+            expect(fsMock.writeFileSync).toHaveBeenCalledTimes(1);
         });
 
         it('should not generate new theme parameters when last request was made less than 72 hours ago', async () => {
@@ -195,6 +206,7 @@ describe('QuizServiceImpl', () => {
 
             expect(result).toEqual(questionsSavedAfterGeneration);
             expect(result.length).toBe(numberOfQuestions);
+            expect(fsMock.writeFileSync).toHaveBeenCalledTimes(1);
         });
 
         it('should generate new questions when last request was made more than 72 hours ago', async () => {
@@ -267,6 +279,7 @@ describe('QuizServiceImpl', () => {
             ).toContainEqual([parsedQuestions, quizTheme.id]);
 
             expect(firstResult).toEqual(secondResult);
+            expect(fsMock.writeFileSync).toHaveBeenCalledTimes(1);
         });
     });
 });

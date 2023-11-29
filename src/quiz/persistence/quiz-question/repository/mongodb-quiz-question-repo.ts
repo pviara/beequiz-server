@@ -17,7 +17,9 @@ export class MongoDbQuizQuestionRepo implements QuizQuestionRepository {
     ) {}
 
     async getQuizQuestions(themeId: string): Promise<QuizQuestion[]> {
-        const entities = await this.model.find({ themeId });
+        const entities = await this.model.find({
+            themeId: new Types.ObjectId(themeId),
+        });
         return this.mapToQuestions(entities);
     }
 
