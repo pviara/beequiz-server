@@ -5,5 +5,6 @@ export interface QuizQuestionRepository {
     getQuizQuestions(themeId: string): Promise<QuizQuestion[]>;
     saveGeneratedQuestions(
         quizQuestions: ParsedQuizQuestion[],
+        themeId: string,
     ): Promise<QuizQuestion[]>;
 }

@@ -11,7 +11,7 @@ export class QuizController {
         private quizService: QuizService,
     ) {}
 
-    @Get('theme')
+    @Get('parameters')
     async theme(): Promise<QuizParameters> {
         return this.quizService.getQuizParameters();
     }
@@ -19,7 +19,7 @@ export class QuizController {
     @Get('question')
     async question(): Promise<QuizQuestion[]> {
         return this.quizService.getQuizQuestions(
-            '6565f60c55fb7207f75f310f',
+            '6567384ad4343caccd799497',
             10,
         );
     }

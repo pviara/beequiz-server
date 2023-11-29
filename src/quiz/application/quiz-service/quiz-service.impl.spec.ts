@@ -191,7 +191,7 @@ describe('QuizServiceImpl', () => {
             ).toBe(1);
             expect(
                 quizQuestionRepositorySpy.calls.saveGeneratedQuestions.history,
-            ).toContainEqual(parsedQuizQuestions);
+            ).toContainEqual([parsedQuizQuestions, quizTheme.id]);
 
             expect(result).toEqual(questionsSavedAfterGeneration);
             expect(result.length).toBe(numberOfQuestions);
@@ -264,7 +264,7 @@ describe('QuizServiceImpl', () => {
             ).toBe(1);
             expect(
                 quizQuestionRepositorySpy.calls.saveGeneratedQuestions.history,
-            ).toContainEqual(parsedQuestions);
+            ).toContainEqual([parsedQuestions, quizTheme.id]);
 
             expect(firstResult).toEqual(secondResult);
         });
@@ -327,7 +327,7 @@ class QuizQuestionRepositorySpy implements QuizQuestionRepository {
         },
         saveGeneratedQuestions: {
             count: 0,
-            history: [] as ParsedQuizQuestion[][],
+            history: [] as [ParsedQuizQuestion[], string][],
         },
     };
 
@@ -339,9 +339,13 @@ class QuizQuestionRepositorySpy implements QuizQuestionRepository {
 
     saveGeneratedQuestions(
         quizQuestions: QuizQuestion[],
+        themeId: string,
     ): Promise<QuizQuestion[]> {
         this.calls.saveGeneratedQuestions.count++;
-        this.calls.saveGeneratedQuestions.history.push(quizQuestions);
+        this.calls.saveGeneratedQuestions.history.push([
+            quizQuestions,
+            themeId,
+        ]);
         return Promise.resolve([]);
     }
 }
@@ -460,11 +464,13 @@ function stubSaveGeneratedQuestions(
 ): void {
     quizQuestionRepositorySpy.saveGeneratedQuestions = (
         quizQuestions: ParsedQuizQuestion[],
+        themeId: string,
     ): Promise<QuizQuestion[]> => {
         quizQuestionRepositorySpy.calls.saveGeneratedQuestions.count++;
-        quizQuestionRepositorySpy.calls.saveGeneratedQuestions.history.push(
+        quizQuestionRepositorySpy.calls.saveGeneratedQuestions.history.push([
             quizQuestions,
-        );
+            themeId,
+        ]);
         return Promise.resolve(returnedValue);
     };
 }

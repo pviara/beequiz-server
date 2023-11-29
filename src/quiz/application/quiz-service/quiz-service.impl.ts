@@ -89,6 +89,7 @@ export class QuizServiceImpl implements QuizService {
         savedQuizQuestions =
             await this.quizQuestionRepository.saveGeneratedQuestions(
                 parsedQuizQuestions,
+                quizTheme.id,
             );
 
         this.recordLastQuestionRequestDate();

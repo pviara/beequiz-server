@@ -1,4 +1,4 @@
-import { AnyKeys, Model } from 'mongoose';
+import { AnyKeys, Model, Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ParsedQuizQuestion } from '../../../application/quiz-parser/model/parsed-quiz-question';
@@ -23,11 +23,13 @@ export class MongoDbQuizQuestionRepo implements QuizQuestionRepository {
 
     async saveGeneratedQuestions(
         quizQuestions: ParsedQuizQuestion[],
+        themeId: string,
     ): Promise<QuizQuestion[]> {
         const created = await this.model.create(
             ...quizQuestions.map(
                 (quizQuestion) =>
                     ({
+                        themeId: new Types.ObjectId(themeId),
                         label: quizQuestion.label,
                         answers: quizQuestion.answers.map(
                             (quizAnswer) =>
