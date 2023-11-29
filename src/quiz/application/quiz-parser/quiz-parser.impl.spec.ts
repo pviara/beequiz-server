@@ -1,6 +1,6 @@
+import { ParsedQuizTheme } from './model/parsed-quiz-theme';
 import { QuizAnswer, QuizQuestion } from '../../domain/quiz-question';
 import { QuizParserImpl } from './quiz-parser.impl';
-import { QuizTheme } from '../../domain/quiz-parameters';
 
 describe('QuizParserImpl', () => {
     let sut: QuizParserImpl;
@@ -129,7 +129,7 @@ describe('QuizParserImpl', () => {
         });
 
         it('should return array of instances of quiz themes', () => {
-            const quizThemes: { themes: QuizTheme[] } = {
+            const quizThemes: { themes: ParsedQuizTheme[] } = {
                 themes: [
                     {
                         code: 'codeA',
@@ -150,9 +150,9 @@ describe('QuizParserImpl', () => {
             const result = sut.parseQuizThemes(stringifiedObject);
 
             expect(result).toEqual([
-                new QuizTheme('codeA', 'labelA'),
-                new QuizTheme('codeB', 'labelB'),
-                new QuizTheme('codeC', 'labelC'),
+                new ParsedQuizTheme('codeA', 'labelA'),
+                new ParsedQuizTheme('codeB', 'labelB'),
+                new ParsedQuizTheme('codeC', 'labelC'),
             ]);
         });
     });

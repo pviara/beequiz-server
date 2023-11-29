@@ -8,6 +8,7 @@ import { QuizParser } from '../../../../quiz/application/quiz-parser/quiz-parser
 import { QuizQuestion } from '../../../../quiz/domain/quiz-question';
 import { QuizTheme } from '../../../../quiz/domain/quiz-parameters';
 import { QUIZ_PARSER_TOKEN } from '../../../../quiz/application/quiz-parser/quiz-parser.provider';
+import { ParsedQuizTheme } from 'src/quiz/application/quiz-parser/model/parsed-quiz-theme';
 
 export class OpenAIServiceImpl implements OpenAIService {
     constructor(
@@ -55,7 +56,7 @@ export class OpenAIServiceImpl implements OpenAIService {
 
     async generateThemesForQuiz(
         savedQuizThemes: QuizTheme[],
-    ): Promise<QuizTheme[]> {
+    ): Promise<ParsedQuizTheme[]> {
         const prompt = this.promptService.getQuizThemesPrompt(savedQuizThemes);
 
         const openAIObject = this.openAIObjectFactory.createOpenAIObject();

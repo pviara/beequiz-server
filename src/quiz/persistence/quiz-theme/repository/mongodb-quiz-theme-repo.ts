@@ -1,6 +1,7 @@
 import { AnyKeys, Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { ParsedQuizTheme } from '../../../application/quiz-parser/model/parsed-quiz-theme';
 import { QuizTheme } from '../../../domain/quiz-parameters';
 import { QuizThemeEntity, QUIZ_THEME_MODEL } from '../entity/quiz-theme-entity';
 import { QuizThemeRepository } from './quiz-theme-repository';
@@ -15,11 +16,13 @@ export class MongoDbQuizThemeRepo implements QuizThemeRepository {
     async getQuizThemes(): Promise<QuizTheme[]> {
         const entities = await this.model.find({});
         return entities.map(
-            (entity) => new QuizTheme(entity.code, entity.label),
+            (entity) => new QuizTheme(entity.id, entity.code, entity.label),
         );
     }
 
-    async saveGeneratedThemes(quizThemes: QuizTheme[]): Promise<QuizTheme[]> {
+    async saveGeneratedThemes(
+        quizThemes: ParsedQuizTheme[],
+    ): Promise<QuizTheme[]> {
         const created = await this.model.create(
             ...quizThemes.map(
                 (quizTheme) =>
@@ -30,7 +33,7 @@ export class MongoDbQuizThemeRepo implements QuizThemeRepository {
             ),
         );
         return created.map(
-            (entity) => new QuizTheme(entity.code, entity.label),
+            (entity) => new QuizTheme(entity.id, entity.code, entity.label),
         );
     }
 }

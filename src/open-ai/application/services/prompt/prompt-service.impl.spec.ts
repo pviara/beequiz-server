@@ -52,9 +52,9 @@ describe('PromptServiceImpl', () => {
 
         it('should add quiz themes inside the prompt to mark them as used', () => {
             const savedQuizThemes = [
-                new QuizTheme('', 'sport'),
-                new QuizTheme('', 'cinéma'),
-                new QuizTheme('', 'musique'),
+                new QuizTheme('', '', 'sport'),
+                new QuizTheme('', '', 'cinéma'),
+                new QuizTheme('', '', 'musique'),
             ];
 
             const result = sut.getQuizThemesPrompt(savedQuizThemes);

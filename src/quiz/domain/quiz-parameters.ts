@@ -1,5 +1,6 @@
 export class QuizTheme {
     constructor(
+        readonly id: string,
         readonly code: string,
         readonly label: string,
     ) {}

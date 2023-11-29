@@ -1,7 +1,7 @@
 import { QuizQuestion } from '../../domain/quiz-question';
-import { QuizTheme } from '../../domain/quiz-parameters';
+import { ParsedQuizTheme } from './model/parsed-quiz-theme';
 
 export interface QuizParser {
     parseQuizQuestions(stringifiedArray: string): QuizQuestion[];
-    parseQuizThemes(stringifiedArray: string): QuizTheme[];
+    parseQuizThemes(stringifiedArray: string): ParsedQuizTheme[];
 }

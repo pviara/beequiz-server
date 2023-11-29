@@ -1,10 +1,11 @@
 import { isInvalidStructure } from '../../../../utils/utils';
 import { QuizTheme } from '../../../domain/quiz-parameters';
+import { ParsedQuizTheme } from '../model/parsed-quiz-theme';
 
 export class QuizThemesParser {
     constructor(readonly stringifiedObject: string) {}
 
-    parse(): QuizTheme[] {
+    parse(): ParsedQuizTheme[] {
         try {
             const parsedObject = JSON.parse(this.stringifiedObject);
             if (!parsedObject.themes) {
@@ -41,14 +42,14 @@ export class QuizThemesParser {
         return isInvalidStructure(checkedObject, objStructRef);
     }
 
-    private createObjectStructureRef(): QuizTheme {
-        return new QuizTheme('code', 'label');
+    private createObjectStructureRef(): ParsedQuizTheme {
+        return new ParsedQuizTheme('code', 'label');
     }
 
     private mapQuizThemes(parsedObject: any): QuizTheme[] {
         return parsedObject.themes.map(
             (quizTheme: Record<string, any>) =>
-                new QuizTheme(quizTheme.code, quizTheme.label),
+                new ParsedQuizTheme(quizTheme.code, quizTheme.label),
         );
     }
 }

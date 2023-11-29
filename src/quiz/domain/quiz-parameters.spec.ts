@@ -4,11 +4,11 @@ describe('QuizParameters', () => {
     describe('shuffleThemes', () => {
         it('should break current themes order', () => {
             const initialQuizThemes: QuizTheme[] = [
-                new QuizTheme('A', 'A'),
-                new QuizTheme('B', 'B'),
-                new QuizTheme('C', 'C'),
-                new QuizTheme('D', 'D'),
-                new QuizTheme('E', 'E'),
+                new QuizTheme('id', 'A', 'A'),
+                new QuizTheme('id', 'B', 'B'),
+                new QuizTheme('id', 'C', 'C'),
+                new QuizTheme('id', 'D', 'D'),
+                new QuizTheme('id', 'E', 'E'),
             ];
 
             const sut = new QuizParameters(Array.from(initialQuizThemes), []);

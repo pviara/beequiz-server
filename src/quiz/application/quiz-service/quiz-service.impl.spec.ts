@@ -8,6 +8,7 @@ import { QuizQuestion } from '../../domain/quiz-question';
 import { QuizQuestionRepository } from '../../persistence/quiz-question/repository/quiz-question-repository';
 import { QuizTheme } from '../../domain/quiz-parameters';
 import { QuizThemeRepository } from '../../persistence/quiz-theme/repository/quiz-theme-repository';
+import { ParsedQuizTheme } from '../quiz-parser/model/parsed-quiz-theme';
 
 describe('QuizServiceImpl', () => {
     let sut: QuizServiceImpl;
@@ -41,32 +42,41 @@ describe('QuizServiceImpl', () => {
         });
 
         it('should generate new theme parameters using OpenAI', async () => {
-            const quizThemes: QuizTheme[] = [
-                new QuizTheme('', ''),
-                new QuizTheme('', ''),
+            const parsedQuizThemes: ParsedQuizTheme[] = [
+                new ParsedQuizTheme('', ''),
+                new ParsedQuizTheme('', ''),
             ];
-            stubGenerateThemesForQuiz(openAIServiceSpy, quizThemes);
-            stubSaveGeneratedThemes(quizThemeRepositorySpy, quizThemes);
+            const savedQuizThemes = parsedQuizThemes.map(
+                (quizTheme) =>
+                    new QuizTheme('', quizTheme.code, quizTheme.label),
+            );
+
+            stubGenerateThemesForQuiz(openAIServiceSpy, parsedQuizThemes);
+            stubSaveGeneratedThemes(quizThemeRepositorySpy, savedQuizThemes);
 
             const result = await sut.getQuizParameters();
 
             expect(openAIServiceSpy.calls.generateThemesForQuiz.count).toBe(1);
-            expect(result.themes).toEqual(quizThemes);
+            expect(result.themes).toEqual(savedQuizThemes);
         });
 
         it('should not generate new theme parameters when last request was made less than 72 hours ago', async () => {
             const now = new Date('2023-01-01');
             stubGetNow(dateTimeServiceSpy, now);
 
-            const quizThemesA: QuizTheme[] = [
-                new QuizTheme('codeA', 'labelA'),
-                new QuizTheme('codeB', 'labelB'),
-                new QuizTheme('codeC', 'labelC'),
+            const parsedQuizThemes: ParsedQuizTheme[] = [
+                new ParsedQuizTheme('codeA', 'labelA'),
+                new ParsedQuizTheme('codeB', 'labelB'),
+                new ParsedQuizTheme('codeC', 'labelC'),
             ];
+            const savedQuizThemes = parsedQuizThemes.map(
+                (quizTheme) =>
+                    new QuizTheme('', quizTheme.code, quizTheme.label),
+            );
 
-            stubGenerateThemesForQuiz(openAIServiceSpy, quizThemesA);
-            stubGetQuizThemes(quizThemeRepositorySpy, quizThemesA);
-            stubSaveGeneratedThemes(quizThemeRepositorySpy, quizThemesA);
+            stubGenerateThemesForQuiz(openAIServiceSpy, parsedQuizThemes);
+            stubGetQuizThemes(quizThemeRepositorySpy, savedQuizThemes);
+            stubSaveGeneratedThemes(quizThemeRepositorySpy, savedQuizThemes);
 
             const firstResult = await sut.getQuizParameters();
             const secondResult = await sut.getQuizParameters();
@@ -78,7 +88,7 @@ describe('QuizServiceImpl', () => {
             );
             expect(
                 quizThemeRepositorySpy.calls.saveGeneratedThemes.history,
-            ).toContainEqual(quizThemesA);
+            ).toContainEqual(parsedQuizThemes);
 
             expect(firstResult.themes).toEqual(secondResult.themes);
         });
@@ -212,7 +222,9 @@ class OpenAIServiceSpy implements OpenAIService {
         return Promise.resolve([]);
     }
 
-    generateThemesForQuiz(savedQuizThemes: QuizTheme[]): Promise<QuizTheme[]> {
+    generateThemesForQuiz(
+        savedQuizThemes: QuizTheme[],
+    ): Promise<ParsedQuizTheme[]> {
         this.calls.generateThemesForQuiz.count++;
         this.calls.generateThemesForQuiz.history.push(savedQuizThemes);
         return Promise.resolve([]);
@@ -250,7 +262,7 @@ class QuizThemeRepositorySpy implements QuizThemeRepository {
         },
         saveGeneratedThemes: {
             count: 0,
-            history: [] as QuizTheme[][],
+            history: [] as ParsedQuizTheme[][],
         },
     };
 
@@ -295,9 +307,9 @@ function stubGenerateQuestionsForQuiz(
 
 function stubGenerateThemesForQuiz(
     openAIServiceSpy: OpenAIServiceSpy,
-    returnedValue: QuizTheme[],
+    returnedValue: ParsedQuizTheme[],
 ): void {
-    openAIServiceSpy.generateThemesForQuiz = (): Promise<QuizTheme[]> => {
+    openAIServiceSpy.generateThemesForQuiz = (): Promise<ParsedQuizTheme[]> => {
         openAIServiceSpy.calls.generateThemesForQuiz.count++;
         return Promise.resolve(returnedValue);
     };
@@ -331,7 +343,7 @@ function stubSaveGeneratedThemes(
     returnedValue: QuizTheme[],
 ): void {
     quizThemeRepositorySpy.saveGeneratedThemes = (
-        quizThemes: QuizTheme[],
+        quizThemes: ParsedQuizTheme[],
     ): Promise<QuizTheme[]> => {
         quizThemeRepositorySpy.calls.saveGeneratedThemes.count++;
         quizThemeRepositorySpy.calls.saveGeneratedThemes.history.push(
