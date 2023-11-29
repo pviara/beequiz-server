@@ -4,7 +4,7 @@ import {
     QuizServiceImpl,
 } from './quiz-service.impl';
 import { OpenAIService } from '../../../open-ai/application/services/open-ai/open-ai-service';
-import { QuizQuestion } from '../../domain/quiz-question';
+import { QuizAnswer, QuizQuestion } from '../../domain/quiz-question';
 import { QuizQuestionRepository } from '../../persistence/quiz-question/repository/quiz-question-repository';
 import { QuizTheme } from '../../domain/quiz-parameters';
 import { QuizThemeRepository } from '../../persistence/quiz-theme/repository/quiz-theme-repository';
@@ -126,7 +126,14 @@ describe('QuizServiceImpl', () => {
                     new QuizQuestion(
                         '',
                         quizQuestion.label,
-                        quizQuestion.answers,
+                        quizQuestion.answers.map(
+                            (quizAnswer) =>
+                                new QuizAnswer(
+                                    '',
+                                    quizAnswer.label,
+                                    quizAnswer.isCorrect,
+                                ),
+                        ),
                     ),
             );
             stubSaveGeneratedQuestions(
@@ -179,7 +186,14 @@ describe('QuizServiceImpl', () => {
                     new QuizQuestion(
                         '',
                         quizQuestion.label,
-                        quizQuestion.answers,
+                        quizQuestion.answers.map(
+                            (quizAnswer) =>
+                                new QuizAnswer(
+                                    '',
+                                    quizAnswer.label,
+                                    quizAnswer.isCorrect,
+                                ),
+                        ),
                     ),
             );
             stubGenerateQuestionsForQuiz(openAIServiceSpy, parsedQuestions);

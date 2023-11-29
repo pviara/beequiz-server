@@ -1,12 +1,12 @@
+import { AnyKeys, Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { ParsedQuizQuestion } from '../../../application/quiz-parser/model/parsed-quiz-question';
-import { QuizQuestion } from '../../../domain/quiz-question';
+import { QuizAnswer, QuizQuestion } from '../../../domain/quiz-question';
 import { QuizQuestionRepository } from './quiz-question-repository';
 import {
-    QUIZ_QUESTION_MODEL,
     QuizQuestionEntity,
+    QUIZ_QUESTION_MODEL,
 } from '../entity/quiz-question-entity';
 
 @Injectable()
@@ -16,13 +16,54 @@ export class MongoDbQuizQuestionRepo implements QuizQuestionRepository {
         private model: Model<QuizQuestionEntity>,
     ) {}
 
-    getQuizQuestions(themeId: string): Promise<QuizQuestion[]> {
-        throw new Error('Method not implemented.');
+    async getQuizQuestions(themeId: string): Promise<QuizQuestion[]> {
+        const entities = await this.model.find({ themeId });
+        return this.mapToQuestions(entities);
     }
 
-    saveGeneratedQuestions(
+    async saveGeneratedQuestions(
         quizQuestions: ParsedQuizQuestion[],
     ): Promise<QuizQuestion[]> {
-        throw new Error('Method not implemented.');
+        const created = await this.model.create(
+            ...quizQuestions.map(
+                (quizQuestion) =>
+                    ({
+                        label: quizQuestion.label,
+                        answers: quizQuestion.answers.map(
+                            (quizAnswer) =>
+                                ({
+                                    label: quizAnswer.label,
+                                    isCorrect: quizAnswer.isCorrect,
+                                }) as AnyKeys<
+                                    QuizQuestionEntity['answers'][any]
+                                >,
+                        ),
+                    }) as AnyKeys<QuizQuestionEntity>,
+            ),
+        );
+        return this.mapToQuestions(created);
+    }
+
+    private mapToQuestions(entities: QuizQuestionEntity[]): QuizQuestion[] {
+        return entities.map((entity) => this.mapToQuestion(entity));
+    }
+
+    private mapToQuestion(entity: QuizQuestionEntity): QuizQuestion {
+        return new QuizQuestion(
+            entity.id,
+            entity.label,
+            this.mapToAnswer(entity),
+        );
+    }
+
+    private mapToAnswer(entity: QuizQuestionEntity): QuizAnswer[] {
+        return entity.answers.map(
+            (answerEntity) =>
+                new QuizAnswer(
+                    answerEntity.id,
+                    answerEntity.label,
+                    answerEntity.isCorrect,
+                ),
+        );
     }
 }
