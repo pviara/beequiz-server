@@ -23,6 +23,7 @@ const lastThemeRequestDateFilePath =
 export class QuizServiceImpl implements QuizService {
     private lastQuestionRequestDate: Date | null =
         this.getLastQuestionRequestDateFromJSON();
+
     private lastThemeRequestDate: Date | null =
         this.getLastThemeRequestDateFromJSON();
 
@@ -48,7 +49,6 @@ export class QuizServiceImpl implements QuizService {
                 savedQuizThemes,
                 DEFAULT_NUMBER_OF_QUESTIONS,
             );
-            quizParameters.shuffleThemes();
 
             return quizParameters;
         }
@@ -56,19 +56,26 @@ export class QuizServiceImpl implements QuizService {
         const quizThemes =
             await this.openAIService.generateThemesForQuiz(savedQuizThemes);
 
-        savedQuizThemes =
+        const savedQuizThemesAfterGeneration =
             await this.quizThemeRepository.saveGeneratedThemes(quizThemes);
 
         this.recordLastThemeRequestDate();
 
-        return new QuizParameters(savedQuizThemes, DEFAULT_NUMBER_OF_QUESTIONS);
+        const quizThemesToReturn = [
+            ...savedQuizThemesAfterGeneration,
+            ...savedQuizThemes,
+        ];
+        return new QuizParameters(
+            quizThemesToReturn,
+            DEFAULT_NUMBER_OF_QUESTIONS,
+        );
     }
 
     async getQuizQuestions(
         quizThemeId: string,
         numberOfQuestions: number,
     ): Promise<QuizQuestion[]> {
-        let savedQuizQuestions =
+        const savedQuizQuestions =
             await this.quizQuestionRepository.getQuizQuestions(quizThemeId);
 
         const areEnoughSavedQuestions =
@@ -94,7 +101,7 @@ export class QuizServiceImpl implements QuizService {
                 quizTheme.label,
             );
 
-        savedQuizQuestions =
+        const savedQuizQuestionsAfterGeneration =
             await this.quizQuestionRepository.saveGeneratedQuestions(
                 parsedQuizQuestions,
                 quizTheme.id,
@@ -102,7 +109,7 @@ export class QuizServiceImpl implements QuizService {
 
         this.recordLastQuestionRequestDate();
 
-        return savedQuizQuestions;
+        return [...savedQuizQuestionsAfterGeneration, ...savedQuizQuestions];
     }
 
     private hasLastQuestionRequestBeenMadeLessThan72HoursAgo(): boolean {

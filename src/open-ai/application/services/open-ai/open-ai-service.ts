@@ -10,6 +10,6 @@ export interface OpenAIService {
         themeLabel: string,
     ): Promise<ParsedQuizQuestion[]>;
     generateThemesForQuiz(
-        savedQuizThemes: QuizTheme[],
+        existingThemes: QuizTheme[],
     ): Promise<ParsedQuizTheme[]>;
 }

@@ -58,9 +58,9 @@ export class OpenAIServiceImpl implements OpenAIService {
     }
 
     async generateThemesForQuiz(
-        savedQuizThemes: QuizTheme[],
+        existingThemes: QuizTheme[],
     ): Promise<ParsedQuizTheme[]> {
-        const prompt = this.promptService.getQuizThemesPrompt(savedQuizThemes);
+        const prompt = this.promptService.getQuizThemesPrompt(existingThemes);
 
         const openAIObject = this.openAIObjectFactory.createOpenAIObject();
 

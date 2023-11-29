@@ -66,10 +66,9 @@ describe('QuizServiceImpl', () => {
             stubGenerateThemesForQuiz(openAIServiceSpy, parsedQuizThemes);
             stubSaveGeneratedThemes(quizThemeRepositorySpy, savedQuizThemes);
 
-            const result = await sut.getQuizParameters();
+            await sut.getQuizParameters();
 
             expect(openAIServiceSpy.calls.generateThemesForQuiz.count).toBe(1);
-            expect(result.themes).toEqual(savedQuizThemes);
             expect(fsMock.writeFileSync).toHaveBeenCalledTimes(1);
         });
 
@@ -92,6 +91,12 @@ describe('QuizServiceImpl', () => {
             stubSaveGeneratedThemes(quizThemeRepositorySpy, savedQuizThemes);
 
             const firstResult = await sut.getQuizParameters();
+
+            stubGetQuizThemes(quizThemeRepositorySpy, [
+                ...savedQuizThemes,
+                ...savedQuizThemes,
+            ]);
+
             const secondResult = await sut.getQuizParameters();
 
             expect(dateTimeServiceSpy.calls.getNow.count).toBe(2);
@@ -209,7 +214,7 @@ describe('QuizServiceImpl', () => {
             expect(fsMock.writeFileSync).toHaveBeenCalledTimes(1);
         });
 
-        it('should generate new questions when last request was made more than 72 hours ago', async () => {
+        it('should not generate new questions when last request was made less than 72 hours ago', async () => {
             const now = new Date('2023-01-01');
             stubGetNow(dateTimeServiceSpy, now);
 
@@ -257,10 +262,10 @@ describe('QuizServiceImpl', () => {
                 numberOfQuestions,
             );
 
-            stubGetQuizQuestions(
-                quizQuestionRepositorySpy,
-                savedQuestionsAfterGeneration,
-            );
+            stubGetQuizQuestions(quizQuestionRepositorySpy, [
+                ...savedQuestionsAfterGeneration,
+                ...savedQuestions,
+            ]);
 
             const secondResult = await sut.getQuizQuestions(
                 themeId,
