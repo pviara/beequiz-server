@@ -10,6 +10,7 @@ import { QuizService } from './quiz-service';
 import { QuizThemeRepository } from '../../persistence/quiz-theme/repository/quiz-theme-repository';
 import { QUIZ_QUESTION_REPO_TOKEN } from '../../persistence/quiz-question/repository/quiz-question-repository.provider';
 import { QUIZ_THEME_REPO_TOKEN } from '../../persistence/quiz-theme/repository/quiz-theme-repository.provider';
+import { QuizThemeNotFoundException } from '../errors/quiz-theme-not-found.exception';
 
 export const DEFAULT_NUMBER_OF_QUESTIONS = [5, 10, 15];
 
@@ -72,10 +73,17 @@ export class QuizServiceImpl implements QuizService {
             return savedQuizQuestions;
         }
 
+        const quizTheme =
+            await this.quizThemeRepository.getQuizTheme(quizThemeId);
+        if (!quizTheme) {
+            throw new QuizThemeNotFoundException(quizThemeId);
+        }
+
         const parsedQuizQuestions =
             await this.openAIService.generateQuestionsForQuiz(
                 savedQuizQuestions,
                 numberOfQuestions,
+                quizTheme.label,
             );
 
         savedQuizQuestions =

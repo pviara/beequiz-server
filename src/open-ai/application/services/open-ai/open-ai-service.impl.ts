@@ -26,10 +26,12 @@ export class OpenAIServiceImpl implements OpenAIService {
     async generateQuestionsForQuiz(
         savedQuizQuestions: QuizQuestion[],
         numberOfQuestions: number,
+        themeLabel: string,
     ): Promise<ParsedQuizQuestion[]> {
         const prompt = this.promptService.getQuizQuestionsPrompt(
             savedQuizQuestions,
             numberOfQuestions,
+            themeLabel,
         );
 
         const openAIObject = this.openAIObjectFactory.createOpenAIObject();

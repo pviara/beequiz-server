@@ -4,12 +4,13 @@ import {
     QuizServiceImpl,
 } from './quiz-service.impl';
 import { OpenAIService } from '../../../open-ai/application/services/open-ai/open-ai-service';
+import { ParsedQuizQuestion } from '../quiz-parser/model/parsed-quiz-question';
+import { ParsedQuizTheme } from '../quiz-parser/model/parsed-quiz-theme';
 import { QuizAnswer, QuizQuestion } from '../../domain/quiz-question';
 import { QuizQuestionRepository } from '../../persistence/quiz-question/repository/quiz-question-repository';
 import { QuizTheme } from '../../domain/quiz-parameters';
+import { QuizThemeNotFoundException } from '../errors/quiz-theme-not-found.exception';
 import { QuizThemeRepository } from '../../persistence/quiz-theme/repository/quiz-theme-repository';
-import { ParsedQuizTheme } from '../quiz-parser/model/parsed-quiz-theme';
-import { ParsedQuizQuestion } from '../quiz-parser/model/parsed-quiz-question';
 
 describe('QuizServiceImpl', () => {
     let sut: QuizServiceImpl;
@@ -98,7 +99,10 @@ describe('QuizServiceImpl', () => {
     describe('getQuizQuestions', () => {
         it('should retrieve all theme-related questions from repository', async () => {
             const themeId = 'theme_id';
-            await sut.getQuizQuestions(themeId, 5);
+
+            stubGetQuizTheme(quizThemeRepositorySpy, new QuizTheme('', '', ''));
+
+            await sut.getQuizQuestions(themeId, 0);
 
             expect(quizQuestionRepositorySpy.calls.getQuizQuestions.count).toBe(
                 1,
@@ -106,6 +110,27 @@ describe('QuizServiceImpl', () => {
             expect(
                 quizQuestionRepositorySpy.calls.getQuizQuestions.history,
             ).toContain(themeId);
+        });
+
+        it('should retrieve target theme using given themeId', async () => {
+            const themeId = 'theme_id';
+            const quizTheme = new QuizTheme(themeId, 'code', 'label');
+            stubGetQuizTheme(quizThemeRepositorySpy, quizTheme);
+
+            await sut.getQuizQuestions(themeId, 5);
+
+            expect(quizThemeRepositorySpy.calls.getQuizTheme.count).toBe(1);
+            expect(quizThemeRepositorySpy.calls.getQuizTheme.history).toContain(
+                themeId,
+            );
+        });
+
+        it('should throw an error when target theme cannot be found using given themeId', async () => {
+            stubGetQuizTheme(quizThemeRepositorySpy, null);
+
+            await expect(sut.getQuizQuestions('theme_id', 5)).rejects.toThrow(
+                QuizThemeNotFoundException,
+            );
         });
 
         it('should generate new questions using OpenAI when there is not enough theme-related questions', async () => {
@@ -142,6 +167,9 @@ describe('QuizServiceImpl', () => {
             );
 
             const themeId = 'theme_id';
+            const quizTheme = new QuizTheme(themeId, 'code', 'label');
+            stubGetQuizTheme(quizThemeRepositorySpy, quizTheme);
+
             const result = await sut.getQuizQuestions(
                 themeId,
                 numberOfQuestions,
@@ -152,7 +180,11 @@ describe('QuizServiceImpl', () => {
             );
             expect(
                 openAIServiceSpy.calls.generateQuestionsForQuiz.history,
-            ).toContainEqual([savedQuizQuestions, numberOfQuestions]);
+            ).toContainEqual([
+                savedQuizQuestions,
+                numberOfQuestions,
+                quizTheme.label,
+            ]);
 
             expect(
                 quizQuestionRepositorySpy.calls.saveGeneratedQuestions.count,
@@ -203,6 +235,9 @@ describe('QuizServiceImpl', () => {
             );
 
             const themeId = 'theme_id';
+            const quizTheme = new QuizTheme(themeId, 'code', 'label');
+            stubGetQuizTheme(quizThemeRepositorySpy, quizTheme);
+
             const numberOfQuestions = 3;
 
             const firstResult = await sut.getQuizQuestions(
@@ -253,7 +288,7 @@ class OpenAIServiceSpy implements OpenAIService {
     calls = {
         generateQuestionsForQuiz: {
             count: 0,
-            history: [] as [QuizQuestion[], number][],
+            history: [] as [QuizQuestion[], number, string][],
         },
         generateThemesForQuiz: {
             count: 0,
@@ -264,11 +299,13 @@ class OpenAIServiceSpy implements OpenAIService {
     generateQuestionsForQuiz(
         savedQuizQuestions: QuizQuestion[],
         numberOfQuestions: number,
+        themeLabel: string,
     ): Promise<ParsedQuizQuestion[]> {
         this.calls.generateQuestionsForQuiz.count++;
         this.calls.generateQuestionsForQuiz.history.push([
             savedQuizQuestions,
             numberOfQuestions,
+            themeLabel,
         ]);
         return Promise.resolve([]);
     }
@@ -311,6 +348,10 @@ class QuizQuestionRepositorySpy implements QuizQuestionRepository {
 
 class QuizThemeRepositorySpy implements QuizThemeRepository {
     calls = {
+        getQuizTheme: {
+            count: 0,
+            history: [] as string[],
+        },
         getQuizThemes: {
             count: 0,
         },
@@ -319,6 +360,12 @@ class QuizThemeRepositorySpy implements QuizThemeRepository {
             history: [] as ParsedQuizTheme[][],
         },
     };
+
+    async getQuizTheme(themeId: string): Promise<QuizTheme | null> {
+        this.calls.getQuizTheme.count++;
+        this.calls.getQuizTheme.history.push(themeId);
+        return null;
+    }
 
     async getQuizThemes(): Promise<QuizTheme[]> {
         this.calls.getQuizThemes.count++;
@@ -349,11 +396,13 @@ function stubGenerateQuestionsForQuiz(
     openAIServiceSpy.generateQuestionsForQuiz = (
         savedQuizQuestions: QuizQuestion[],
         numberOfQuestions: number,
+        themeLabel: string,
     ): Promise<ParsedQuizQuestion[]> => {
         openAIServiceSpy.calls.generateQuestionsForQuiz.count++;
         openAIServiceSpy.calls.generateQuestionsForQuiz.history.push([
             savedQuizQuestions,
             numberOfQuestions,
+            themeLabel,
         ]);
         return Promise.resolve(returnedValue);
     };
@@ -378,6 +427,19 @@ function stubGetQuizQuestions(
     ): Promise<QuizQuestion[]> => {
         quizQuestionRepositorySpy.calls.getQuizQuestions.count++;
         quizQuestionRepositorySpy.calls.getQuizQuestions.history.push(themeId);
+        return Promise.resolve(returnedValue);
+    };
+}
+
+function stubGetQuizTheme(
+    quizThemeRepositorySpy: QuizThemeRepositorySpy,
+    returnedValue: QuizTheme | null,
+): void {
+    quizThemeRepositorySpy.getQuizTheme = (
+        themeId: string,
+    ): Promise<QuizTheme | null> => {
+        quizThemeRepositorySpy.calls.getQuizTheme.count++;
+        quizThemeRepositorySpy.calls.getQuizTheme.history.push(themeId);
         return Promise.resolve(returnedValue);
     };
 }

@@ -10,6 +10,7 @@ export class PromptServiceImpl implements PromptService {
     getQuizQuestionsPrompt(
         savedQuizQuestions: QuizQuestion[],
         numberOfQuestions: number,
+        themeLabel: string,
     ): string {
         const initialPrompt = QUIZ_QUESTIONS_PROMPT;
 
@@ -19,6 +20,7 @@ export class PromptServiceImpl implements PromptService {
 
         return initialPrompt
             .replace('X', numberOfQuestions.toString())
+            .replace('Y', themeLabel.toString())
             .replace('#', questionLabels.join(','));
     }
 

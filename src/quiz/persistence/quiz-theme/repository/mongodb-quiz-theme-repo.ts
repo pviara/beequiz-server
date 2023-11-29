@@ -13,6 +13,10 @@ export class MongoDbQuizThemeRepo implements QuizThemeRepository {
         private model: Model<QuizThemeEntity>,
     ) {}
 
+    getQuizTheme(themeId: string): Promise<QuizTheme | null> {
+        throw new Error('Method not implemented.');
+    }
+
     async getQuizThemes(): Promise<QuizTheme[]> {
         const entities = await this.model.find({});
         return entities.map(

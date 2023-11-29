@@ -34,15 +34,21 @@ describe('OpenAIServiceImpl', () => {
 
             const savedQuizQuestions: QuizQuestion[] = [];
             const numberOfQuestions = 10;
+            const themeLabel = 'sport';
             await sut.generateQuestionsForQuiz(
                 savedQuizQuestions,
                 numberOfQuestions,
+                themeLabel,
             );
 
             expect(promptServiceSpy.calls.getQuizQuestionsPrompt.count).toBe(1);
             expect(
                 promptServiceSpy.calls.getQuizQuestionsPrompt.history,
-            ).toContainEqual([savedQuizQuestions, numberOfQuestions]);
+            ).toContainEqual([
+                savedQuizQuestions,
+                numberOfQuestions,
+                themeLabel,
+            ]);
         });
 
         it('should call openai API using retrieved prompt', async () => {
@@ -51,7 +57,7 @@ describe('OpenAIServiceImpl', () => {
 
             stubCreateOpenAIObject(openAIObjectFactorySpy);
 
-            await sut.generateQuestionsForQuiz([], 10);
+            await sut.generateQuestionsForQuiz([], 10, 'music');
 
             expect(openAIObjectFactorySpy.calls.createOpenAIObject.count).toBe(
                 1,
@@ -161,7 +167,7 @@ class PromptServiceSpy implements PromptService {
     calls = {
         getQuizQuestionsPrompt: {
             count: 0,
-            history: [] as [QuizQuestion[], number][],
+            history: [] as [QuizQuestion[], number, string][],
         },
         getQuizThemesPrompt: {
             count: 0,
@@ -172,11 +178,13 @@ class PromptServiceSpy implements PromptService {
     getQuizQuestionsPrompt(
         savedQuizQuestions: QuizQuestion[],
         numberOfQuestions: number,
+        themeLabel: string,
     ): string {
         this.calls.getQuizQuestionsPrompt.count++;
         this.calls.getQuizQuestionsPrompt.history.push([
             savedQuizQuestions,
             numberOfQuestions,
+            themeLabel,
         ]);
         return '';
     }
@@ -254,11 +262,13 @@ function stubGetQuizQuestionsPrompt(
     promptServiceSpy.getQuizQuestionsPrompt = (
         savedQuizQuestions: QuizQuestion[],
         numberOfQuestions: number,
+        themeLabel: string,
     ) => {
         promptServiceSpy.calls.getQuizQuestionsPrompt.count++;
         promptServiceSpy.calls.getQuizQuestionsPrompt.history.push([
             savedQuizQuestions,
             numberOfQuestions,
+            themeLabel,
         ]);
         return returnedValue;
     };

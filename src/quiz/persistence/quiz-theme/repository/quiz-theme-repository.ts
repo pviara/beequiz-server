@@ -2,6 +2,7 @@ import { ParsedQuizTheme } from 'src/quiz/application/quiz-parser/model/parsed-q
 import { QuizTheme } from '../../../domain/quiz-parameters';
 
 export interface QuizThemeRepository {
+    getQuizTheme(themeId: string): Promise<QuizTheme | null>;
     getQuizThemes(): Promise<QuizTheme[]>;
     saveGeneratedThemes(quizThemes: ParsedQuizTheme[]): Promise<QuizTheme[]>;
 }

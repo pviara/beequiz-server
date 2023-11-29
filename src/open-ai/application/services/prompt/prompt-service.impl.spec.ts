@@ -10,14 +10,23 @@ describe('PromptServiceImpl', () => {
     });
 
     describe('getQuizQuestionsPrompt', () => {
-        it('should add number of questions inside the prompt', () => {
+        it('should add number of questions and theme label inside the prompt', () => {
             const numberOfQuestions = 5;
-            const result = sut.getQuizQuestionsPrompt([], numberOfQuestions);
+            const themeLabel = 'history';
+            const result = sut.getQuizQuestionsPrompt(
+                [],
+                numberOfQuestions,
+                themeLabel,
+            );
 
             expect(
                 result.includes(
                     `embedded JSON de ${numberOfQuestions} questions`,
                 ),
+            ).toBe(true);
+
+            expect(
+                result.includes(`basées sur le thème de "${themeLabel}"`),
             ).toBe(true);
         });
 
@@ -28,7 +37,11 @@ describe('PromptServiceImpl', () => {
                 new QuizQuestion('', 'label3', []),
             ];
 
-            const result = sut.getQuizQuestionsPrompt(savedQuizQuestions, 5);
+            const result = sut.getQuizQuestionsPrompt(
+                savedQuizQuestions,
+                5,
+                'geography',
+            );
 
             const [{ label: label1 }, { label: label2 }, { label: label3 }] =
                 savedQuizQuestions;

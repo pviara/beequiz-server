@@ -5,6 +5,7 @@ export interface PromptService {
     getQuizQuestionsPrompt(
         savedQuizQuestions: QuizQuestion[],
         numberOfQuestions: number,
+        themeLabel: string,
     ): string;
     getQuizThemesPrompt(savedQuizThemes: QuizTheme[]): string;
 }

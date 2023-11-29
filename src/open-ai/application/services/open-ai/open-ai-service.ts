@@ -7,6 +7,7 @@ export interface OpenAIService {
     generateQuestionsForQuiz(
         savedQuizQuestions: QuizQuestion[],
         numberOfQuestions: number,
+        themeLabel: string,
     ): Promise<ParsedQuizQuestion[]>;
     generateThemesForQuiz(
         savedQuizThemes: QuizTheme[],
