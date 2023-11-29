@@ -2,13 +2,14 @@ import { Inject } from '@nestjs/common';
 import { OpenAIObjectFactory } from '../../../../open-ai/application/open-ai-object-factory/open-ai-object-factory';
 import { OpenAIService } from './open-ai-service';
 import { OPENAI_OBJECT_FACTORY_TOKEN } from '../../../../open-ai/application/open-ai-object-factory/open-ai-object-factory.provider';
+import { ParsedQuizQuestion } from '../../../../quiz/application/quiz-parser/model/parsed-quiz-question';
+import { ParsedQuizTheme } from '../../../../quiz/application/quiz-parser/model/parsed-quiz-theme';
 import { PromptService } from '../prompt/prompt-service';
 import { PROMPT_SERVICE_TOKEN } from '../prompt/prompt-service.provider';
 import { QuizParser } from '../../../../quiz/application/quiz-parser/quiz-parser';
 import { QuizQuestion } from '../../../../quiz/domain/quiz-question';
 import { QuizTheme } from '../../../../quiz/domain/quiz-parameters';
 import { QUIZ_PARSER_TOKEN } from '../../../../quiz/application/quiz-parser/quiz-parser.provider';
-import { ParsedQuizTheme } from 'src/quiz/application/quiz-parser/model/parsed-quiz-theme';
 
 export class OpenAIServiceImpl implements OpenAIService {
     constructor(
@@ -25,7 +26,7 @@ export class OpenAIServiceImpl implements OpenAIService {
     async generateQuestionsForQuiz(
         savedQuizQuestions: QuizQuestion[],
         numberOfQuestions: number,
-    ): Promise<QuizQuestion[]> {
+    ): Promise<ParsedQuizQuestion[]> {
         const prompt = this.promptService.getQuizQuestionsPrompt(
             savedQuizQuestions,
             numberOfQuestions,

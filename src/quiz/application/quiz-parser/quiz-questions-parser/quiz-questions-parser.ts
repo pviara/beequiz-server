@@ -1,10 +1,13 @@
 import { isInvalidStructure } from '../../../../utils/utils';
-import { QuizAnswer, QuizQuestion } from '../../../domain/quiz-question';
+import {
+    ParsedQuizAnswer,
+    ParsedQuizQuestion,
+} from '../model/parsed-quiz-question';
 
 export class QuizQuestionsParser {
     constructor(readonly stringifiedObject: string) {}
 
-    parse(): QuizQuestion[] {
+    parse(): ParsedQuizQuestion[] {
         try {
             const parsedObject = JSON.parse(this.stringifiedObject);
             if (!parsedObject.questions) {
@@ -44,14 +47,19 @@ export class QuizQuestionsParser {
         return isInvalidStructure(checkedObject, objStructRef);
     }
 
-    private createObjectStructureRef(): QuizQuestion {
-        return new QuizQuestion('label', [new QuizAnswer('label', true)]);
+    private createObjectStructureRef(): ParsedQuizQuestion {
+        return new ParsedQuizQuestion('label', [
+            new ParsedQuizAnswer('label', true),
+        ]);
     }
 
-    private mapQuizQuestions(parsedObject: any): QuizQuestion[] {
+    private mapQuizQuestions(parsedObject: any): ParsedQuizQuestion[] {
         return parsedObject.questions.map(
             (quizQuestion: Record<string, any>) =>
-                new QuizQuestion(quizQuestion.label, quizQuestion.answers),
+                new ParsedQuizQuestion(
+                    quizQuestion.label,
+                    quizQuestion.answers,
+                ),
         );
     }
 }

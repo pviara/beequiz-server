@@ -59,8 +59,8 @@ export class QuizServiceImpl implements QuizService {
         quizThemeId: string,
         numberOfQuestions: number,
     ): Promise<QuizQuestion[]> {
-        const savedQuizQuestions =
-            this.quizQuestionRepository.getQuizQuestions(quizThemeId);
+        let savedQuizQuestions =
+            await this.quizQuestionRepository.getQuizQuestions(quizThemeId);
 
         const areEnoughSavedQuestions =
             savedQuizQuestions.length >= numberOfQuestions;
@@ -72,16 +72,20 @@ export class QuizServiceImpl implements QuizService {
             return savedQuizQuestions;
         }
 
-        const quizQuestions = await this.openAIService.generateQuestionsForQuiz(
-            savedQuizQuestions,
-            numberOfQuestions,
-        );
+        const parsedQuizQuestions =
+            await this.openAIService.generateQuestionsForQuiz(
+                savedQuizQuestions,
+                numberOfQuestions,
+            );
 
-        this.quizQuestionRepository.saveGeneratedQuestions(quizQuestions);
+        savedQuizQuestions =
+            await this.quizQuestionRepository.saveGeneratedQuestions(
+                parsedQuizQuestions,
+            );
 
         this.recordLastQuestionRequestDate();
 
-        return quizQuestions;
+        return savedQuizQuestions;
     }
 
     private hasLastQuestionRequestBeenMadeLessThan72HoursAgo(): boolean {

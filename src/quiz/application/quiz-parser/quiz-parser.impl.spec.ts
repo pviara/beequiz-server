@@ -1,6 +1,10 @@
 import { ParsedQuizTheme } from './model/parsed-quiz-theme';
 import { QuizAnswer, QuizQuestion } from '../../domain/quiz-question';
 import { QuizParserImpl } from './quiz-parser.impl';
+import {
+    ParsedQuizAnswer,
+    ParsedQuizQuestion,
+} from './model/parsed-quiz-question';
 
 describe('QuizParserImpl', () => {
     let sut: QuizParserImpl;
@@ -54,7 +58,7 @@ describe('QuizParserImpl', () => {
         });
 
         it('should return array of instances of quiz questions', () => {
-            const quizQuestions: { questions: QuizQuestion[] } = {
+            const quizQuestions: { questions: ParsedQuizQuestion[] } = {
                 questions: [
                     {
                         label: 'labelA',
@@ -89,13 +93,13 @@ describe('QuizParserImpl', () => {
             const result = sut.parseQuizQuestions(stringifiedObject);
 
             expect(result).toEqual([
-                new QuizQuestion('labelA', [
-                    new QuizAnswer('labelA-A', false),
-                    new QuizAnswer('labelA-B', true),
+                new ParsedQuizQuestion('labelA', [
+                    new ParsedQuizAnswer('labelA-A', false),
+                    new ParsedQuizAnswer('labelA-B', true),
                 ]),
-                new QuizQuestion('labelB', [
-                    new QuizAnswer('labelB-A', false),
-                    new QuizAnswer('labelB-B', true),
+                new ParsedQuizQuestion('labelB', [
+                    new ParsedQuizAnswer('labelB-A', false),
+                    new ParsedQuizAnswer('labelB-B', true),
                 ]),
             ]);
         });

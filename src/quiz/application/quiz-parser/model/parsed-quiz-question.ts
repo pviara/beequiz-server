@@ -1,14 +1,13 @@
-export class QuizAnswer {
+export class ParsedQuizAnswer {
     constructor(
         readonly label: string,
         readonly isCorrect: boolean,
     ) {}
 }
 
-export class QuizQuestion {
+export class ParsedQuizQuestion {
     constructor(
-        readonly id: string,
         readonly label: string,
-        readonly answers: QuizAnswer[],
+        readonly answers: ParsedQuizAnswer[],
     ) {}
 }

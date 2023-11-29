@@ -23,9 +23,9 @@ describe('PromptServiceImpl', () => {
 
         it('should add quiz questions inside the prompt to mark them as used', () => {
             const savedQuizQuestions = [
-                new QuizQuestion('label1', []),
-                new QuizQuestion('label2', []),
-                new QuizQuestion('label3', []),
+                new QuizQuestion('', 'label1', []),
+                new QuizQuestion('', 'label2', []),
+                new QuizQuestion('', 'label3', []),
             ];
 
             const result = sut.getQuizQuestionsPrompt(savedQuizQuestions, 5);

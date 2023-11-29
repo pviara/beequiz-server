@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { ParsedQuizQuestion } from '../../../application/quiz-parser/model/parsed-quiz-question';
 import { QuizQuestion } from '../../../domain/quiz-question';
 import { QuizQuestionRepository } from './quiz-question-repository';
 import {
@@ -15,11 +16,13 @@ export class MongoDbQuizQuestionRepo implements QuizQuestionRepository {
         private model: Model<QuizQuestionEntity>,
     ) {}
 
-    getQuizQuestions(themeId: string): QuizQuestion[] {
+    getQuizQuestions(themeId: string): Promise<QuizQuestion[]> {
         throw new Error('Method not implemented.');
     }
 
-    saveGeneratedQuestions(quizQuestions: QuizQuestion[]): void {
+    saveGeneratedQuestions(
+        quizQuestions: ParsedQuizQuestion[],
+    ): Promise<QuizQuestion[]> {
         throw new Error('Method not implemented.');
     }
 }
