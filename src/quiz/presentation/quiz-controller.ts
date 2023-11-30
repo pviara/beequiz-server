@@ -1,34 +1,39 @@
-import { Controller, Get, Inject } from '@nestjs/common';
-import { QuizService } from '../application/quiz-service/quiz-service';
-import { QUIZ_SERVICE_TOKEN } from '../application/quiz-service/quiz-service.provider';
+import { CommandBus } from '@nestjs/cqrs';
+import { Controller, Get } from '@nestjs/common';
 import { QuizParameters } from '../domain/quiz-parameters';
+import {
+    GetQuizParametersCommand,
+    GetQuizParametersHandler,
+} from '../application/handlers/get-quiz-parameters.handler';
+import {
+    GetQuizQuestionsCommand,
+    GetQuizQuestionsHandler,
+} from '../application/handlers/get-quiz-questions.handler';
 
 @Controller()
 export class QuizController {
-    constructor(
-        @Inject(QUIZ_SERVICE_TOKEN)
-        private quizService: QuizService,
-    ) {}
+    constructor(private commandBus: CommandBus) {}
 
     @Get('parameters')
     async theme(): Promise<QuizParameters> {
-        return this.quizService.getQuizParameters();
+        const command = new GetQuizParametersCommand();
+
+        return this.commandBus.execute<
+            typeof command,
+            ReturnType<GetQuizParametersHandler['execute']>
+        >(command);
     }
 
-    @Get('question')
+    @Get('questions')
     async question(): Promise<any[]> {
-        return (
-            await this.quizService.getQuizQuestions(
-                '6567452ddd9a07af30a1b148',
-                20,
-            )
-        ).map((quizQuestion) => ({
-            id: quizQuestion.id,
-            label: quizQuestion.label,
-            answers: quizQuestion.answers.map((answer) => ({
-                id: answer.id,
-                label: answer.label,
-            })),
-        }));
+        const command = new GetQuizQuestionsCommand(
+            10,
+            '6567452ddd9a07af30a1b148',
+        );
+
+        return this.commandBus.execute<
+            typeof command,
+            ReturnType<GetQuizQuestionsHandler['execute']>
+        >(command);
     }
 }
