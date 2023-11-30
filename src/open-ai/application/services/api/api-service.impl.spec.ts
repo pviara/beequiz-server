@@ -1,5 +1,6 @@
 import {
     ApiServiceImpl,
+    QUIZ_QUESTIONS_REQUEST_INFO_PATH,
     QUIZ_THEMES_REQUEST_INFO_PATH,
     RequestInfo,
 } from './api-service.impl';
@@ -19,6 +20,41 @@ describe('ApiServiceImpl', () => {
         jest.resetAllMocks();
 
         sut = new ApiServiceImpl(dateTimeServiceSpy);
+    });
+
+    describe('cannotGenerateQuizQuestions', () => {
+        it('should return true when last quiz question request was made LESS than 3 days ago', () => {
+            const readRequestInfo: RequestInfo = {
+                date: new Date('2023-11-24'),
+            };
+            const dummyDate = new Date('2023-11-25');
+
+            stubReadFileSync(readRequestInfo);
+            stubGetNow(dateTimeServiceSpy, dummyDate);
+
+            const result = sut.cannotGenerateQuizQuestions();
+
+            expect(fsMock.readFileSync).toHaveBeenCalledTimes(1);
+            expect(fsMock.readFileSync).toHaveBeenCalledWith(
+                resolve(QUIZ_QUESTIONS_REQUEST_INFO_PATH),
+            );
+
+            expect(result).toBe(true);
+        });
+
+        it('should return false when last quiz theme request was made MORE than 3 days ago', () => {
+            const readRequestInfo: RequestInfo = {
+                date: new Date('2023-11-24'),
+            };
+            const dummyDate = new Date('2023-11-28');
+
+            stubReadFileSync(readRequestInfo);
+            stubGetNow(dateTimeServiceSpy, dummyDate);
+
+            const result = sut.cannotGenerateQuizThemes();
+
+            expect(result).toBe(false);
+        });
     });
 
     describe('cannotGenerateQuizThemes', () => {
@@ -53,6 +89,25 @@ describe('ApiServiceImpl', () => {
             const result = sut.cannotGenerateQuizThemes();
 
             expect(result).toBe(false);
+        });
+    });
+
+    describe('flagQuizQuestionSRequest', () => {
+        it("should write a JSON file at a specific path with today's date in it", () => {
+            const dummyDate = new Date('2023-11-25');
+            const requestInfoToWrite: RequestInfo = {
+                date: dummyDate,
+            };
+
+            stubGetNow(dateTimeServiceSpy, dummyDate);
+
+            sut.flagQuizQuestionRequest();
+
+            expect(fsMock.writeFileSync).toHaveBeenCalledTimes(1);
+            expect(fsMock.writeFileSync).toHaveBeenCalledWith(
+                resolve(QUIZ_QUESTIONS_REQUEST_INFO_PATH),
+                JSON.stringify(requestInfoToWrite),
+            );
         });
     });
 

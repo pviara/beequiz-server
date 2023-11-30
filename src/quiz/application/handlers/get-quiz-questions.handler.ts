@@ -5,11 +5,11 @@ import { Inject } from '@nestjs/common';
 import { OpenAIService } from '../../../open-ai/application/services/open-ai/open-ai-service';
 import { OPENAI_SERVICE_TOKEN } from '../../../open-ai/application/services/open-ai/open-ai-service.provider';
 import { ParsedQuizQuestion } from '../quiz-parser/model/parsed-quiz-question';
+import { QuizQuestion } from '../../domain/quiz-question';
 import { QuizQuestionRepository } from '../../persistence/quiz-question/repository/quiz-question-repository';
 import { QuizThemeRepository } from '../../persistence/quiz-theme/repository/quiz-theme-repository';
 import { QuizThemeNotFoundException } from '../errors/quiz-theme-not-found.exception';
 import { QuizTheme } from '../../domain/quiz-parameters';
-import { QuizQuestion } from '../../domain/quiz-question';
 import { QUIZ_QUESTION_REPO_TOKEN } from '../../persistence/quiz-question/repository/quiz-question-repository.provider';
 import { QUIZ_THEME_REPO_TOKEN } from '../../persistence/quiz-theme/repository/quiz-theme-repository.provider';
 
@@ -26,6 +26,7 @@ export class GetQuizQuestionsHandler
 {
     private existingQuestions: QuizQuestion[] = [];
     private generatedQuestions: ParsedQuizQuestion[] = [];
+    private numberOfQuestions!: number;
     private savedQuestions: QuizQuestion[] = [];
     private theme!: QuizTheme;
 
@@ -47,18 +48,17 @@ export class GetQuizQuestionsHandler
         numberOfQuestions,
         themeId,
     }: GetQuizQuestionsCommand): Promise<any> {
+        this.numberOfQuestions = numberOfQuestions;
+
         const theme = await this.getTheme(themeId);
 
         await this.getExistingQuestionsFor(theme.id);
 
-        if (
-            this.apiService.cannotGenerateQuizQuestions() &&
-            this.areEnoughExistingQuestionsFor(numberOfQuestions)
-        ) {
+        if (this.cannotGenerateQuizQuestions()) {
             return this.existingQuestions;
         }
 
-        await this.generateQuestions(numberOfQuestions);
+        await this.generateQuestions();
         await this.saveGeneratedQuestions();
 
         return this.savedQuestions;
@@ -75,19 +75,28 @@ export class GetQuizQuestionsHandler
     }
 
     private async getExistingQuestionsFor(themeId: string): Promise<void> {
-        this.existingQuestions =
-            await this.questionRepo.getQuizQuestions(themeId);
+        this.existingQuestions = await this.questionRepo.getQuizQuestions(
+            this.numberOfQuestions,
+            themeId,
+        );
     }
 
-    private areEnoughExistingQuestionsFor(numberOfQuestions: number): boolean {
-        return this.existingQuestions.length >= numberOfQuestions;
+    private cannotGenerateQuizQuestions(): boolean {
+        return (
+            this.areEnoughExistingQuestions() &&
+            this.apiService.cannotGenerateQuizQuestions()
+        );
     }
 
-    private async generateQuestions(numberOfQuestions: number): Promise<void> {
+    private areEnoughExistingQuestions(): boolean {
+        return this.existingQuestions.length >= this.numberOfQuestions;
+    }
+
+    private async generateQuestions(): Promise<void> {
         this.generatedQuestions =
             await this.openAIService.generateQuestionsForQuiz(
                 this.existingQuestions,
-                numberOfQuestions,
+                this.numberOfQuestions,
                 this.theme.label,
             );
 

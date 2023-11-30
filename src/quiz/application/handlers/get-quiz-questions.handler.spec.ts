@@ -85,7 +85,7 @@ describe('GetQuizQuestionsHandler', () => {
             );
         });
 
-        it('should retrieve existing quiz themes from database anyway', async () => {
+        it('should retrieve existing quiz questions from database anyway', async () => {
             const command = new GetQuizQuestionsCommand(5, existingTheme.id);
 
             stubGetQuizTheme(quizThemeRepoSpy, existingTheme);
@@ -95,7 +95,7 @@ describe('GetQuizQuestionsHandler', () => {
             expect(quizQuestionRepoSpy.calls.getQuizQuestions.count).toBe(1);
             expect(
                 quizQuestionRepoSpy.calls.getQuizQuestions.history,
-            ).toContain(existingTheme.id);
+            ).toContainEqual([command.numberOfQuestions, existingTheme.id]);
         });
 
         describe('OpenAI API request cannot be made', () => {
@@ -132,10 +132,6 @@ describe('GetQuizQuestionsHandler', () => {
                 stubGetQuizQuestions(quizQuestionRepoSpy, slicedQuestions);
 
                 await sut.execute(command);
-
-                expect(
-                    apiServiceSpy.calls.cannotGenerateQuizQuestions.count,
-                ).toBe(1);
 
                 expect(
                     openAIServiceSpy.calls.generateQuestionsForQuiz.count,

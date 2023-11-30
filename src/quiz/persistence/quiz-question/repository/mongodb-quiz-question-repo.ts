@@ -1,4 +1,4 @@
-import { AnyKeys, Model, Types } from 'mongoose';
+import { AnyKeys, Model, PipelineStage, Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ParsedQuizQuestion } from '../../../application/quiz-parser/model/parsed-quiz-question';
@@ -16,10 +16,24 @@ export class MongoDbQuizQuestionRepo implements QuizQuestionRepository {
         private model: Model<QuizQuestionEntity>,
     ) {}
 
-    async getQuizQuestions(themeId: string): Promise<QuizQuestion[]> {
-        const entities = await this.model.find({
-            themeId: new Types.ObjectId(themeId),
-        });
+    async getQuizQuestions(
+        numberOfQuestions: number,
+        themeId: string,
+    ): Promise<QuizQuestion[]> {
+        const pipeline: PipelineStage[] = [
+            {
+                $match: {
+                    themeId: new Types.ObjectId(themeId),
+                },
+            },
+            {
+                $sample: {
+                    size: numberOfQuestions,
+                },
+            },
+        ];
+
+        const entities = await this.model.aggregate(pipeline).exec();
         return this.mapToQuestions(entities);
     }
 

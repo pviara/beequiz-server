@@ -6,7 +6,7 @@ export class QuizQuestionRepositorySpy implements QuizQuestionRepository {
     calls = {
         getQuizQuestions: {
             count: 0,
-            history: [] as string[],
+            history: [] as [number, string][],
         },
         saveGeneratedQuestions: {
             count: 0,
@@ -14,9 +14,12 @@ export class QuizQuestionRepositorySpy implements QuizQuestionRepository {
         },
     };
 
-    async getQuizQuestions(themeId: string): Promise<QuizQuestion[]> {
+    async getQuizQuestions(
+        length: number,
+        themeId: string,
+    ): Promise<QuizQuestion[]> {
         this.calls.getQuizQuestions.count++;
-        this.calls.getQuizQuestions.history.push(themeId);
+        this.calls.getQuizQuestions.history.push([length, themeId]);
         return [];
     }
 
@@ -37,8 +40,15 @@ export function stubGetQuizQuestions(
     quizQuestionRepoSpy: QuizQuestionRepositorySpy,
     returnedValue: QuizQuestion[],
 ): void {
-    quizQuestionRepoSpy.getQuizQuestions = (): Promise<QuizQuestion[]> => {
+    quizQuestionRepoSpy.getQuizQuestions = (
+        length: number,
+        themeId: string,
+    ): Promise<QuizQuestion[]> => {
         quizQuestionRepoSpy.calls.getQuizQuestions.count++;
+        quizQuestionRepoSpy.calls.getQuizQuestions.history.push([
+            length,
+            themeId,
+        ]);
         return Promise.resolve(returnedValue);
     };
 }

@@ -28,7 +28,7 @@ export class QuizController {
     async question(): Promise<any[]> {
         const command = new GetQuizQuestionsCommand(
             10,
-            '6567452ddd9a07af30a1b148',
+            '65687f995dd8a5d11a617ae8',
         );
 
         return this.commandBus.execute<

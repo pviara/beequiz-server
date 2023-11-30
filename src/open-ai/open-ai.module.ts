@@ -5,10 +5,11 @@ import { OpenAIObjectFactoryProvider } from './application/open-ai-object-factor
 import { OpenAIServiceProvider } from './application/services/open-ai/open-ai-service.provider';
 import { PromptServiceProvider } from './application/services/prompt/prompt-service.provider';
 import { QuizParserModule } from '../quiz/application/quiz-parser/quiz-parser.module';
+import { SharedModule } from '../shared/shared.module';
 
 @Module({
     exports: [ApiServiceProvider, OpenAIServiceProvider],
-    imports: [AppConfigModule, QuizParserModule],
+    imports: [AppConfigModule, QuizParserModule, SharedModule],
     providers: [
         ApiServiceProvider,
         OpenAIObjectFactoryProvider,
