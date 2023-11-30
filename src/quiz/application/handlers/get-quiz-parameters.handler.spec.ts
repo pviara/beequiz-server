@@ -1,11 +1,20 @@
-import { ApiService } from '../../../open-ai/application/services/api/api-service';
+import {
+    ApiServiceSpy,
+    stubCannotGenerateQuizThemes,
+} from './test/api-service.spy';
 import { GetQuizParametersHandler } from './get-quiz-parameters.handler';
-import { OpenAIService } from '../../../open-ai/application/services/open-ai/open-ai-service';
-import { ParsedQuizQuestion } from '../quiz-parser/model/parsed-quiz-question';
+import {
+    OpenAIServiceSpy,
+    stubGenerateThemesForQuiz,
+} from './test/open-ai-api-service.spy';
 import { ParsedQuizTheme } from '../quiz-parser/model/parsed-quiz-theme';
-import { QuizQuestion } from '../../domain/quiz-question';
 import { QuizTheme } from '../../domain/quiz-parameters';
-import { QuizThemeRepository } from '../../persistence/quiz-theme/repository/quiz-theme-repository';
+import {
+    QuizThemeRepositorySpy,
+    mapToQuizThemes,
+    stubGetQuizThemes,
+    stubSaveGeneratedThemes,
+} from './test/quiz-theme-repository.spy';
 
 describe('GetQuizParametersHandler', () => {
     let sut: GetQuizParametersHandler;
@@ -95,135 +104,3 @@ describe('GetQuizParametersHandler', () => {
         });
     });
 });
-
-class ApiServiceSpy implements ApiService {
-    calls = {
-        cannotGenerateQuizThemes: {
-            count: 0,
-        },
-        flagQuizThemeRequest: {
-            count: 0,
-        },
-    };
-
-    cannotGenerateQuizQuestions(): boolean {
-        throw new Error('Method not implemented.');
-    }
-
-    cannotGenerateQuizThemes(): boolean {
-        this.calls.cannotGenerateQuizThemes.count++;
-        return true;
-    }
-
-    flagQuizQuestionRequest(): void {
-        throw new Error('Method not implemented.');
-    }
-
-    flagQuizThemeRequest(): void {
-        this.calls.flagQuizThemeRequest.count++;
-    }
-}
-
-function stubCannotGenerateQuizThemes(
-    apiServiceSpy: ApiServiceSpy,
-    returnedValue: boolean,
-): void {
-    apiServiceSpy.cannotGenerateQuizThemes = () => {
-        apiServiceSpy.calls.cannotGenerateQuizThemes.count++;
-        return returnedValue;
-    };
-}
-
-class OpenAIServiceSpy implements OpenAIService {
-    calls = {
-        generateThemesForQuiz: {
-            count: 0,
-            history: [] as QuizTheme[][],
-        },
-    };
-
-    generateQuestionsForQuiz(
-        savedQuizQuestions: QuizQuestion[],
-        numberOfQuestions: number,
-        themeLabel: string,
-    ): Promise<ParsedQuizQuestion[]> {
-        return Promise.resolve([]);
-    }
-
-    generateThemesForQuiz(
-        savedQuizThemes: QuizTheme[],
-    ): Promise<ParsedQuizTheme[]> {
-        this.calls.generateThemesForQuiz.count++;
-        this.calls.generateThemesForQuiz.history.push(savedQuizThemes);
-        return Promise.resolve([]);
-    }
-}
-
-function stubGenerateThemesForQuiz(
-    openAIServiceSpy: OpenAIServiceSpy,
-    returnedValue: ParsedQuizTheme[],
-): void {
-    openAIServiceSpy.generateThemesForQuiz = (): Promise<ParsedQuizTheme[]> => {
-        openAIServiceSpy.calls.generateThemesForQuiz.count++;
-        return Promise.resolve(returnedValue);
-    };
-}
-
-class QuizThemeRepositorySpy implements QuizThemeRepository {
-    calls = {
-        getQuizThemes: {
-            count: 0,
-        },
-        saveGeneratedThemes: {
-            count: 0,
-            history: [] as ParsedQuizTheme[][],
-        },
-    };
-
-    async getQuizTheme(themeId: string): Promise<QuizTheme | null> {
-        return null;
-    }
-
-    async getQuizThemes(): Promise<QuizTheme[]> {
-        this.calls.getQuizThemes.count++;
-        return [];
-    }
-
-    async saveGeneratedThemes(quizThemes: QuizTheme[]): Promise<QuizTheme[]> {
-        this.calls.saveGeneratedThemes.count++;
-        this.calls.saveGeneratedThemes.history.push(quizThemes);
-        return [];
-    }
-}
-
-function stubGetQuizThemes(
-    quizThemeRepoSpy: QuizThemeRepositorySpy,
-    returnedValue: QuizTheme[],
-): void {
-    quizThemeRepoSpy.getQuizThemes = (): Promise<QuizTheme[]> => {
-        quizThemeRepoSpy.calls.getQuizThemes.count++;
-        return Promise.resolve(returnedValue);
-    };
-}
-
-function stubSaveGeneratedThemes(
-    quizThemeRepositorySpy: QuizThemeRepositorySpy,
-    returnedValue: QuizTheme[],
-): void {
-    quizThemeRepositorySpy.saveGeneratedThemes = (
-        quizThemes: ParsedQuizTheme[],
-    ): Promise<QuizTheme[]> => {
-        quizThemeRepositorySpy.calls.saveGeneratedThemes.count++;
-        quizThemeRepositorySpy.calls.saveGeneratedThemes.history.push(
-            quizThemes,
-        );
-        return Promise.resolve(returnedValue);
-    };
-}
-
-function mapToQuizThemes(generatedThemes: ParsedQuizTheme[]): QuizTheme[] {
-    return generatedThemes.map(
-        (parsedTheme) =>
-            new QuizTheme('id', parsedTheme.code, parsedTheme.label),
-    );
-}
