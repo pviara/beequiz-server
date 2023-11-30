@@ -5,7 +5,7 @@ import { QuizTheme } from '../../../../quiz/domain/quiz-parameters';
 
 export interface OpenAIService {
     generateQuestionsForQuiz(
-        savedQuizQuestions: QuizQuestion[],
+        existingQuestions: QuizQuestion[],
         numberOfQuestions: number,
         themeLabel: string,
     ): Promise<ParsedQuizQuestion[]>;

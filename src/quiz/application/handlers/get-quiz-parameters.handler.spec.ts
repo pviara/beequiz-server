@@ -122,22 +122,30 @@ class ApiServiceSpy implements ApiService {
         },
     };
 
-    flagQuizThemeRequest(): void {
-        this.calls.flagQuizThemeRequest.count++;
+    cannotGenerateQuizQuestions(): boolean {
+        throw new Error('Method not implemented.');
     }
 
     cannotGenerateQuizThemes(): boolean {
         this.calls.cannotGenerateQuizThemes.count++;
         return true;
     }
+
+    flagQuizQuestionRequest(): void {
+        throw new Error('Method not implemented.');
+    }
+
+    flagQuizThemeRequest(): void {
+        this.calls.flagQuizThemeRequest.count++;
+    }
 }
 
 function stubCannotGenerateQuizThemes(
-    requestInfoServiceSpy: ApiServiceSpy,
+    apiServiceSpy: ApiServiceSpy,
     returnedValue: boolean,
 ): void {
-    requestInfoServiceSpy.cannotGenerateQuizThemes = () => {
-        requestInfoServiceSpy.calls.cannotGenerateQuizThemes.count++;
+    apiServiceSpy.cannotGenerateQuizThemes = () => {
+        apiServiceSpy.calls.cannotGenerateQuizThemes.count++;
         return returnedValue;
     };
 }

@@ -13,6 +13,10 @@ export const QUIZ_THEMES_REQUEST_INFO_PATH =
 export class ApiServiceImpl implements ApiService {
     constructor(private dateTimeService: DateTimeService) {}
 
+    cannotGenerateQuizQuestions(): boolean {
+        throw new Error('Method not implemented.');
+    }
+
     cannotGenerateQuizThemes(): boolean {
         const requestInfo = this.retrieveRequestInfo();
         if (!requestInfo) {
@@ -24,6 +28,10 @@ export class ApiServiceImpl implements ApiService {
         }
 
         return false;
+    }
+
+    flagQuizQuestionRequest(): void {
+        throw new Error('Method not implemented.');
     }
 
     flagQuizThemeRequest(): void {

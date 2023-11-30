@@ -4,7 +4,7 @@ import { QuizQuestion } from '../../../domain/quiz-question';
 export interface QuizQuestionRepository {
     getQuizQuestions(themeId: string): Promise<QuizQuestion[]>;
     saveGeneratedQuestions(
-        quizQuestions: ParsedQuizQuestion[],
+        generatedQuestions: ParsedQuizQuestion[],
         themeId: string,
     ): Promise<QuizQuestion[]>;
 }

@@ -7,6 +7,7 @@ import { OPENAI_SERVICE_TOKEN } from '../../../open-ai/application/services/open
 import { QuizParameters, QuizTheme } from '../../domain/quiz-parameters';
 import { QuizThemeRepository } from '../../persistence/quiz-theme/repository/quiz-theme-repository';
 import { QUIZ_THEME_REPO_TOKEN } from '../../persistence/quiz-theme/repository/quiz-theme-repository.provider';
+import { ParsedQuizTheme } from '../quiz-parser/model/parsed-quiz-theme';
 
 const DEFAULT_NUMBER_OF_QUESTIONS = [5, 10, 15];
 
@@ -16,6 +17,10 @@ export class GetQuizParametersCommand implements ICommand {
 
 @CommandHandler(GetQuizParametersCommand)
 export class GetQuizParametersHandler implements ICommandHandler {
+    private existingThemes: QuizTheme[] = [];
+    private generatedThemes: ParsedQuizTheme[] = [];
+    private savedThemes: QuizTheme[] = [];
+
     constructor(
         @Inject(API_SERVICE_TOKEN)
         private apiService: ApiService,
@@ -28,24 +33,44 @@ export class GetQuizParametersHandler implements ICommandHandler {
     ) {}
 
     async execute(): Promise<QuizParameters> {
-        const existingThemes = await this.repository.getQuizThemes();
+        await this.getThemes();
 
         if (this.apiService.cannotGenerateQuizThemes()) {
-            return this.createQuizParameters(existingThemes);
+            return this.createQuizParameters();
         }
 
-        const generatedThemes =
-            await this.openAIService.generateThemesForQuiz(existingThemes);
+        await this.generateThemes();
+        await this.saveGeneratedThemes();
 
-        const savedThemes =
-            await this.repository.saveGeneratedThemes(generatedThemes);
-
-        this.apiService.flagQuizThemeRequest();
-
-        return this.createQuizParameters([...existingThemes, ...savedThemes]);
+        return this.createQuizParameters();
     }
 
-    private createQuizParameters(quizThemes: QuizTheme[]): QuizParameters {
-        return new QuizParameters(quizThemes, DEFAULT_NUMBER_OF_QUESTIONS);
+    private async getThemes(): Promise<void> {
+        this.existingThemes = await this.repository.getQuizThemes();
+    }
+
+    private createQuizParameters(): QuizParameters {
+        return new QuizParameters(
+            this.combineExistingAndSavedThemes(),
+            DEFAULT_NUMBER_OF_QUESTIONS,
+        );
+    }
+
+    private combineExistingAndSavedThemes(): QuizTheme[] {
+        return [...this.existingThemes, ...this.savedThemes];
+    }
+
+    private async generateThemes(): Promise<void> {
+        this.generatedThemes = await this.openAIService.generateThemesForQuiz(
+            this.existingThemes,
+        );
+
+        this.apiService.flagQuizThemeRequest();
+    }
+
+    private async saveGeneratedThemes(): Promise<void> {
+        this.savedThemes = await this.repository.saveGeneratedThemes(
+            this.generatedThemes,
+        );
     }
 }
