@@ -9,6 +9,8 @@ import {
     GetQuizQuestionsCommand,
     GetQuizQuestionsHandler,
 } from '../application/handlers/get-quiz-questions.handler';
+import { QuizAnswerDTO, QuizQuestionDTO } from './dto/quiz-question-dto';
+import { QuizQuestion } from '../domain/quiz-question';
 
 @Controller()
 export class QuizController {
@@ -25,15 +27,30 @@ export class QuizController {
     }
 
     @Get('questions')
-    async question(): Promise<any[]> {
+    async question(): Promise<QuizQuestionDTO[]> {
         const command = new GetQuizQuestionsCommand(
             10,
-            '65687f995dd8a5d11a617ae8',
+            '65687f995dd8a5d11a617aee',
         );
 
-        return this.commandBus.execute<
+        const result = await this.commandBus.execute<
             typeof command,
             ReturnType<GetQuizQuestionsHandler['execute']>
         >(command);
+
+        return this.mapToQuestionsDTO(result);
+    }
+
+    private mapToQuestionsDTO(questions: QuizQuestion[]): QuizQuestionDTO[] {
+        return questions.map(
+            (question) =>
+                new QuizQuestionDTO(
+                    question.id,
+                    question.label,
+                    question.answers.map(
+                        (answer) => new QuizAnswerDTO(answer.id, answer.label),
+                    ),
+                ),
+        );
     }
 }

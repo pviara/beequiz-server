@@ -68,7 +68,7 @@ export class MongoDbQuizQuestionRepo implements QuizQuestionRepository {
 
     private mapToQuestion(entity: QuizQuestionEntity): QuizQuestion {
         return new QuizQuestion(
-            entity.id,
+            entity._id,
             entity.label,
             this.mapToAnswer(entity),
         );
@@ -78,7 +78,7 @@ export class MongoDbQuizQuestionRepo implements QuizQuestionRepository {
         return entity.answers.map(
             (answerEntity) =>
                 new QuizAnswer(
-                    answerEntity.id,
+                    answerEntity._id,
                     answerEntity.label,
                     answerEntity.isCorrect,
                 ),

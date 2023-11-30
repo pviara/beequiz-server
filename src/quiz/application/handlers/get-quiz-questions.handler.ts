@@ -47,7 +47,7 @@ export class GetQuizQuestionsHandler
     async execute({
         numberOfQuestions,
         themeId,
-    }: GetQuizQuestionsCommand): Promise<any> {
+    }: GetQuizQuestionsCommand): Promise<QuizQuestion[]> {
         this.numberOfQuestions = numberOfQuestions;
 
         const theme = await this.getTheme(themeId);
