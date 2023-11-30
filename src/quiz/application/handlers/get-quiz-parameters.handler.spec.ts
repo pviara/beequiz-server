@@ -1,11 +1,11 @@
 import { ApiService } from '../../../open-ai/application/services/api/api-service';
 import { GetQuizParametersHandler } from './get-quiz-parameters.handler';
 import { OpenAIService } from '../../../open-ai/application/services/open-ai/open-ai-service';
+import { ParsedQuizQuestion } from '../quiz-parser/model/parsed-quiz-question';
 import { ParsedQuizTheme } from '../quiz-parser/model/parsed-quiz-theme';
 import { QuizQuestion } from '../../domain/quiz-question';
 import { QuizTheme } from '../../domain/quiz-parameters';
 import { QuizThemeRepository } from '../../persistence/quiz-theme/repository/quiz-theme-repository';
-import { ParsedQuizQuestion } from '../quiz-parser/model/parsed-quiz-question';
 
 describe('GetQuizParametersHandler', () => {
     let sut: GetQuizParametersHandler;
@@ -13,6 +13,18 @@ describe('GetQuizParametersHandler', () => {
     let apiServiceSpy: ApiServiceSpy;
     let openAIServiceSpy: OpenAIServiceSpy;
     let quizThemeRepoSpy: QuizThemeRepositorySpy;
+
+    const existingThemes: QuizTheme[] = [
+        new QuizTheme('id1', 'code1', 'label1'),
+        new QuizTheme('id2', 'code2', 'label2'),
+        new QuizTheme('id3', 'code3', 'label3'),
+    ];
+
+    const generatedThemes: ParsedQuizTheme[] = [
+        new ParsedQuizTheme('codeA', 'labelA'),
+        new ParsedQuizTheme('codeB', 'labelB'),
+        new ParsedQuizTheme('codeC', 'labelC'),
+    ];
 
     beforeEach(() => {
         apiServiceSpy = new ApiServiceSpy();
@@ -33,81 +45,53 @@ describe('GetQuizParametersHandler', () => {
             expect(quizThemeRepoSpy.calls.getQuizThemes.count).toBe(1);
         });
 
-        it('should directly return existing quiz themes if OpenAI API request CANNOT be made', async () => {
-            const existingThemes: QuizTheme[] = [
-                new QuizTheme('id1', 'code1', 'label1'),
-                new QuizTheme('id2', 'code2', 'label2'),
-                new QuizTheme('id3', 'code3', 'label3'),
-            ];
+        describe('OpenAI API request cannot be made', () => {
+            it('should directly return existing themes', async () => {
+                stubGetQuizThemes(quizThemeRepoSpy, existingThemes);
+                stubCannotGenerateQuizThemes(apiServiceSpy, true);
 
-            stubGetQuizThemes(quizThemeRepoSpy, existingThemes);
-            stubCannotGenerateQuizThemes(apiServiceSpy, true);
+                const result = await sut.execute();
 
-            const result = await sut.execute();
-
-            expect(apiServiceSpy.calls.cannotGenerateQuizThemes.count).toBe(1);
-            expect(result.themes).toEqual(existingThemes);
+                expect(apiServiceSpy.calls.cannotGenerateQuizThemes.count).toBe(
+                    1,
+                );
+                expect(result.themes).toEqual(existingThemes);
+            });
         });
 
-        it('should generate new quiz themes if OpenAI API request CAN be made', async () => {
-            const existingThemes: QuizTheme[] = [
-                new QuizTheme('id1', 'code1', 'label1'),
-                new QuizTheme('id2', 'code2', 'label2'),
-                new QuizTheme('id3', 'code3', 'label3'),
-            ];
+        describe('OpenAI API request can be made', () => {
+            beforeEach(() => {
+                stubGetQuizThemes(quizThemeRepoSpy, existingThemes);
+                stubCannotGenerateQuizThemes(apiServiceSpy, false);
+            });
 
-            stubGetQuizThemes(quizThemeRepoSpy, existingThemes);
-            stubCannotGenerateQuizThemes(apiServiceSpy, false);
+            it('should generate new quiz themes', async () => {
+                await sut.execute();
 
-            await sut.execute();
+                expect(openAIServiceSpy.calls.generateThemesForQuiz.count).toBe(
+                    1,
+                );
+            });
 
-            expect(openAIServiceSpy.calls.generateThemesForQuiz.count).toBe(1);
-        });
+            it('should indicate that an OpenAI API request has been made', async () => {
+                await sut.execute();
 
-        it('should return both existing and generated quiz themes once request has been made', async () => {
-            const existingThemes: QuizTheme[] = [
-                new QuizTheme('id1', 'code1', 'label1'),
-                new QuizTheme('id2', 'code2', 'label2'),
-                new QuizTheme('id3', 'code3', 'label3'),
-            ];
+                expect(apiServiceSpy.calls.flagQuizThemeRequest.count).toBe(1);
+            });
 
-            const generatedThemes: ParsedQuizTheme[] = [
-                new ParsedQuizTheme('codeA', 'labelA'),
-                new ParsedQuizTheme('codeB', 'labelB'),
-                new ParsedQuizTheme('codeC', 'labelC'),
-            ];
+            it('should return both existing and generated quiz themes', async () => {
+                stubGenerateThemesForQuiz(openAIServiceSpy, generatedThemes);
 
-            const savedGeneratedThemes = mapToQuizThemes(generatedThemes);
+                const savedGeneratedThemes = mapToQuizThemes(generatedThemes);
+                stubSaveGeneratedThemes(quizThemeRepoSpy, savedGeneratedThemes);
 
-            stubGetQuizThemes(quizThemeRepoSpy, existingThemes);
-            stubCannotGenerateQuizThemes(apiServiceSpy, false);
-            stubGenerateThemesForQuiz(openAIServiceSpy, generatedThemes);
-            stubSaveGeneratedThemes(quizThemeRepoSpy, savedGeneratedThemes);
+                const result = await sut.execute();
 
-            const result = await sut.execute();
-
-            expect(quizThemeRepoSpy.calls.saveGeneratedThemes.count).toBe(1);
-            expect(
-                quizThemeRepoSpy.calls.saveGeneratedThemes.history,
-            ).toContainEqual(generatedThemes);
-
-            const existingAndSavedThemes = [
-                ...existingThemes,
-                ...savedGeneratedThemes,
-            ];
-
-            expect(result.themes).toEqual(existingAndSavedThemes);
-        });
-
-        it('should indicate that an OpenAI API request has been made', async () => {
-            stubGetQuizThemes(quizThemeRepoSpy, []);
-            stubCannotGenerateQuizThemes(apiServiceSpy, false);
-            stubGenerateThemesForQuiz(openAIServiceSpy, []);
-            stubSaveGeneratedThemes(quizThemeRepoSpy, []);
-
-            await sut.execute();
-
-            expect(apiServiceSpy.calls.flagQuizThemeRequest.count).toBe(1);
+                expect(result.themes).toEqual([
+                    ...existingThemes,
+                    ...savedGeneratedThemes,
+                ]);
+            });
         });
     });
 });

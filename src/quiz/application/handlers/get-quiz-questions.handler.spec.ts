@@ -5,12 +5,12 @@ import {
 } from './get-quiz-questions.handler';
 import { OpenAIService } from '../../../open-ai/application/services/open-ai/open-ai-service';
 import { ParsedQuizQuestion } from '../quiz-parser/model/parsed-quiz-question';
+import { ParsedQuizTheme } from '../quiz-parser/model/parsed-quiz-theme';
 import { QuizAnswer, QuizQuestion } from '../../domain/quiz-question';
 import { QuizQuestionRepository } from '../../persistence/quiz-question/repository/quiz-question-repository';
 import { QuizTheme } from '../../domain/quiz-parameters';
 import { QuizThemeNotFoundException } from '../errors/quiz-theme-not-found.exception';
 import { QuizThemeRepository } from '../../persistence/quiz-theme/repository/quiz-theme-repository';
-import { ParsedQuizTheme } from '../quiz-parser/model/parsed-quiz-theme';
 
 describe('GetQuizQuestionsHandler', () => {
     let sut: GetQuizQuestionsHandler;
@@ -169,6 +169,19 @@ describe('GetQuizQuestionsHandler', () => {
                 expect(
                     quizQuestionRepoSpy.calls.saveGeneratedQuestions.history,
                 ).toContainEqual([generatedQuestions, existingTheme.id]);
+            });
+
+            it('should indicate that an OpenAI API request has been made', async () => {
+                const command = new GetQuizQuestionsCommand(
+                    existingQuestions.length,
+                    existingTheme.id,
+                );
+
+                await sut.execute(command);
+
+                expect(apiServiceSpy.calls.flagQuizQuestionRequest.count).toBe(
+                    1,
+                );
             });
 
             it('should only return generated questions', async () => {
