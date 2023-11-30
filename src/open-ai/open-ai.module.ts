@@ -1,3 +1,4 @@
+import { ApiServiceProvider } from './application/services/api/api-service.provider';
 import { AppConfigModule } from '../infrastructure/app-config/app-config.module';
 import { Module } from '@nestjs/common';
 import { OpenAIObjectFactoryProvider } from './application/open-ai-object-factory/open-ai-object-factory.provider';
@@ -6,9 +7,10 @@ import { PromptServiceProvider } from './application/services/prompt/prompt-serv
 import { QuizParserModule } from '../quiz/application/quiz-parser/quiz-parser.module';
 
 @Module({
-    exports: [OpenAIServiceProvider],
+    exports: [ApiServiceProvider, OpenAIServiceProvider],
     imports: [AppConfigModule, QuizParserModule],
     providers: [
+        ApiServiceProvider,
         OpenAIObjectFactoryProvider,
         OpenAIServiceProvider,
         PromptServiceProvider,
