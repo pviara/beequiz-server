@@ -4,11 +4,11 @@ import { QuizParameters } from '../domain/quiz-parameters';
 import {
     GetQuizParametersCommand,
     GetQuizParametersHandler,
-} from '../application/handlers/get-quiz-parameters.handler';
+} from '../application/handlers/get-quiz-parameters/get-quiz-parameters.handler';
 import {
     GetQuizQuestionsCommand,
     GetQuizQuestionsHandler,
-} from '../application/handlers/get-quiz-questions.handler';
+} from '../application/handlers/get-quiz-questions/get-quiz-questions.handler';
 import { QuizAnswerDTO, QuizQuestionDTO } from './dto/quiz-question-dto';
 import { QuizQuestion } from '../domain/quiz-question';
 

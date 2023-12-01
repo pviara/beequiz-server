@@ -1,7 +1,7 @@
 import {
     ApiServiceSpy,
     stubCannotGenerateQuizQuestions,
-} from './test/api-service.spy';
+} from '../test/api-service.spy';
 import {
     GetQuizQuestionsCommand,
     GetQuizQuestionsHandler,
@@ -9,21 +9,21 @@ import {
 import {
     OpenAIServiceSpy,
     stubGenerateQuestionsForQuiz,
-} from './test/open-ai-api-service.spy';
-import { ParsedQuizQuestion } from '../quiz-parser/model/parsed-quiz-question';
-import { QuizQuestion } from '../../domain/quiz-question';
+} from '../test/open-ai-api-service.spy';
+import { ParsedQuizQuestion } from '../../quiz-parser/model/parsed-quiz-question';
+import { QuizQuestion } from '../../../domain/quiz-question';
 import {
     QuizQuestionRepositorySpy,
     mapToQuizQuestions,
     stubGetQuizQuestions,
     stubSaveGeneratedQuestions,
-} from './test/quiz-question-repository.spy';
-import { QuizTheme } from '../../domain/quiz-parameters';
-import { QuizThemeNotFoundException } from '../errors/quiz-theme-not-found.exception';
+} from '../test/quiz-question-repository.spy';
+import { QuizTheme } from '../../../domain/quiz-parameters';
+import { QuizThemeNotFoundException } from '../../errors/quiz-theme-not-found.exception';
 import {
     QuizThemeRepositorySpy,
     stubGetQuizTheme,
-} from './test/quiz-theme-repository.spy';
+} from '../test/quiz-theme-repository.spy';
 
 describe('GetQuizQuestionsHandler', () => {
     let sut: GetQuizQuestionsHandler;

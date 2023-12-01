@@ -1,13 +1,13 @@
-import { ApiService } from '../../../open-ai/application/services/api/api-service';
-import { API_SERVICE_TOKEN } from '../../../open-ai/application/services/api/api-service.provider';
+import { ApiService } from '../../../../open-ai/application/services/api/api-service';
+import { API_SERVICE_TOKEN } from '../../../../open-ai/application/services/api/api-service.provider';
 import { CommandHandler, ICommand, ICommandHandler } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
-import { OpenAIService } from '../../../open-ai/application/services/open-ai/open-ai-service';
-import { OPENAI_SERVICE_TOKEN } from '../../../open-ai/application/services/open-ai/open-ai-service.provider';
-import { ParsedQuizTheme } from '../quiz-parser/model/parsed-quiz-theme';
-import { QuizParameters, QuizTheme } from '../../domain/quiz-parameters';
-import { QuizThemeRepository } from '../../persistence/quiz-theme/repository/quiz-theme-repository';
-import { QUIZ_THEME_REPO_TOKEN } from '../../persistence/quiz-theme/repository/quiz-theme-repository.provider';
+import { OpenAIService } from '../../../../open-ai/application/services/open-ai/open-ai-service';
+import { OPENAI_SERVICE_TOKEN } from '../../../../open-ai/application/services/open-ai/open-ai-service.provider';
+import { ParsedQuizTheme } from '../../quiz-parser/model/parsed-quiz-theme';
+import { QuizParameters, QuizTheme } from '../../../domain/quiz-parameters';
+import { QuizThemeRepository } from '../../../persistence/quiz-theme/repository/quiz-theme-repository';
+import { QUIZ_THEME_REPO_TOKEN } from '../../../persistence/quiz-theme/repository/quiz-theme-repository.provider';
 
 const DEFAULT_NUMBER_OF_QUESTIONS = [5, 10, 15];
 

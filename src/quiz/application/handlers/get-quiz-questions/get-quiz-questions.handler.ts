@@ -1,17 +1,17 @@
-import { ApiService } from '../../../open-ai/application/services/api/api-service';
-import { API_SERVICE_TOKEN } from '../../../open-ai/application/services/api/api-service.provider';
+import { ApiService } from '../../../../open-ai/application/services/api/api-service';
+import { API_SERVICE_TOKEN } from '../../../../open-ai/application/services/api/api-service.provider';
 import { CommandHandler, ICommand, ICommandHandler } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
-import { OpenAIService } from '../../../open-ai/application/services/open-ai/open-ai-service';
-import { OPENAI_SERVICE_TOKEN } from '../../../open-ai/application/services/open-ai/open-ai-service.provider';
-import { ParsedQuizQuestion } from '../quiz-parser/model/parsed-quiz-question';
-import { QuizQuestion } from '../../domain/quiz-question';
-import { QuizQuestionRepository } from '../../persistence/quiz-question/repository/quiz-question-repository';
-import { QuizThemeRepository } from '../../persistence/quiz-theme/repository/quiz-theme-repository';
-import { QuizThemeNotFoundException } from '../errors/quiz-theme-not-found.exception';
-import { QuizTheme } from '../../domain/quiz-parameters';
-import { QUIZ_QUESTION_REPO_TOKEN } from '../../persistence/quiz-question/repository/quiz-question-repository.provider';
-import { QUIZ_THEME_REPO_TOKEN } from '../../persistence/quiz-theme/repository/quiz-theme-repository.provider';
+import { OpenAIService } from '../../../../open-ai/application/services/open-ai/open-ai-service';
+import { OPENAI_SERVICE_TOKEN } from '../../../../open-ai/application/services/open-ai/open-ai-service.provider';
+import { ParsedQuizQuestion } from '../../quiz-parser/model/parsed-quiz-question';
+import { QuizQuestion } from '../../../domain/quiz-question';
+import { QuizQuestionRepository } from '../../../persistence/quiz-question/repository/quiz-question-repository';
+import { QuizThemeRepository } from '../../../persistence/quiz-theme/repository/quiz-theme-repository';
+import { QuizThemeNotFoundException } from '../../errors/quiz-theme-not-found.exception';
+import { QuizTheme } from '../../../domain/quiz-parameters';
+import { QUIZ_QUESTION_REPO_TOKEN } from '../../../persistence/quiz-question/repository/quiz-question-repository.provider';
+import { QUIZ_THEME_REPO_TOKEN } from '../../../persistence/quiz-theme/repository/quiz-theme-repository.provider';
 
 export class GetQuizQuestionsCommand implements ICommand {
     constructor(
