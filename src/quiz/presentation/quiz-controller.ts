@@ -1,4 +1,16 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+    AnswerQuestionCommand,
+    AnswerQuestionHandler,
+} from '../application/handlers/answer-question/answer-question.handler';
+import { AnswerQuestionDTO } from './dto/answer-question-dto';
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Get,
+    Post,
+    Query,
+} from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { QuizParameters } from '../domain/quiz-parameters';
 import {
@@ -9,13 +21,9 @@ import {
     GetQuizQuestionsCommand,
     GetQuizQuestionsHandler,
 } from '../application/handlers/get-quiz-questions/get-quiz-questions.handler';
+import { isValidObjectId } from 'mongoose';
 import { QuizAnswerDTO, QuizQuestionDTO } from './dto/quiz-question-dto';
 import { QuizQuestion } from '../domain/quiz-question';
-import {
-    AnswerQuestionCommand,
-    AnswerQuestionHandler,
-} from '../application/handlers/answer-question/answer-question.handler';
-import { AnswerQuestionDTO } from './dto/answer-question-dto';
 
 type AnswerStatementDTO = ReturnType<AnswerQuestionHandler['execute']>;
 
@@ -48,6 +56,12 @@ export class QuizController {
     async getQuestions(
         @Query('themeId') themeId: string,
     ): Promise<QuizQuestionDTO[]> {
+        if (!isValidObjectId(themeId)) {
+            throw new BadRequestException(
+                'Given theme id is not a valid ObjectId.',
+            );
+        }
+
         const command = new GetQuizQuestionsCommand(10, themeId);
 
         const result = await this.commandBus.execute<

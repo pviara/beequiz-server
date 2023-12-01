@@ -15,13 +15,17 @@ export class AppConfigServiceImpl implements AppConfigService {
     constructor(private configService: ConfigService) {}
 
     getDatabaseConfig(): DatabaseConfiguration {
-        const databaseURI = this.configService.get(DATABASE_URI);
+        const databaseURI = this.configService.get<string>(DATABASE_URI);
         if (!databaseURI) {
             this.throwVarNotFoundErrorFor(DATABASE_URI);
         }
 
         return {
-            DATABASE_URI: databaseURI,
+            DATABASE_URI: databaseURI as string,
+            TEST_DATABASE_URI: (databaseURI as string).replace(
+                'beequiz?',
+                'test_beequiz?',
+            ),
         };
     }
 

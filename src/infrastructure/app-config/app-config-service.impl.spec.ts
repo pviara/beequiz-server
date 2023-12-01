@@ -1,6 +1,9 @@
 import { AppConfigServiceImpl } from './app-config-service.impl';
 import { ConfigService } from '@nestjs/config';
-import { DATABASE_URI } from './configuration/database-configuration';
+import {
+    DATABASE_URI,
+    TEST_DATABASE_URI,
+} from './configuration/database-configuration';
 import { OPENAI_API_KEY } from './configuration/openai-configuration';
 
 describe('AppConfigServiceImpl', () => {
@@ -29,6 +32,15 @@ describe('AppConfigServiceImpl', () => {
             expect(configServiceSpy.callCountToGet).toBe(1);
             expect(configServiceSpy.callHistoryToGet).toContain(DATABASE_URI);
             expect(result).toHaveProperty(DATABASE_URI);
+        });
+
+        it('should compute test database URI by itself', () => {
+            const returnedValue = 'beequiz?';
+            stubConfigServiceGet(configServiceSpy, returnedValue);
+
+            const result = sut.getDatabaseConfig();
+
+            expect(result[TEST_DATABASE_URI]).toBe('test_beequiz?');
         });
     });
 

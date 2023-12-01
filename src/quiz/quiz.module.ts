@@ -8,15 +8,22 @@ import { QuizController } from './presentation/quiz-controller';
 import { QuizPersistenceModule } from './persistence/quiz-persistence.module';
 import { SharedModule } from '../shared/shared.module';
 
-const commandHandlers = [
+export const quizModuleProviders = [
     AnswerQuestionHandler,
     GetQuizParametersHandler,
     GetQuizQuestionsHandler,
 ];
 
+export const quizModuleImports = [
+    CqrsModule,
+    OpenAIModule,
+    QuizPersistenceModule,
+    SharedModule,
+];
+
 @Module({
     controllers: [QuizController],
-    imports: [CqrsModule, OpenAIModule, QuizPersistenceModule, SharedModule],
-    providers: [...commandHandlers],
+    imports: [...quizModuleImports],
+    providers: [...quizModuleProviders],
 })
 export class QuizModule {}
