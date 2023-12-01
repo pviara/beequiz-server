@@ -69,7 +69,6 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node",
-    "verbose": true
+    "testEnvironment": "node"
   }
 }

@@ -2,6 +2,7 @@ import { ParsedQuizQuestion } from '../../../application/quiz-parser/model/parse
 import { QuizQuestion } from '../../../domain/quiz-question';
 
 export interface QuizQuestionRepository {
+    getQuizQuestion(questionId: string): Promise<QuizQuestion | null>;
     getQuizQuestions(length: number, themeId: string): Promise<QuizQuestion[]>;
     saveGeneratedQuestions(
         generatedQuestions: ParsedQuizQuestion[],

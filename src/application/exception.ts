@@ -1,4 +1,6 @@
 export enum ExceptionCode {
+    QuizAnswerDoesNotExist,
+    QuizQuestionNotFound,
     QuizThemeNotFound,
     UserAlreadyExists,
     UserNotFound,

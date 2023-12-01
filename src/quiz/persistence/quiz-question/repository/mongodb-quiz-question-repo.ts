@@ -16,6 +16,14 @@ export class MongoDbQuizQuestionRepo implements QuizQuestionRepository {
         private model: Model<QuizQuestionEntity>,
     ) {}
 
+    async getQuizQuestion(questionId: string): Promise<QuizQuestion | null> {
+        const entity = await this.model.findById(questionId);
+        if (entity) {
+            return this.mapToQuestion(entity);
+        }
+        return null;
+    }
+
     async getQuizQuestions(
         numberOfQuestions: number,
         themeId: string,
@@ -68,7 +76,7 @@ export class MongoDbQuizQuestionRepo implements QuizQuestionRepository {
 
     private mapToQuestion(entity: QuizQuestionEntity): QuizQuestion {
         return new QuizQuestion(
-            entity._id,
+            `${entity._id}`,
             entity.label,
             this.mapToAnswer(entity),
         );
@@ -78,7 +86,7 @@ export class MongoDbQuizQuestionRepo implements QuizQuestionRepository {
         return entity.answers.map(
             (answerEntity) =>
                 new QuizAnswer(
-                    answerEntity._id,
+                    `${answerEntity._id}`,
                     answerEntity.label,
                     answerEntity.isCorrect,
                 ),

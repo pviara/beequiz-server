@@ -4,6 +4,10 @@ import { QuizQuestionRepository } from '../../../persistence/quiz-question/repos
 
 export class QuizQuestionRepositorySpy implements QuizQuestionRepository {
     calls = {
+        getQuizQuestion: {
+            count: 0,
+            history: [] as string[],
+        },
         getQuizQuestions: {
             count: 0,
             history: [] as [number, string][],
@@ -13,6 +17,12 @@ export class QuizQuestionRepositorySpy implements QuizQuestionRepository {
             history: [] as [ParsedQuizQuestion[], string][],
         },
     };
+
+    async getQuizQuestion(questionId: string): Promise<QuizQuestion | null> {
+        this.calls.getQuizQuestion.count++;
+        this.calls.getQuizQuestion.history.push(questionId);
+        return null;
+    }
 
     async getQuizQuestions(
         length: number,
@@ -34,6 +44,19 @@ export class QuizQuestionRepositorySpy implements QuizQuestionRepository {
         ]);
         return [];
     }
+}
+
+export function stubGetQuizQuestion(
+    quizQuestionRepoSpy: QuizQuestionRepositorySpy,
+    returnedValue: QuizQuestion | null,
+): void {
+    quizQuestionRepoSpy.getQuizQuestion = (
+        questionId: string,
+    ): Promise<QuizQuestion | null> => {
+        quizQuestionRepoSpy.calls.getQuizQuestion.count++;
+        quizQuestionRepoSpy.calls.getQuizQuestion.history.push(questionId);
+        return Promise.resolve(returnedValue);
+    };
 }
 
 export function stubGetQuizQuestions(
