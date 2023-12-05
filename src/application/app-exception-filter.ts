@@ -14,6 +14,7 @@ export class AppExceptionFilter implements ExceptionFilter {
         [ExceptionCode.QuizAnswerDoesNotExist]: HttpStatus.UnprocessableEntity,
         [ExceptionCode.QuizQuestionNotFound]: HttpStatus.NotFound,
         [ExceptionCode.QuizThemeNotFound]: HttpStatus.NotFound,
+        [ExceptionCode.StillOnGoingQuizGame]: HttpStatus.Conflict,
         [ExceptionCode.UserAlreadyExists]: HttpStatus.Conflict,
         [ExceptionCode.UserNotFound]: HttpStatus.NotFound,
     };
