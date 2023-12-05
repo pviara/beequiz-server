@@ -23,11 +23,11 @@ describe('ApiServiceImpl', () => {
     });
 
     describe('cannotGenerateQuizQuestions', () => {
-        it('should return true when last quiz question request was made LESS than 3 days ago', () => {
+        it('should return true when last quiz question request was made LESS than 2 minutes ago', () => {
             const readRequestInfo: RequestInfo = {
-                date: new Date('2023-11-24'),
+                date: new Date('2023-12-05T10:23:00'),
             };
-            const dummyDate = new Date('2023-11-25');
+            const dummyDate = new Date('2023-12-05T10:24:00');
 
             stubReadFileSync(readRequestInfo);
             stubGetNow(dateTimeServiceSpy, dummyDate);
@@ -42,27 +42,27 @@ describe('ApiServiceImpl', () => {
             expect(result).toBe(true);
         });
 
-        it('should return false when last quiz theme request was made MORE than 3 days ago', () => {
+        it('should return false when last quiz question request was made MORE than 2 minutes ago', () => {
             const readRequestInfo: RequestInfo = {
-                date: new Date('2023-11-24'),
+                date: new Date('2023-12-05T10:23:00'),
             };
-            const dummyDate = new Date('2023-11-28');
+            const dummyDate = new Date('2023-12-05T10:25:12');
 
             stubReadFileSync(readRequestInfo);
             stubGetNow(dateTimeServiceSpy, dummyDate);
 
-            const result = sut.cannotGenerateQuizThemes();
+            const result = sut.cannotGenerateQuizQuestions();
 
             expect(result).toBe(false);
         });
     });
 
     describe('cannotGenerateQuizThemes', () => {
-        it('should return true when last quiz theme request was made LESS than 3 days ago', () => {
+        it('should return true when last quiz theme request was made LESS than 2 minutes ago', () => {
             const readRequestInfo: RequestInfo = {
-                date: new Date('2023-11-24'),
+                date: new Date('2023-11-24T21:58:00'),
             };
-            const dummyDate = new Date('2023-11-25');
+            const dummyDate = new Date('2023-11-24T21:59:00');
 
             stubReadFileSync(readRequestInfo);
             stubGetNow(dateTimeServiceSpy, dummyDate);
@@ -77,11 +77,11 @@ describe('ApiServiceImpl', () => {
             expect(result).toBe(true);
         });
 
-        it('should return false when last quiz theme request was made MORE than 3 days ago', () => {
+        it('should return false when last quiz theme request was made MORE than 2 minutes ago', () => {
             const readRequestInfo: RequestInfo = {
-                date: new Date('2023-11-24'),
+                date: new Date('2023-11-24T21:58:00'),
             };
-            const dummyDate = new Date('2023-11-28');
+            const dummyDate = new Date('2023-11-24T22:37:00');
 
             stubReadFileSync(readRequestInfo);
             stubGetNow(dateTimeServiceSpy, dummyDate);

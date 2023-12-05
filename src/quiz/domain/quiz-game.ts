@@ -1,4 +1,4 @@
-import { QuizQuestion } from "./quiz-question";
+import { QuizQuestion } from './quiz-question';
 
 export class QuizGame {
     constructor(
@@ -10,10 +10,4 @@ export class QuizGame {
     ) {}
 }
 
-const game = new QuizGame(
-    'id',
-    'userId',
-    [],
-    'questionId',
-    0
-);
+const game = new QuizGame('id', 'userId', [], 'questionId', 0);

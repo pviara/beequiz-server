@@ -22,84 +22,63 @@ export class ApiServiceImpl implements ApiService {
     ) {}
 
     cannotGenerateQuizQuestions(): boolean {
-        const requestInfo = this.retrieveQuestionRequestInfo();
-        if (!requestInfo) {
-            return false;
-        }
-
-        if (this.isDateIsLessThan3DaysAgo(requestInfo.date)) {
-            return true;
-        }
-
-        return false;
+        const requestInfo = this.retrieveRequestInfo('questions');
+        return this.isDateIsLessThanTwoMinutesAgo(requestInfo.date);
     }
 
     cannotGenerateQuizThemes(): boolean {
-        const requestInfo = this.retrieveThemeRequestInfo();
-        if (!requestInfo) {
-            return false;
-        }
-
-        if (this.isDateIsLessThan3DaysAgo(requestInfo.date)) {
-            return true;
-        }
-
-        return false;
+        const requestInfo = this.retrieveRequestInfo('themes');
+        return this.isDateIsLessThanTwoMinutesAgo(requestInfo.date);
     }
 
     flagQuizQuestionRequest(): void {
-        const requestInfo: RequestInfo = {
-            date: this.dateTimeService.getNow(),
-        };
-
-        writeFileSync(
-            resolve(QUIZ_QUESTIONS_REQUEST_INFO_PATH),
-            JSON.stringify(requestInfo),
-        );
+        this.flagRequest('questions');
     }
 
     flagQuizThemeRequest(): void {
+        this.flagRequest('themes');
+    }
+
+    private retrieveRequestInfo(type: 'questions' | 'themes'): RequestInfo {
+        const path = this.getFilePathFor(type);
+
+        const existingRequestInfo = JSON.parse(
+            readFileSync(resolve(path)).toString(),
+        );
+        const noDateInRequestInfo = !existingRequestInfo?.date;
+
+        if (noDateInRequestInfo) {
+            return {
+                date: this.dateTimeService.getNow(),
+            };
+        }
+
+        return {
+            date: new Date(existingRequestInfo.date),
+        };
+    }
+
+    private getFilePathFor(type: 'questions' | 'themes'): string {
+        return type === 'questions'
+            ? QUIZ_QUESTIONS_REQUEST_INFO_PATH
+            : QUIZ_THEMES_REQUEST_INFO_PATH;
+    }
+
+    private isDateIsLessThanTwoMinutesAgo(date: Date): boolean {
+        const currentDate = this.dateTimeService.getNow();
+        const timeDifference = currentDate.getTime() - date.getTime();
+        const passedMinutes = timeDifference / (1000 * 60);
+
+        return passedMinutes < 2;
+    }
+
+    private flagRequest(type: 'questions' | 'themes'): void {
         const requestInfo: RequestInfo = {
             date: this.dateTimeService.getNow(),
         };
 
-        writeFileSync(
-            resolve(QUIZ_THEMES_REQUEST_INFO_PATH),
-            JSON.stringify(requestInfo),
-        );
-    }
+        const path = this.getFilePathFor(type);
 
-    private isDateIsLessThan3DaysAgo(date: Date): boolean {
-        const currentDate = this.dateTimeService.getNow();
-        const timeDifference = currentDate.getTime() - date.getTime();
-        const hoursDifference = timeDifference / (1000 * 60 * 60);
-
-        return hoursDifference < 72;
-    }
-
-    private retrieveQuestionRequestInfo(): RequestInfo | null {
-        const requestInfo = JSON.parse(
-            readFileSync(resolve(QUIZ_QUESTIONS_REQUEST_INFO_PATH)).toString(),
-        );
-        if (!requestInfo?.date) {
-            return null;
-        }
-
-        return {
-            date: new Date(requestInfo.date),
-        };
-    }
-
-    private retrieveThemeRequestInfo(): RequestInfo | null {
-        const requestInfo = JSON.parse(
-            readFileSync(resolve(QUIZ_THEMES_REQUEST_INFO_PATH)).toString(),
-        );
-        if (!requestInfo?.date) {
-            return null;
-        }
-
-        return {
-            date: new Date(requestInfo.date),
-        };
+        writeFileSync(resolve(path), JSON.stringify(requestInfo));
     }
 }
