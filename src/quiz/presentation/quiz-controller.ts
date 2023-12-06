@@ -28,7 +28,7 @@ import {
     GetQuizParametersTempCommand,
     GetQuizParametersTempHandler,
 } from '../application/handlers/get-quiz-parameters-tmp/get-quiz-parameters-tmp.handler';
-import { isParsedStringNaN } from 'src/utils/utils';
+import { isParsedStringNaN } from '../../utils/utils';
 
 type AnswerStatementDTO = ReturnType<AnswerQuestionHandler['execute']>;
 
