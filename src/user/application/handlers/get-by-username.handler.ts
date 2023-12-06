@@ -1,7 +1,9 @@
+import { Inject } from '@nestjs/common';
 import { IQuery, IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { User } from '../../domain/user';
 import { UserNotFoundException } from '../errors/user-not-found.exception';
 import { UserRepository } from '../../persistence/user-repository';
+import { USER_REPO_TOKEN } from '../../persistence/user-repository.provider';
 
 export class GetByUsernameQuery implements IQuery {
     constructor(readonly username: string) {}
@@ -9,10 +11,15 @@ export class GetByUsernameQuery implements IQuery {
 
 @QueryHandler(GetByUsernameQuery)
 export class GetByUsernameHandler implements IQueryHandler<GetByUsernameQuery> {
-    constructor(private repo: UserRepository) {}
+    constructor(
+        @Inject(USER_REPO_TOKEN)
+        private repository: UserRepository,
+    ) {}
 
     async execute(query: GetByUsernameQuery): Promise<User> {
-        const existingUser = await this.repo.getByUsername(query.username);
+        const existingUser = await this.repository.getByUsername(
+            query.username,
+        );
         if (!existingUser) {
             throw new UserNotFoundException(query.username);
         }
