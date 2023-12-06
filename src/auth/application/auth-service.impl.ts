@@ -18,6 +18,8 @@ export class AuthServiceImpl implements AuthService {
     }
 
     signIn(user: User): AccessToken {
-        return this.jwtService.sign({ username: user.username });
+        return {
+            token: this.jwtService.sign({ username: user.username })
+        };
     }
 }

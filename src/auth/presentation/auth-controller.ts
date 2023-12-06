@@ -17,6 +17,6 @@ export class AuthController {
     async signIn(
         @Request() req: ExpressRequest & { user: User },
     ): Promise<AccessToken> {
-        return this.authService.signIn(req.user);
+        return this.authService.signIn(req.user)
     }
 }
