@@ -2,7 +2,7 @@ import {
     GetByUsernameHandler,
     GetByUsernameQuery,
 } from './get-by-username.handler';
-import { stubGetByUsername } from '../test/utils';
+import { stubGetByUsername } from '../test/user-repository.spy';
 import { User } from '../../domain/user';
 import { UserNotFoundException } from '../errors/user-not-found.exception';
 import { UserRepositorySpy } from '../test/user-repository.spy';

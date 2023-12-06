@@ -1,7 +1,7 @@
 import { AddUserCommand, AddUserHandler } from '../handlers/add-user.handler';
 import { AddUserRepoDTO } from '../../persistence/add-user-repo.dto';
 import { PasswordHasher } from '../../domain/password-hasher';
-import { stubGetByUsername } from '../test/utils';
+import { stubGetByUsername } from '../test/user-repository.spy';
 import { User } from '../../domain/user';
 import { UserAlreadyExistsException } from '../errors/user-already-exists.exception';
 import { UserRepositorySpy } from '../test/user-repository.spy';
