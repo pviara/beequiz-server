@@ -1,4 +1,5 @@
 import { AppConfigService } from '../../../infrastructure/app-config/app-config-service';
+import { APP_CONFIG_SERVICE_TOKEN } from '../../../infrastructure/app-config/app-config-service.provider';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
@@ -15,6 +16,7 @@ type JwtAuthPayload = {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(
+        @Inject(APP_CONFIG_SERVICE_TOKEN)
         configService: AppConfigService,
 
         @Inject(USER_REPO_TOKEN)

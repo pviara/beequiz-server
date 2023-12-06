@@ -1,11 +1,14 @@
-import { AuthService } from './auth-service';
+import { AccessToken, AuthService } from './auth-service';
 import { Inject } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { User } from '../../user/domain/user';
 import { UserAuthService } from '../../user/application/services/user-auth-service';
 import { USER_AUTH_SERVICE_TOKEN } from '../../user/application/services/user-auth.provider';
 
 export class AuthServiceImpl implements AuthService {
     constructor(
+        private jwtService: JwtService,
+
         @Inject(USER_AUTH_SERVICE_TOKEN)
         private userAuthService: UserAuthService,
     ) {}
@@ -14,7 +17,7 @@ export class AuthServiceImpl implements AuthService {
         return this.userAuthService.authenticate(username, password);
     }
 
-    signIn(user: User): string {
-        throw new Error('Method not implemented.');
+    signIn(user: User): AccessToken {
+        return this.jwtService.sign({ username: user.username });
     }
 }

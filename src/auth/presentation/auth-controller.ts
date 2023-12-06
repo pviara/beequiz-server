@@ -1,6 +1,7 @@
 import { AccessToken, AuthService } from '../application/auth-service';
 import { AUTH_SERVICE_TOKEN } from '../application/auth-service.provider';
-import { Controller, Inject, Post, Request } from '@nestjs/common';
+import { Controller, Inject, Post, Request, UseGuards } from '@nestjs/common';
+import { LocalAuthGuard } from './guards/local-auth-guard';
 import { Request as ExpressRequest } from 'express';
 import { User } from '../../user/domain/user';
 
@@ -11,6 +12,7 @@ export class AuthController {
         private authService: AuthService,
     ) {}
 
+    @UseGuards(LocalAuthGuard)
     @Post()
     async signIn(
         @Request() req: ExpressRequest & { user: User },

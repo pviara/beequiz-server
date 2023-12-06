@@ -13,7 +13,7 @@ const queryHandlers = [GetByUsernameHandler];
 
 @Module({
     controllers: [UserController],
-    exports: [UserAuthServiceProvider],
+    exports: [UserAuthServiceProvider, UserRepoProvider],
     imports: [
         CqrsModule,
         MongooseModule.forFeature([{ name: USER_MODEL, schema: userSchema }]),

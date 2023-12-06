@@ -1,12 +1,17 @@
+import { AuthModule } from './auth/auth.module';
 import { Module } from '@nestjs/common';
-import { RouterModule, Routes } from '@nestjs/core';
 import { QuizModule } from './quiz/quiz.module';
+import { RouterModule, Routes } from '@nestjs/core';
 import { UserModule } from './user/user.module';
 
 const routes: Routes = [
     {
         path: 'api',
         children: [
+            {
+                path: 'auth',
+                module: AuthModule,
+            },
             {
                 path: 'quiz',
                 module: QuizModule,
