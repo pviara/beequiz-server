@@ -10,6 +10,7 @@ export class UserPasswordDocument {
     salt!: string;
 }
 
+@Schema()
 export class UserDocument extends Document {
     @Prop({ required: true })
     username!: string;

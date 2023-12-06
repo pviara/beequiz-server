@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../../domain/user';
 import { UserAuthService } from './user-auth-service';
-import { USER_MODEL, UserEntity } from '../../persistence/user-entity';
+import { USER_MODEL, UserEntity } from '../../persistence/entity/user-entity';
 
 export class UserAuthServiceImpl implements UserAuthService {
     constructor(

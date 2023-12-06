@@ -1,10 +1,10 @@
-import { AddUserRepoDTO } from '../../persistence/add-user-repo.dto';
+import { AddUserRepoDTO } from '../../persistence/dto/add-user-repo.dto';
 import { CommandHandler, ICommand, ICommandHandler } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import { PasswordHasher } from '../../domain/password-hasher';
 import { UserAlreadyExistsException } from '../errors/user-already-exists.exception';
-import { UserRepository } from '../../persistence/user-repository';
-import { USER_REPO_TOKEN } from '../../persistence/user-repository.provider';
+import { UserRepository } from '../../persistence/repository/user-repository';
+import { USER_REPO_TOKEN } from '../../persistence/repository/user-repository.provider';
 
 export class AddUserCommand implements ICommand {
     constructor(
@@ -28,7 +28,7 @@ export class AddUserHandler implements ICommandHandler<AddUserCommand> {
             throw new UserAlreadyExistsException(command.username);
         }
 
-        const { passwordHash } = new PasswordHasher(command.password);
+        const passwordHash = await new PasswordHasher(command.password).hash();
         const userToAdd = new AddUserRepoDTO(command.username, passwordHash);
 
         await this.repository.add(userToAdd);

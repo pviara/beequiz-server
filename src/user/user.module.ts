@@ -4,13 +4,15 @@ import { GetByUsernameHandler } from './application/handlers/get-by-username.han
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserAuthServiceProvider } from './application/services/user-auth.provider';
-import { UserRepoProvider } from './persistence/user-repository.provider';
-import { USER_MODEL, userSchema } from './persistence/user-entity';
+import { UserController } from './presentation/user-controller';
+import { UserRepoProvider } from './persistence/repository/user-repository.provider';
+import { USER_MODEL, userSchema } from './persistence/entity/user-entity';
 
 const commandHandlers = [AddUserHandler];
 const queryHandlers = [GetByUsernameHandler];
 
 @Module({
+    controllers: [UserController],
     exports: [UserAuthServiceProvider],
     imports: [
         CqrsModule,

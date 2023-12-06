@@ -1,10 +1,13 @@
 import { AddUserCommand, AddUserHandler } from '../handlers/add-user.handler';
-import { AddUserRepoDTO } from '../../persistence/add-user-repo.dto';
+import { AddUserRepoDTO } from '../../persistence/dto/add-user-repo.dto';
 import { PasswordHasher } from '../../domain/password-hasher';
 import { stubGetByUsername } from '../test/user-repository.spy';
 import { User } from '../../domain/user';
 import { UserAlreadyExistsException } from '../errors/user-already-exists.exception';
 import { UserRepositorySpy } from '../test/user-repository.spy';
+import * as bcrypt from 'bcrypt';
+
+jest.mock('bcrypt');
 
 describe('AddUserHandler', () => {
     let sut: AddUserHandler;
@@ -12,6 +15,8 @@ describe('AddUserHandler', () => {
 
     beforeEach(() => {
         userRepositorySpy = new UserRepositorySpy();
+        jest.resetAllMocks();
+
         sut = new AddUserHandler(userRepositorySpy);
     });
 
@@ -43,7 +48,9 @@ describe('AddUserHandler', () => {
 
             stubGetByUsername(userRepositorySpy, null);
 
-            const { passwordHash } = new PasswordHasher(command.password);
+            const passwordHash = await new PasswordHasher(
+                command.password,
+            ).hash();
             const addUser = new AddUserRepoDTO(command.username, passwordHash);
 
             await sut.execute(command);

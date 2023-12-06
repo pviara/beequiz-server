@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { RouterModule, Routes } from '@nestjs/core';
 import { QuizModule } from './quiz/quiz.module';
+import { UserModule } from './user/user.module';
 
 const routes: Routes = [
     {
@@ -9,6 +10,10 @@ const routes: Routes = [
             {
                 path: 'quiz',
                 module: QuizModule,
+            },
+            {
+                path: 'user',
+                module: UserModule,
             },
         ],
     },

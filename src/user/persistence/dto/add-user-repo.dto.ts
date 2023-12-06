@@ -1,4 +1,4 @@
-import { PasswordHash } from '../domain/password-hash';
+import { PasswordHash } from '../../domain/password-hash';
 
 export class AddUserRepoDTO {
     constructor(

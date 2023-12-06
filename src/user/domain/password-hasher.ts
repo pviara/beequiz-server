@@ -1,13 +1,13 @@
+import { genSalt, hash } from 'bcrypt';
 import { PasswordHash } from './password-hash';
 
 export class PasswordHasher {
-    readonly passwordHash: PasswordHash;
+    constructor(private passwordToHash: string) {}
 
-    constructor(passwordToHash: string) {
-        this.passwordHash = this.hash(passwordToHash);
-    }
+    async hash(): Promise<PasswordHash> {
+        const salt = await genSalt(10);
+        const hashedPassword = await hash(this.passwordToHash, salt);
 
-    hash(passwordToHash: string): PasswordHash {
-        return new PasswordHash('', '');
+        return new PasswordHash(hashedPassword, salt);
     }
 }
