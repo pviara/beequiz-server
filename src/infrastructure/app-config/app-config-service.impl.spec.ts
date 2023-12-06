@@ -4,6 +4,7 @@ import {
     DATABASE_URI,
     TEST_DATABASE_URI,
 } from './configuration/database-configuration';
+import { JWT_SECRET } from './configuration/authentication-configuration';
 import { OPENAI_API_KEY } from './configuration/openai-configuration';
 
 describe('AppConfigServiceImpl', () => {
@@ -13,6 +14,26 @@ describe('AppConfigServiceImpl', () => {
     beforeEach(() => {
         configServiceSpy = new ConfigServiceSpy();
         sut = new AppConfigServiceImpl(configServiceSpy);
+    });
+
+    describe('getAuthConfig', () => {
+        it("should throw an error when jwt secret couldn't be found", () => {
+            const returnedValue = undefined as unknown as string;
+            stubConfigServiceGet(configServiceSpy, returnedValue);
+
+            expect(() => sut.getAuthConfig()).toThrow();
+        });
+
+        it('should get jwt secret using NestJS ConfigService', () => {
+            const returnedValue = 'fake_jwt_secret';
+            stubConfigServiceGet(configServiceSpy, returnedValue);
+
+            const result = sut.getAuthConfig();
+
+            expect(configServiceSpy.callCountToGet).toBe(1);
+            expect(configServiceSpy.callHistoryToGet).toContain(JWT_SECRET);
+            expect(result).toHaveProperty(JWT_SECRET);
+        });
     });
 
     describe('getDatabaseConfig', () => {

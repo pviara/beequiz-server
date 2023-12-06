@@ -9,10 +9,25 @@ import {
     DATABASE_URI,
     DatabaseConfiguration,
 } from './configuration/database-configuration';
+import {
+    AuthenticationConfiguration,
+    JWT_SECRET,
+} from './configuration/authentication-configuration';
 
 @Injectable()
 export class AppConfigServiceImpl implements AppConfigService {
     constructor(private configService: ConfigService) {}
+
+    getAuthConfig(): AuthenticationConfiguration {
+        const jwtSecret = this.configService.get(JWT_SECRET);
+        if (!jwtSecret) {
+            this.throwVarNotFoundErrorFor(JWT_SECRET);
+        }
+
+        return {
+            JWT_SECRET: jwtSecret,
+        };
+    }
 
     getDatabaseConfig(): DatabaseConfiguration {
         const databaseURI = this.configService.get<string>(DATABASE_URI);
