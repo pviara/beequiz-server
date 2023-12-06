@@ -15,7 +15,7 @@ export class GetQuizParametersCommand implements ICommand {
     constructor() {}
 }
 
-@CommandHandler(GetQuizParametersCommand)
+// @CommandHandler(GetQuizParametersCommand)
 export class GetQuizParametersHandler implements ICommandHandler {
     private existingThemes: QuizTheme[] = [];
     private generatedThemes: ParsedQuizTheme[] = [];

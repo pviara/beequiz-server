@@ -1,6 +1,6 @@
 import { AnswerQuestionHandler } from './application/handlers/answer-question/answer-question.handler';
 import { CqrsModule } from '@nestjs/cqrs';
-import { GetQuizParametersHandler } from './application/handlers/get-quiz-parameters/get-quiz-parameters.handler';
+import { GetQuizParametersTempHandler } from './application/handlers/get-quiz-parameters-tmp/get-quiz-parameters-tmp.handler';
 import { GetQuizQuestionsHandler } from './application/handlers/get-quiz-questions/get-quiz-questions.handler';
 import { Module } from '@nestjs/common';
 import { OpenAIModule } from '../open-ai/open-ai.module';
@@ -10,7 +10,7 @@ import { SharedModule } from '../shared/shared.module';
 
 export const quizModuleProviders = [
     AnswerQuestionHandler,
-    GetQuizParametersHandler,
+    GetQuizParametersTempHandler,
     GetQuizQuestionsHandler,
 ];
 

@@ -24,6 +24,11 @@ import {
 import { isValidObjectId } from 'mongoose';
 import { QuizAnswerDTO, QuizQuestionDTO } from './dto/quiz-question-dto';
 import { QuizQuestion } from '../domain/quiz-question';
+import {
+    GetQuizParametersTempCommand,
+    GetQuizParametersTempHandler,
+} from '../application/handlers/get-quiz-parameters-tmp/get-quiz-parameters-tmp.handler';
+import { isParsedStringNaN } from 'src/utils/utils';
 
 type AnswerStatementDTO = ReturnType<AnswerQuestionHandler['execute']>;
 
@@ -44,32 +49,39 @@ export class QuizController {
 
     @Get('parameters')
     async getParameters(): Promise<QuizParameters> {
-        const command = new GetQuizParametersCommand();
+        const command = new GetQuizParametersTempCommand();
 
         return this.commandBus.execute<
             typeof command,
-            ReturnType<GetQuizParametersHandler['execute']>
+            ReturnType<GetQuizParametersTempHandler['execute']>
         >(command);
     }
 
     @Get('questions')
     async getQuestions(
+        @Query('amount') amount: string,
         @Query('themeId') themeId: string,
     ): Promise<QuizQuestionDTO[]> {
+        if (isParsedStringNaN(amount)) {
+            throw new BadRequestException(
+                'Given number of questions is not a number.',
+            );
+        }
+
         if (!isValidObjectId(themeId)) {
             throw new BadRequestException(
                 'Given theme id is not a valid ObjectId.',
             );
         }
 
-        const command = new GetQuizQuestionsCommand(10, themeId);
+        const command = new GetQuizQuestionsCommand(+amount, themeId);
 
         const result = await this.commandBus.execute<
             typeof command,
             ReturnType<GetQuizQuestionsHandler['execute']>
         >(command);
 
-        return this.mapToQuestionsDTO(result);
+        return result;
     }
 
     private mapToQuestionsDTO(questions: QuizQuestion[]): QuizQuestionDTO[] {

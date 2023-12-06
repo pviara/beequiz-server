@@ -30,6 +30,7 @@ export class QuizQuestionsParser {
 
             return this.mapQuizQuestions(parsedObject);
         } catch (error: unknown) {
+            console.log('error is:', error, JSON.parse(this.stringifiedObject));
             throw new Error('Parsing given stringified object has failed.');
         }
     }
