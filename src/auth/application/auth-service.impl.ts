@@ -1,6 +1,7 @@
-import { AccessToken, AuthService } from './auth-service';
+import { AuthService } from './auth-service';
 import { Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { SignedInUser } from '../domain/signed-in-user';
 import { User } from '../../user/domain/user';
 import { UserAuthService } from '../../user/application/services/user-auth-service';
 import { USER_AUTH_SERVICE_TOKEN } from '../../user/application/services/user-auth.provider';
@@ -17,9 +18,10 @@ export class AuthServiceImpl implements AuthService {
         return this.userAuthService.authenticate(username, password);
     }
 
-    signIn(user: User): AccessToken {
+    signIn(user: User): SignedInUser {
         return {
-            token: this.jwtService.sign({ username: user.username })
+            token: this.jwtService.sign({ username: user.username }),
+            user,
         };
     }
 }
