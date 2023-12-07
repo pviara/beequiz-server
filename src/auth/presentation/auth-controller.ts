@@ -1,6 +1,7 @@
 import { AuthService } from '../application/auth-service';
 import { AUTH_SERVICE_TOKEN } from '../application/auth-service.provider';
-import { Controller, Inject, Post, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Inject, Post, Request, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from './guards/jwt-auth-guard';
 import { LocalAuthGuard } from './guards/local-auth-guard';
 import { Request as ExpressRequest } from 'express';
 import { SignedInUser } from '../domain/signed-in-user';
@@ -13,6 +14,10 @@ export class AuthController {
         private authService: AuthService,
     ) {}
 
+    @UseGuards(JwtAuthGuard)
+    @Get()
+    async checkToken(): Promise<void> {}
+    
     @UseGuards(LocalAuthGuard)
     @Post()
     async signIn(

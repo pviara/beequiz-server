@@ -1,4 +1,6 @@
+import { AddUserCommand } from '../application/handlers/add-user.handler';
 import { AddUserDTO } from './dto/add-user.dto';
+import { AddUserDTOInterceptor } from './interceptors/add-user-dto-interceptor';
 import {
     BadRequestException,
     Body,
@@ -7,8 +9,6 @@ import {
     UseInterceptors,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { AddUserCommand } from '../application/handlers/add-user.handler';
-import { AddUserDTOInterceptor } from './interceptors/add-user-dto-interceptor';
 
 @Controller()
 export class UserController {
