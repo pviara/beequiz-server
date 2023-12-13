@@ -11,7 +11,8 @@ enum HttpStatus {
 @Catch(Exception)
 export class AppExceptionFilter implements ExceptionFilter {
     private exceptionMapping: Record<ExceptionCode, HttpStatus> = {
-        [ExceptionCode.ProblemOccurredWithOpenAI]: HttpStatus.UnprocessableEntity,
+        [ExceptionCode.ProblemOccurredWithOpenAI]:
+            HttpStatus.UnprocessableEntity,
         [ExceptionCode.QuizAnswerDoesNotExist]: HttpStatus.UnprocessableEntity,
         [ExceptionCode.QuizQuestionNotFound]: HttpStatus.NotFound,
         [ExceptionCode.QuizThemeNotFound]: HttpStatus.NotFound,
