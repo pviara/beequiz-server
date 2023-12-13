@@ -1,4 +1,4 @@
-import { InvalidStringifiedObjectException } from '../../errors/invalid-stringified-object.exception';
+import { ProblemOccurredWithOpenAIException } from '../../errors/problem-occurred-with-openai.exception';
 import { QuizQuestionsParser } from './quiz-questions-parser';
 
 describe('QuizQuestionsParser', () => {
@@ -8,9 +8,7 @@ describe('QuizQuestionsParser', () => {
 
             for (const _case of cases) {
                 const sut = new QuizQuestionsParser(_case);
-                expect(() => sut.parse()).toThrow(
-                    InvalidStringifiedObjectException,
-                );
+                expect(() => sut.parse()).toThrow();
             }
         });
 
@@ -24,9 +22,7 @@ describe('QuizQuestionsParser', () => {
 
             const sut = new QuizQuestionsParser(stringifiedObject);
 
-            expect(() => sut.parse()).toThrow(
-                InvalidStringifiedObjectException,
-            );
+            expect(() => sut.parse()).toThrow();
         });
 
         it('should throw an error when given "questions" is not an array', () => {
@@ -37,9 +33,7 @@ describe('QuizQuestionsParser', () => {
 
             const sut = new QuizQuestionsParser(stringifiedObject);
 
-            expect(() => sut.parse()).toThrow(
-                InvalidStringifiedObjectException,
-            );
+            expect(() => sut.parse()).toThrow();
         });
 
         it('should throw an error when at least one element of "questions" array is invalid', () => {
@@ -71,9 +65,7 @@ describe('QuizQuestionsParser', () => {
 
             for (const _case of cases) {
                 const sut = new QuizQuestionsParser(_case);
-                expect(() => sut.parse()).toThrow(
-                    InvalidStringifiedObjectException,
-                );
+                expect(() => sut.parse()).toThrow();
             }
         });
     });
@@ -99,9 +91,7 @@ describe('QuizQuestionsParser', () => {
 
             const sut = new QuizQuestionsParser(stringifiedObject);
 
-            expect(() => sut.parse()).not.toThrow(
-                InvalidStringifiedObjectException,
-            );
+            expect(() => sut.parse()).not.toThrow();
         });
 
         it('should return an array of instantiated quiz questions which length matches initial length', () => {

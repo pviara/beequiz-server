@@ -1,5 +1,5 @@
 export enum ExceptionCode {
-    InvalidStringifiedObject,
+    ProblemOccurredWithOpenAI,
     QuizAnswerDoesNotExist,
     QuizQuestionNotFound,
     QuizThemeNotFound,
