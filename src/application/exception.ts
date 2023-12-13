@@ -1,4 +1,5 @@
 export enum ExceptionCode {
+    InvalidStringifiedObject,
     QuizAnswerDoesNotExist,
     QuizQuestionNotFound,
     QuizThemeNotFound,

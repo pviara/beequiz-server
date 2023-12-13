@@ -1,3 +1,4 @@
+import { InvalidStringifiedObjectException } from '../../errors/invalid-stringified-object.exception';
 import { QuizQuestionsParser } from './quiz-questions-parser';
 
 describe('QuizQuestionsParser', () => {
@@ -7,7 +8,9 @@ describe('QuizQuestionsParser', () => {
 
             for (const _case of cases) {
                 const sut = new QuizQuestionsParser(_case);
-                expect(() => sut.parse()).toThrow();
+                expect(() => sut.parse()).toThrow(
+                    InvalidStringifiedObjectException,
+                );
             }
         });
 
@@ -21,7 +24,9 @@ describe('QuizQuestionsParser', () => {
 
             const sut = new QuizQuestionsParser(stringifiedObject);
 
-            expect(() => sut.parse()).toThrow();
+            expect(() => sut.parse()).toThrow(
+                InvalidStringifiedObjectException,
+            );
         });
 
         it('should throw an error when given "questions" is not an array', () => {
@@ -32,7 +37,9 @@ describe('QuizQuestionsParser', () => {
 
             const sut = new QuizQuestionsParser(stringifiedObject);
 
-            expect(() => sut.parse()).toThrow();
+            expect(() => sut.parse()).toThrow(
+                InvalidStringifiedObjectException,
+            );
         });
 
         it('should throw an error when at least one element of "questions" array is invalid', () => {
@@ -64,7 +71,9 @@ describe('QuizQuestionsParser', () => {
 
             for (const _case of cases) {
                 const sut = new QuizQuestionsParser(_case);
-                expect(() => sut.parse()).toThrow();
+                expect(() => sut.parse()).toThrow(
+                    InvalidStringifiedObjectException,
+                );
             }
         });
     });
@@ -90,7 +99,9 @@ describe('QuizQuestionsParser', () => {
 
             const sut = new QuizQuestionsParser(stringifiedObject);
 
-            expect(() => sut.parse()).not.toThrow();
+            expect(() => sut.parse()).not.toThrow(
+                InvalidStringifiedObjectException,
+            );
         });
 
         it('should return an array of instantiated quiz questions which length matches initial length', () => {
