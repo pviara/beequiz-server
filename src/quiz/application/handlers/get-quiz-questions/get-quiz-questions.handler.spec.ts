@@ -7,17 +7,19 @@ import {
     GetQuizQuestionsHandler,
 } from './get-quiz-questions.handler';
 import {
+    makeGenerateQuestionsForQuizThrow,
     OpenAIServiceSpy,
     stubGenerateQuestionsForQuiz,
 } from '../test/open-ai-api-service.spy';
-import { ParsedQuizQuestion } from '../../quiz-parser/model/parsed-quiz-question';
-import { QuizQuestion } from '../../../domain/quiz-question';
 import {
-    QuizQuestionRepositorySpy,
     mapToQuizQuestions,
+    QuizQuestionRepositorySpy,
     stubGetQuizQuestions,
     stubSaveGeneratedQuestions,
 } from '../test/quiz-question-repository.spy';
+import { ParsedQuizQuestion } from '../../quiz-parser/model/parsed-quiz-question';
+import { ProblemOccurredWithOpenAIException } from '../../errors/problem-occurred-with-openai.exception';
+import { QuizQuestion } from '../../../domain/quiz-question';
 import { QuizTheme } from '../../../domain/quiz-parameters';
 import { QuizThemeNotFoundException } from '../../errors/quiz-theme-not-found.exception';
 import {
@@ -210,6 +212,34 @@ describe('GetQuizQuestionsHandler', () => {
                 const result = await sut.execute(command);
 
                 expect(result).toEqual(savedQuestions);
+            });
+
+            describe('An error is thrown from OpenAIService', () => {
+                beforeEach(() => {
+                    makeGenerateQuestionsForQuizThrow(openAIServiceSpy);
+                });
+
+                it('should return existing questions when there are enough of them', async () => {
+                    const command = new GetQuizQuestionsCommand(
+                        existingQuestions.length,
+                        existingTheme.id,
+                    );
+
+                    const result = await sut.execute(command);
+
+                    expect(result).toEqual(existingQuestions);
+                });
+
+                it('should throw an error when there are not enough questions to return', async () => {
+                    const command = new GetQuizQuestionsCommand(
+                        existingQuestions.length + 10,
+                        existingTheme.id,
+                    );
+
+                    await expect(sut.execute(command)).rejects.toThrow(
+                        ProblemOccurredWithOpenAIException,
+                    );
+                });
             });
         });
     });

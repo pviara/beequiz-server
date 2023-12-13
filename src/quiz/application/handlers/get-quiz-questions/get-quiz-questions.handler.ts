@@ -12,6 +12,7 @@ import { QuizThemeNotFoundException } from '../../errors/quiz-theme-not-found.ex
 import { QuizTheme } from '../../../domain/quiz-parameters';
 import { QUIZ_QUESTION_REPO_TOKEN } from '../../../persistence/quiz-question/repository/quiz-question-repository.provider';
 import { QUIZ_THEME_REPO_TOKEN } from '../../../persistence/quiz-theme/repository/quiz-theme-repository.provider';
+import { ProblemOccurredWithOpenAIException } from '../../errors/problem-occurred-with-openai.exception';
 
 export class GetQuizQuestionsCommand implements ICommand {
     constructor(
@@ -58,10 +59,17 @@ export class GetQuizQuestionsHandler
             return this.existingQuestions;
         }
 
-        await this.generateQuestions();
-        await this.saveGeneratedQuestions();
+        try {
+            await this.generateQuestions();
+            await this.saveGeneratedQuestions();
+            return this.savedQuestions;
+        } catch (error: unknown) {
+            if (this.areEnoughExistingQuestions()) {
+                return this.existingQuestions;
+            }
 
-        return this.savedQuestions;
+            throw new ProblemOccurredWithOpenAIException();
+        }
     }
 
     private async getTheme(themeId: string): Promise<QuizTheme> {

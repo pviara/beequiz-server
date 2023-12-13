@@ -39,6 +39,24 @@ export class OpenAIServiceSpy implements OpenAIService {
     }
 }
 
+export function makeGenerateQuestionsForQuizThrow(
+    openAIServiceSpy: OpenAIServiceSpy,
+): void {
+    openAIServiceSpy.generateQuestionsForQuiz = (
+        existingQuestions: QuizQuestion[],
+        numberOfQuestions: number,
+        themeLabel: string,
+    ): Promise<ParsedQuizQuestion[]> => {
+        registerCallToGenerateQuestionsForQuiz(
+            openAIServiceSpy,
+            existingQuestions,
+            numberOfQuestions,
+            themeLabel,
+        );
+        throw new Error();
+    };
+}
+
 export function stubGenerateQuestionsForQuiz(
     openAIServiceSpy: OpenAIServiceSpy,
     returnedValue: ParsedQuizQuestion[],
@@ -48,12 +66,12 @@ export function stubGenerateQuestionsForQuiz(
         numberOfQuestions: number,
         themeLabel: string,
     ): Promise<ParsedQuizQuestion[]> => {
-        openAIServiceSpy.calls.generateQuestionsForQuiz.count++;
-        openAIServiceSpy.calls.generateQuestionsForQuiz.history.push([
+        registerCallToGenerateQuestionsForQuiz(
+            openAIServiceSpy,
             existingQuestions,
             numberOfQuestions,
             themeLabel,
-        ]);
+        );
         return Promise.resolve(returnedValue);
     };
 }
@@ -66,4 +84,18 @@ export function stubGenerateThemesForQuiz(
         openAIServiceSpy.calls.generateThemesForQuiz.count++;
         return Promise.resolve(returnedValue);
     };
+}
+
+function registerCallToGenerateQuestionsForQuiz(
+    openAIServiceSpy: OpenAIServiceSpy,
+    existingQuestions: QuizQuestion[],
+    numberOfQuestions: number,
+    themeLabel: string,
+) {
+    openAIServiceSpy.calls.generateQuestionsForQuiz.count++;
+    openAIServiceSpy.calls.generateQuestionsForQuiz.history.push([
+        existingQuestions,
+        numberOfQuestions,
+        themeLabel,
+    ]);
 }
