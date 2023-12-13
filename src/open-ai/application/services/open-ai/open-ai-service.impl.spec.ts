@@ -1,7 +1,7 @@
 import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
+import { GPT_VERSION, OpenAIServiceImpl } from './open-ai-service.impl';
 import OpenAI from 'openai';
 import { OpenAIObjectFactory } from '../../../../open-ai/application/open-ai-object-factory/open-ai-object-factory';
-import { OpenAIServiceImpl } from './open-ai-service.impl';
 import { PromptService } from '../prompt/prompt-service';
 import { QuizParser } from '../../../../quiz/application/quiz-parser/quiz-parser';
 import { QuizQuestion } from '../../../../quiz/domain/quiz-question';
@@ -68,7 +68,7 @@ describe('OpenAIServiceImpl', () => {
             ).toBe(1);
 
             const params: ChatCompletionCreateParamsNonStreaming = {
-                model: 'gpt-4-1106-preview',
+                model: GPT_VERSION,
                 response_format: { type: 'json_object' },
                 messages: [
                     {
@@ -121,7 +121,7 @@ describe('OpenAIServiceImpl', () => {
             ).toBe(1);
 
             const params: ChatCompletionCreateParamsNonStreaming = {
-                model: 'gpt-4-1106-preview',
+                model: GPT_VERSION,
                 response_format: { type: 'json_object' },
                 messages: [
                     {
