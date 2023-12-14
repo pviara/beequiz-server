@@ -1,4 +1,5 @@
 import { isInvalidStructure } from '../../../../utils/utils';
+import { ParsingQuizHasFailedException } from '../../errors/parsing-quiz-has-failed.exception';
 import {
     ParsedQuizAnswer,
     ParsedQuizQuestion,
@@ -11,26 +12,28 @@ export class QuizQuestionsParser {
         try {
             const parsedObject = JSON.parse(this.stringifiedObject);
             if (!parsedObject.questions) {
-                throw new Error(
+                throw new ParsingQuizHasFailedException(
                     'Parsed object does not contain a "questions" property.',
                 );
             }
 
             if (!Array.isArray(parsedObject.questions)) {
-                throw new Error(
+                throw new ParsingQuizHasFailedException(
                     'Parsed object "themes" property is not an array.',
                 );
             }
 
             if (this.containsInvalidQuestion(parsedObject)) {
-                throw new Error(
+                throw new ParsingQuizHasFailedException(
                     'Parsed object contains at least one question which structure is invalid.',
                 );
             }
 
             return this.mapQuizQuestions(parsedObject);
         } catch (error: unknown) {
-            throw new Error('Parsing given stringified object has failed.');
+            throw new ParsingQuizHasFailedException(
+                'Parsing given stringified object has failed.',
+            );
         }
     }
 

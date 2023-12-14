@@ -2,6 +2,7 @@ import { QuizParameters, QuizTheme } from './quiz-parameters';
 
 describe('QuizParameters', () => {
     describe('shuffleThemes', () => {
+        // todo this test has failed once since and so it can fail, so beware (and change it)
         it('should break current themes order', () => {
             const initialQuizThemes: QuizTheme[] = [
                 new QuizTheme('id', 'A', 'A'),
