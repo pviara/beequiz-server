@@ -11,6 +11,7 @@ import { QuizParser } from '../../../../quiz/application/quiz-parser/quiz-parser
 import { QuizQuestion } from '../../../../quiz/domain/quiz-question';
 import { QuizTheme } from '../../../../quiz/domain/quiz-parameters';
 import { QUIZ_PARSER_TOKEN } from '../../../../quiz/application/quiz-parser/quiz-parser.provider';
+import { ExceededAPIQuotaException } from '../../errors/exceeded-api-quota.exception';
 
 export const GPT_VERSION: ChatCompletionCreateParamsBase['model'] =
     'gpt-3.5-turbo-1106';
@@ -40,19 +41,25 @@ export class OpenAIServiceImpl implements OpenAIService {
 
         const openAIObject = this.openAIObjectFactory.createOpenAIObject();
 
-        const response = await openAIObject.chat.completions.create({
-            model: GPT_VERSION,
-            response_format: { type: 'json_object' },
-            messages: [
-                {
-                    role: 'user',
-                    content: prompt,
-                },
-            ],
-        });
+        try {
+            const response = await openAIObject.chat.completions.create({
+                model: GPT_VERSION,
+                response_format: { type: 'json_object' },
+                messages: [
+                    {
+                        role: 'user',
+                        content: prompt,
+                    },
+                ],
+            });
 
-        const [choice] = response.choices;
-        return this.quizParser.parseQuizQuestions(choice.message.content || '');
+            const [choice] = response.choices;
+            return this.quizParser.parseQuizQuestions(
+                choice.message.content || '',
+            );
+        } catch (error: unknown) {
+            throw new ExceededAPIQuotaException();
+        }
     }
 
     async generateThemesForQuiz(

@@ -1,4 +1,5 @@
 import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
+import { ExceededAPIQuotaException } from '../../errors/exceeded-api-quota.exception';
 import { GPT_VERSION, OpenAIServiceImpl } from './open-ai-service.impl';
 import OpenAI from 'openai';
 import { OpenAIObjectFactory } from '../../../../open-ai/application/open-ai-object-factory/open-ai-object-factory';
@@ -16,10 +17,14 @@ describe('OpenAIServiceImpl', () => {
     let promptServiceSpy: PromptServiceSpy;
     let quizQuestionsParserSpy: QuizQuestionsParserSpy;
 
+    let dummyOpenAIObject: OpenAI;
+
     beforeEach(() => {
         openAIObjectFactorySpy = new OpenAIObjectFactorySpy();
         promptServiceSpy = new PromptServiceSpy();
         quizQuestionsParserSpy = new QuizQuestionsParserSpy();
+
+        dummyOpenAIObject = createDummyOpenAIObject(openAIObjectFactorySpy);
 
         sut = new OpenAIServiceImpl(
             openAIObjectFactorySpy,
@@ -29,9 +34,11 @@ describe('OpenAIServiceImpl', () => {
     });
 
     describe('generateQuestionsForQuiz', () => {
-        it('should get appropriate prompt from prompt service', async () => {
-            stubCreateOpenAIObject(openAIObjectFactorySpy);
+        beforeEach(() => {
+            stubCreateOpenAIObject(openAIObjectFactorySpy, dummyOpenAIObject);
+        });
 
+        it('should get appropriate prompt from prompt service', async () => {
             const savedQuizQuestions: QuizQuestion[] = [];
             const numberOfQuestions = 10;
             const themeLabel = 'sport';
@@ -54,8 +61,6 @@ describe('OpenAIServiceImpl', () => {
         it('should call openai API using retrieved prompt', async () => {
             const prompt = 'prompt';
             stubGetQuizQuestionsPrompt(promptServiceSpy, prompt);
-
-            stubCreateOpenAIObject(openAIObjectFactorySpy);
 
             await sut.generateQuestionsForQuiz([], 10, 'music');
 
@@ -89,12 +94,32 @@ describe('OpenAIServiceImpl', () => {
                 quizQuestionsParserSpy.calls.parseQuizQuestions.history,
             ).toContain(DEFAULT_DUMMY_CHOICE);
         });
+
+        it('should throw an exceeded request error when received any error', async () => {
+            const throwingOpenAIObject = {
+                ...dummyOpenAIObject,
+            } as typeof dummyOpenAIObject;
+            throwingOpenAIObject.chat.completions.create = () => {
+                throw new Error();
+            };
+
+            stubCreateOpenAIObject(
+                openAIObjectFactorySpy,
+                throwingOpenAIObject,
+            );
+
+            await expect(
+                sut.generateQuestionsForQuiz([], 10, 'cinema'),
+            ).rejects.toThrow(ExceededAPIQuotaException);
+        });
     });
 
     describe('generateThemesForQuiz', () => {
-        it('should get appropriate prompt from prompt service', async () => {
-            stubCreateOpenAIObject(openAIObjectFactorySpy);
+        beforeEach(() => {
+            stubCreateOpenAIObject(openAIObjectFactorySpy, dummyOpenAIObject);
+        });
 
+        it('should get appropriate prompt from prompt service', async () => {
             const savedQuizThemes: QuizTheme[] = [];
             await sut.generateThemesForQuiz(savedQuizThemes);
 
@@ -107,8 +132,6 @@ describe('OpenAIServiceImpl', () => {
         it('should call openai API using retrieved prompt', async () => {
             const prompt = 'prompt';
             stubGetQuizThemesPrompt(promptServiceSpy, prompt);
-
-            stubCreateOpenAIObject(openAIObjectFactorySpy);
 
             await sut.generateThemesForQuiz([]);
 
@@ -221,37 +244,42 @@ class QuizQuestionsParserSpy implements QuizParser {
     }
 }
 
+function createDummyOpenAIObject(
+    openAIObjectFactorySpy: OpenAIObjectFactorySpy,
+): OpenAI {
+    return {
+        chat: {
+            completions: {
+                create: (params: ChatCompletionCreateParamsNonStreaming) => {
+                    openAIObjectFactorySpy.calls.createOpenAIObject.created
+                        .create.count++;
+                    openAIObjectFactorySpy.calls.createOpenAIObject.created.create.history.push(
+                        params,
+                    );
+
+                    return {
+                        choices: [
+                            {
+                                message: {
+                                    role: 'assistant',
+                                    content: DEFAULT_DUMMY_CHOICE,
+                                },
+                            },
+                        ],
+                    };
+                },
+            },
+        },
+    } as unknown as OpenAI;
+}
+
 function stubCreateOpenAIObject(
     openAIObjectFactorySpy: OpenAIObjectFactorySpy,
+    openAIObject: OpenAI,
 ): void {
     openAIObjectFactorySpy.createOpenAIObject = () => {
         openAIObjectFactorySpy.calls.createOpenAIObject.count++;
-        return {
-            chat: {
-                completions: {
-                    create: (
-                        params: ChatCompletionCreateParamsNonStreaming,
-                    ) => {
-                        openAIObjectFactorySpy.calls.createOpenAIObject.created
-                            .create.count++;
-                        openAIObjectFactorySpy.calls.createOpenAIObject.created.create.history.push(
-                            params,
-                        );
-
-                        return {
-                            choices: [
-                                {
-                                    message: {
-                                        role: 'assistant',
-                                        content: DEFAULT_DUMMY_CHOICE,
-                                    },
-                                },
-                            ],
-                        };
-                    },
-                },
-            },
-        } as unknown as OpenAI;
+        return openAIObject;
     };
 }
 
