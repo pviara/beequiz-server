@@ -2,6 +2,7 @@ import {
     ApiServiceSpy,
     stubCannotGenerateQuizQuestions,
 } from '../test/api-service.spy';
+import { ExceededAPIQuotaException } from '../../../../open-ai/application/errors/exceeded-api-quota.exception';
 import {
     GetQuizQuestionsCommand,
     GetQuizQuestionsHandler,
@@ -215,11 +216,15 @@ describe('GetQuizQuestionsHandler', () => {
             });
 
             describe('An error is thrown from OpenAIService', () => {
-                beforeEach(() => {
-                    makeGenerateQuestionsForQuizThrow(openAIServiceSpy);
-                });
+                const numberOfTimesErrorShouldBeThrown = 1;
 
                 it('should return existing questions when there are enough of them', async () => {
+                    makeGenerateQuestionsForQuizThrow(
+                        openAIServiceSpy,
+                        new Error(),
+                        numberOfTimesErrorShouldBeThrown,
+                    );
+
                     const command = new GetQuizQuestionsCommand(
                         existingQuestions.length,
                         existingTheme.id,
@@ -230,7 +235,13 @@ describe('GetQuizQuestionsHandler', () => {
                     expect(result).toEqual(existingQuestions);
                 });
 
-                it('should throw an error when there are not enough questions to return', async () => {
+                it('should throw an error when caught error from OpenAI service is exceeded quota', async () => {
+                    makeGenerateQuestionsForQuizThrow(
+                        openAIServiceSpy,
+                        new ExceededAPIQuotaException(),
+                        numberOfTimesErrorShouldBeThrown,
+                    );
+
                     const command = new GetQuizQuestionsCommand(
                         existingQuestions.length + 10,
                         existingTheme.id,
@@ -239,6 +250,27 @@ describe('GetQuizQuestionsHandler', () => {
                     await expect(sut.execute(command)).rejects.toThrow(
                         ProblemOccurredWithOpenAIException,
                     );
+                });
+
+                it('should try to generate questions again and again as long as error is not exceeded quota', async () => {
+                    const numberOfTimesErrorShouldBeThrown = 3;
+
+                    makeGenerateQuestionsForQuizThrow(
+                        openAIServiceSpy,
+                        new Error(),
+                        numberOfTimesErrorShouldBeThrown,
+                    );
+
+                    const command = new GetQuizQuestionsCommand(
+                        existingQuestions.length + 10,
+                        existingTheme.id,
+                    );
+
+                    await sut.execute(command);
+
+                    expect(
+                        openAIServiceSpy.calls.generateQuestionsForQuiz.count,
+                    ).toBe(numberOfTimesErrorShouldBeThrown + 1);
                 });
             });
         });

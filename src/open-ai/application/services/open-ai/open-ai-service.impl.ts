@@ -12,7 +12,8 @@ import { QuizQuestion } from '../../../../quiz/domain/quiz-question';
 import { QuizTheme } from '../../../../quiz/domain/quiz-parameters';
 import { QUIZ_PARSER_TOKEN } from '../../../../quiz/application/quiz-parser/quiz-parser.provider';
 
-export const GPT_VERSION: ChatCompletionCreateParamsBase['model'] = 'gpt-3.5-turbo-1106';
+export const GPT_VERSION: ChatCompletionCreateParamsBase['model'] =
+    'gpt-3.5-turbo-1106';
 
 export class OpenAIServiceImpl implements OpenAIService {
     constructor(
@@ -51,9 +52,7 @@ export class OpenAIServiceImpl implements OpenAIService {
         });
 
         const [choice] = response.choices;
-        return this.quizParser.parseQuizQuestions(
-            choice.message.content || '',
-        );
+        return this.quizParser.parseQuizQuestions(choice.message.content || '');
     }
 
     async generateThemesForQuiz(

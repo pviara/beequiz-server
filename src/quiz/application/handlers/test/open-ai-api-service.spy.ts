@@ -9,6 +9,7 @@ export class OpenAIServiceSpy implements OpenAIService {
         generateQuestionsForQuiz: {
             count: 0,
             history: [] as [QuizQuestion[], number, string][],
+            thrownErrorsCount: 0,
         },
         generateThemesForQuiz: {
             count: 0,
@@ -41,6 +42,8 @@ export class OpenAIServiceSpy implements OpenAIService {
 
 export function makeGenerateQuestionsForQuizThrow(
     openAIServiceSpy: OpenAIServiceSpy,
+    error: Error,
+    numberOfTimes: number,
 ): void {
     openAIServiceSpy.generateQuestionsForQuiz = (
         existingQuestions: QuizQuestion[],
@@ -53,7 +56,16 @@ export function makeGenerateQuestionsForQuizThrow(
             numberOfQuestions,
             themeLabel,
         );
-        throw new Error();
+
+        let { thrownErrorsCount } =
+            openAIServiceSpy.calls.generateQuestionsForQuiz;
+
+        if (thrownErrorsCount < numberOfTimes) {
+            openAIServiceSpy.calls.generateQuestionsForQuiz.thrownErrorsCount++;
+            throw error;
+        }
+
+        return Promise.resolve([]);
     };
 }
 

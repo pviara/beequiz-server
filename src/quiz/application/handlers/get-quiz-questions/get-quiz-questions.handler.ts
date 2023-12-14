@@ -1,6 +1,7 @@
 import { ApiService } from '../../../../open-ai/application/services/api/api-service';
 import { API_SERVICE_TOKEN } from '../../../../open-ai/application/services/api/api-service.provider';
 import { CommandHandler, ICommand, ICommandHandler } from '@nestjs/cqrs';
+import { ExceededAPIQuotaException } from '../../../../open-ai/application/errors/exceeded-api-quota.exception';
 import { Inject } from '@nestjs/common';
 import { OpenAIService } from '../../../../open-ai/application/services/open-ai/open-ai-service';
 import { OPENAI_SERVICE_TOKEN } from '../../../../open-ai/application/services/open-ai/open-ai-service.provider';
@@ -59,17 +60,23 @@ export class GetQuizQuestionsHandler
             return this.existingQuestions;
         }
 
-        try {
-            await this.generateQuestions();
-            await this.saveGeneratedQuestions();
-            return this.savedQuestions;
-        } catch (error: unknown) {
-            if (this.areEnoughExistingQuestions()) {
-                return this.existingQuestions;
-            }
+        do {
+            try {
+                await this.generateQuestions();
+                await this.saveGeneratedQuestions();
+                return this.savedQuestions;
+            } catch (error: unknown) {
+                if (this.areEnoughExistingQuestions()) {
+                    return this.existingQuestions;
+                }
 
-            throw new ProblemOccurredWithOpenAIException();
-        }
+                if (error instanceof ExceededAPIQuotaException) {
+                    throw new ProblemOccurredWithOpenAIException();
+                }
+            }
+        } while (this.hasNoQuestionBeenRetrievedYet());
+
+        return this.existingQuestions;
     }
 
     private async getTheme(themeId: string): Promise<QuizTheme> {
@@ -116,5 +123,9 @@ export class GetQuizQuestionsHandler
             this.generatedQuestions,
             this.theme.id,
         );
+    }
+
+    private hasNoQuestionBeenRetrievedYet(): boolean {
+        return this.generatedQuestions.length === 0;
     }
 }
