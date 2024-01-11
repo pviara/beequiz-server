@@ -24,9 +24,29 @@ export class MongoDbUserRepository implements UserRepository {
     async getByUsername(username: string): Promise<User | null> {
         const entity = await this.model.findOne({ username });
         if (entity) {
-            return new User(entity.id, entity.username, entity.hasBeenWelcomed);
+            return this.mapToUser(entity);
         }
 
         return null;
+    }
+
+    async getById(userId: string): Promise<User | null> {
+        const entity = await this.model.findById(userId);
+        if (entity) {
+            return this.mapToUser(entity);
+        }
+
+        return null;
+    }
+
+    async update({ id, ...propsToUpdate }: User): Promise<void> {
+        await this.model.findByIdAndUpdate(id, {
+            username: propsToUpdate.username,
+            hasBeenWelcomed: propsToUpdate.hasBeenWelcomed,
+        });
+    }
+
+    private mapToUser(entity: UserEntity): User {
+        return new User(entity.id, entity.username, entity.hasBeenWelcomed);
     }
 }

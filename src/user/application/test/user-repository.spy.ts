@@ -6,11 +6,15 @@ export class UserRepositorySpy implements UserRepository {
     calls = {
         count: {
             add: 0,
+            getById: 0,
             getByUsername: 0,
+            update: 0,
         },
         history: {
             add: [] as AddUserRepoDTO[],
+            getById: [] as string[],
             getByUsername: [] as string[],
+            update: [] as User[],
         },
     };
 
@@ -20,11 +24,34 @@ export class UserRepositorySpy implements UserRepository {
         return Promise.resolve();
     }
 
+    getById(userId: string): Promise<User | null> {
+        this.calls.count.getById++;
+        this.calls.history.getById.push(userId);
+        return Promise.resolve(null);
+    }
+
     getByUsername(username: string): Promise<User | null> {
         this.calls.count.getByUsername++;
         this.calls.history.getByUsername.push(username);
         return Promise.resolve(null);
     }
+
+    update(user: User): Promise<void> {
+        this.calls.count.update++;
+        this.calls.history.update.push(user);
+        return Promise.resolve();
+    }
+}
+
+export function stubGetById(
+    userRepositorySpy: UserRepositorySpy,
+    returnedValue: User | null,
+): void {
+    userRepositorySpy.getById = (userId: string): Promise<User | null> => {
+        userRepositorySpy.calls.count.getById++;
+        userRepositorySpy.calls.history.getById.push(userId);
+        return Promise.resolve(returnedValue);
+    };
 }
 
 export function stubGetByUsername(

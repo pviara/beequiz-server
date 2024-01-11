@@ -21,7 +21,7 @@ export class GetByUsernameHandler implements IQueryHandler<GetByUsernameQuery> {
             query.username,
         );
         if (!existingUser) {
-            throw new UserNotFoundException(query.username);
+            throw new UserNotFoundException(query.username, 'username');
         }
         return existingUser;
     }
