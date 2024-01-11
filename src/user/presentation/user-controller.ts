@@ -5,10 +5,17 @@ import {
     BadRequestException,
     Body,
     Controller,
+    Patch,
     Post,
+    Request,
+    UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
+import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth-guard';
+import { Request as ExpressRequest } from 'express';
+import { User } from '../domain/user';
+import { WelcomeUserCommand } from '../application/handlers/welcome-user.handler';
 
 @Controller()
 export class UserController {
@@ -32,6 +39,15 @@ export class UserController {
         const { username, password } = dto.extractPayload();
         const command = new AddUserCommand(username, password);
 
+        await this.commandBus.execute(command);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch('welcome')
+    async welcomeUser(
+        @Request() req: ExpressRequest & { user: User },
+    ): Promise<void> {
+        const command = new WelcomeUserCommand(req.user.id);
         await this.commandBus.execute(command);
     }
 }
