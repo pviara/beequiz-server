@@ -1,61 +1,63 @@
+import {
+    ALLOWED_ORIGIN,
+    APP_ENVIRONMENT,
+    ApplicationConfiguration,
+} from './configuration/application-configuration';
 import { AppConfigService } from './app-config-service';
+import {
+    AuthenticationConfiguration,
+    JWT_SECRET,
+} from './configuration/authentication-configuration';
 import { ConfigService } from '@nestjs/config';
+import {
+    DATABASE_URI,
+    DatabaseConfiguration,
+    TEST_DATABASE_URI,
+} from './configuration/database-configuration';
 import { Injectable } from '@nestjs/common';
 import {
     OPENAI_API_KEY,
     OpenAIConfiguration,
 } from './configuration/openai-configuration';
-import {
-    DATABASE_URI,
-    DatabaseConfiguration,
-} from './configuration/database-configuration';
-import {
-    AuthenticationConfiguration,
-    JWT_SECRET,
-} from './configuration/authentication-configuration';
 
 @Injectable()
 export class AppConfigServiceImpl implements AppConfigService {
     constructor(private configService: ConfigService) {}
 
-    getAuthConfig(): AuthenticationConfiguration {
-        const jwtSecret = this.configService.get(JWT_SECRET);
-        if (!jwtSecret) {
-            this.throwVarNotFoundErrorFor(JWT_SECRET);
-        }
+    getAppConfig(): ApplicationConfiguration {
+        return this.getConfiguration(ALLOWED_ORIGIN, APP_ENVIRONMENT);
+    }
 
-        return {
-            JWT_SECRET: jwtSecret,
-        };
+    getAuthConfig(): AuthenticationConfiguration {
+        return this.getConfiguration(JWT_SECRET);
     }
 
     getDatabaseConfig(): DatabaseConfiguration {
-        const databaseURI = this.configService.get<string>(DATABASE_URI);
-        if (!databaseURI) {
-            this.throwVarNotFoundErrorFor(DATABASE_URI);
-        }
-
-        return {
-            DATABASE_URI: databaseURI as string,
-            TEST_DATABASE_URI: (databaseURI as string).replace(
-                'beequiz?',
-                'test_beequiz?',
-            ),
-        };
+        return this.getConfiguration(DATABASE_URI, TEST_DATABASE_URI);
     }
 
     getOpenAIConfig(): OpenAIConfiguration {
-        const openAIAPIKey = this.configService.get(OPENAI_API_KEY);
-        if (!openAIAPIKey) {
-            this.throwVarNotFoundErrorFor(OPENAI_API_KEY);
-        }
-
-        return {
-            OPENAI_API_KEY: openAIAPIKey,
-        };
+        return this.getConfiguration(OPENAI_API_KEY);
     }
 
-    private throwVarNotFoundErrorFor(key: string): void {
-        throw new Error(`Variable not found for key "${key}".`);
+    private getConfiguration<T>(...keys: string[]): T {
+        const configurationEntries = this.createEntriesFor(keys);
+        return Object.fromEntries(configurationEntries) as T;
+    }
+
+    private createEntriesFor(keys: string[]): [string, string][] {
+        return keys.map((key) => {
+            const value = this.getEnvironmentVariable(key);
+            return [key, value];
+        });
+    }
+
+    private getEnvironmentVariable(key: string): string {
+        const value = this.configService.get<string>(key);
+        if (!value) {
+            throw new Error(`Variable not found for key "${key}".`);
+        }
+
+        return value;
     }
 }

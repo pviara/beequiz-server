@@ -1,3 +1,7 @@
+import {
+    ALLOWED_ORIGIN,
+    APP_ENVIRONMENT,
+} from './configuration/application-configuration';
 import { AppConfigServiceImpl } from './app-config-service.impl';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -14,6 +18,30 @@ describe('AppConfigServiceImpl', () => {
     beforeEach(() => {
         configServiceSpy = new ConfigServiceSpy();
         sut = new AppConfigServiceImpl(configServiceSpy);
+    });
+
+    describe('getAppConfig', () => {
+        it("should throw an error when allowed origin couldn't be found", () => {
+            const returnedValue = undefined as unknown as string;
+            stubConfigServiceGet(configServiceSpy, returnedValue);
+
+            expect(() => sut.getAppConfig()).toThrow();
+        });
+
+        it('should get allowed origin using NestJS ConfigService', () => {
+            const returnedValue = 'fake_allowed_origin';
+            stubConfigServiceGet(configServiceSpy, returnedValue);
+
+            const result = sut.getAppConfig();
+
+            expect(configServiceSpy.callCountToGet).toBe(2);
+            expect(configServiceSpy.callHistoryToGet).toEqual([
+                ALLOWED_ORIGIN,
+                APP_ENVIRONMENT,
+            ]);
+            expect(result).toHaveProperty(ALLOWED_ORIGIN);
+            expect(result).toHaveProperty(APP_ENVIRONMENT);
+        });
     });
 
     describe('getAuthConfig', () => {
@@ -50,18 +78,13 @@ describe('AppConfigServiceImpl', () => {
 
             const result = sut.getDatabaseConfig();
 
-            expect(configServiceSpy.callCountToGet).toBe(1);
-            expect(configServiceSpy.callHistoryToGet).toContain(DATABASE_URI);
+            expect(configServiceSpy.callCountToGet).toBe(2);
+            expect(configServiceSpy.callHistoryToGet).toEqual([
+                DATABASE_URI,
+                TEST_DATABASE_URI,
+            ]);
             expect(result).toHaveProperty(DATABASE_URI);
-        });
-
-        it('should compute test database URI by itself', () => {
-            const returnedValue = 'beequiz?';
-            stubConfigServiceGet(configServiceSpy, returnedValue);
-
-            const result = sut.getDatabaseConfig();
-
-            expect(result[TEST_DATABASE_URI]).toBe('test_beequiz?');
+            expect(result).toHaveProperty(TEST_DATABASE_URI);
         });
     });
 
