@@ -11,6 +11,7 @@ import { AppExceptionFilter } from './application/app-exception-filter';
 import { APP_CONFIG_SERVICE_TOKEN } from './infrastructure/app-config/app-config-service.provider';
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 export async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -22,22 +23,22 @@ export async function bootstrap() {
 }
 
 function configureCorsPolicy(app: INestApplication): void {
-    if (!isAppInProductionMode(app)) {
-        app.enableCors({
-            origin: (origin, callback) => {
-                const allowedOrigin = getAllowedOrigin(app);
-                const isOriginAllowed = !origin || allowedOrigin === origin;
+    const corsOptions: CorsOptions = {};
 
-                if (isOriginAllowed) {
-                    callback(null, true);
-                } else {
-                    callback(new Error('CORS: Request origin is not allowed'));
-                }
-            },
-        });
-    } else {
-        app.enableCors();
+    if (isAppInProductionMode(app)) {
+        corsOptions.origin = (origin, callback) => {
+            const allowedOrigin = getAllowedOrigin(app);
+            const isOriginAllowed = !origin || allowedOrigin === origin;
+
+            if (isOriginAllowed) {
+                callback(null, true);
+            } else {
+                callback(new Error('CORS: Request origin is not allowed'));
+            }
+        };
     }
+
+    app.enableCors(corsOptions);
 }
 
 function getAppConfiguration(app: INestApplication): ApplicationConfiguration {
