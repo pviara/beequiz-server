@@ -2,6 +2,7 @@ import { AppModule } from './app.module';
 import {
     ALLOWED_ORIGIN,
     APP_ENVIRONMENT,
+    APP_PORT,
     AppEnvironment,
     ApplicationConfiguration,
 } from './infrastructure/app-config/configuration/application-configuration';
@@ -15,19 +16,16 @@ export async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
     configureCorsPolicy(app);
+    configureGlobalFilters(app);
 
-    app.useGlobalFilters(new AppExceptionFilter());
-
-    await app.listen(4002);
+    await app.listen(getAppPort(app));
 }
 
 function configureCorsPolicy(app: INestApplication): void {
-    const appConfig = getAppConfiguration(app);
-
-    if (!isAppInProductionMode(appConfig)) {
+    if (!isAppInProductionMode(app)) {
         app.enableCors({
             origin: (origin, callback) => {
-                const allowedOrigin = getAllowedOrigin(appConfig);
+                const allowedOrigin = getAllowedOrigin(app);
                 const isOriginAllowed = !origin || allowedOrigin === origin;
 
                 if (isOriginAllowed) {
@@ -49,10 +47,21 @@ function getAppConfiguration(app: INestApplication): ApplicationConfiguration {
     return appConfigService.getAppConfig();
 }
 
-function isAppInProductionMode(appConfig: ApplicationConfiguration) {
+function isAppInProductionMode(app: INestApplication) {
+    const appConfig = getAppConfiguration(app);
     return appConfig[APP_ENVIRONMENT] === AppEnvironment.Production;
 }
 
-function getAllowedOrigin(appConfig: ApplicationConfiguration): string {
+function getAllowedOrigin(app: INestApplication): string {
+    const appConfig = getAppConfiguration(app);
     return appConfig[ALLOWED_ORIGIN];
+}
+
+function getAppPort(app: INestApplication): string {
+    const appConfig = getAppConfiguration(app);
+    return appConfig[APP_PORT];
+}
+
+function configureGlobalFilters(app: INestApplication): void {
+    app.useGlobalFilters(new AppExceptionFilter());
 }
