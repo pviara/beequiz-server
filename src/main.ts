@@ -1,14 +1,3 @@
-import { AppExceptionFilter } from './application/app-exception-filter';
-import { AppModule } from './app.module';
-import { NestFactory } from '@nestjs/core';
+import { bootstrap } from './main-utils';
 
-async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
-
-    app.useGlobalFilters(new AppExceptionFilter());
-
-    app.enableCors();
-
-    await app.listen(4002);
-}
 bootstrap();

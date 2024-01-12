@@ -1,6 +1,7 @@
 import {
     ALLOWED_ORIGIN,
     APP_ENVIRONMENT,
+    APP_PORT,
 } from './configuration/application-configuration';
 import { AppConfigServiceImpl } from './app-config-service.impl';
 import { ConfigService } from '@nestjs/config';
@@ -34,13 +35,15 @@ describe('AppConfigServiceImpl', () => {
 
             const result = sut.getAppConfig();
 
-            expect(configServiceSpy.callCountToGet).toBe(2);
+            expect(configServiceSpy.callCountToGet).toBe(3);
             expect(configServiceSpy.callHistoryToGet).toEqual([
                 ALLOWED_ORIGIN,
                 APP_ENVIRONMENT,
+                APP_PORT,
             ]);
             expect(result).toHaveProperty(ALLOWED_ORIGIN);
             expect(result).toHaveProperty(APP_ENVIRONMENT);
+            expect(result).toHaveProperty(APP_PORT);
         });
     });
 

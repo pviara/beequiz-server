@@ -1,6 +1,7 @@
 import {
     ALLOWED_ORIGIN,
     APP_ENVIRONMENT,
+    APP_PORT,
     ApplicationConfiguration,
 } from './configuration/application-configuration';
 import { AppConfigService } from './app-config-service';
@@ -25,7 +26,7 @@ export class AppConfigServiceImpl implements AppConfigService {
     constructor(private configService: ConfigService) {}
 
     getAppConfig(): ApplicationConfiguration {
-        return this.getConfiguration(ALLOWED_ORIGIN, APP_ENVIRONMENT);
+        return this.getConfiguration(ALLOWED_ORIGIN, APP_ENVIRONMENT, APP_PORT);
     }
 
     getAuthConfig(): AuthenticationConfiguration {
