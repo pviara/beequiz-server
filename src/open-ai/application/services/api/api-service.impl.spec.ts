@@ -4,7 +4,7 @@ import {
     QUIZ_THEMES_REQUEST_INFO_PATH,
     RequestInfo,
 } from './api-service.impl';
-import { DateTimeService } from '../../../../shared/data-time-service/datetime-service';
+import { DateTimeService } from '../../../../shared/date-time-service/datetime-service';
 import { resolve } from 'path';
 import * as fs from 'fs';
 

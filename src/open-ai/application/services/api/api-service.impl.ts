@@ -1,6 +1,6 @@
 import { ApiService } from './api-service';
-import { DateTimeService } from '../../../../shared/data-time-service/datetime-service';
-import { DATE_TIME_SERVICE_TOKEN } from '../../../../shared/data-time-service/date-time-service.provider';
+import { DateTimeService } from '../../../../shared/date-time-service/datetime-service';
+import { DATE_TIME_SERVICE_TOKEN } from '../../../../shared/date-time-service/date-time-service.provider';
 import { Inject } from '@nestjs/common';
 import { readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';

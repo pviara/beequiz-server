@@ -27,8 +27,6 @@ function configureCorsPolicy(app: INestApplication): void {
     const logger = new Logger('CORS');
 
     if (isAppInProductionMode(app)) {
-        logger.log('Configuring CORS policy for production mode');
-
         corsOptions.origin = (origin, callback) => {
             const allowedOrigin = getAllowedOrigin(app);
             const isOriginAllowed = allowedOrigin === origin;
@@ -44,8 +42,9 @@ function configureCorsPolicy(app: INestApplication): void {
                 );
             }
         };
+        logger.log('Configured CORS policy for production mode');
     } else {
-        logger.log('Configuring CORS policy for development mode');
+        logger.log('Configured CORS policy for development mode');
     }
 
     app.enableCors(corsOptions);

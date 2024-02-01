@@ -8,29 +8,23 @@ import {
     Body,
     Controller,
     Get,
-    HttpException,
-    HttpStatus,
     Post,
     Query,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { QuizParameters } from '../domain/quiz-parameters';
-import {
-    GetQuizParametersCommand,
-    GetQuizParametersHandler,
-} from '../application/handlers/get-quiz-parameters/get-quiz-parameters.handler';
-import {
-    GetQuizQuestionsCommand,
-    GetQuizQuestionsHandler,
-} from '../application/handlers/get-quiz-questions/get-quiz-questions.handler';
-import { isValidObjectId } from 'mongoose';
-import { QuizAnswerDTO, QuizQuestionDTO } from './dto/quiz-question-dto';
-import { QuizQuestion } from '../domain/quiz-question';
 import {
     GetQuizParametersTempCommand,
     GetQuizParametersTempHandler,
 } from '../application/handlers/get-quiz-parameters-tmp/get-quiz-parameters-tmp.handler';
+import {
+    GetQuizQuestionsCommand,
+    GetQuizQuestionsHandler,
+} from '../application/handlers/get-quiz-questions/get-quiz-questions.handler';
+import { QuizAnswerDTO, QuizQuestionDTO } from './dto/quiz-question-dto';
+import { QuizParameters } from '../domain/quiz-parameters';
+import { QuizQuestion } from '../domain/quiz-question';
 import { isParsedStringNaN } from '../../utils/utils';
+import { isValidObjectId } from 'mongoose';
 
 type AnswerStatementDTO = ReturnType<AnswerQuestionHandler['execute']>;
 

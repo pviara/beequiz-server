@@ -1,4 +1,4 @@
-import { DateTimeServiceProvider } from './data-time-service/date-time-service.provider';
+import { DateTimeServiceProvider } from './date-time-service/date-time-service.provider';
 import { Module } from '@nestjs/common';
 
 @Module({
