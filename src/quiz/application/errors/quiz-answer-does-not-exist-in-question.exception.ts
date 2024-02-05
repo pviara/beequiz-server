@@ -1,10 +1,10 @@
-import { Exception, ExceptionCode } from '../../../application/exception';
+import { Exception } from '../../../application/exception';
 
 export class QuizAnswerDoesNotExistException extends Exception {
     readonly message: string;
 
     constructor(answerId: string, questionId: string) {
-        super(ExceptionCode.QuizAnswerDoesNotExist);
+        super('QuizAnswerDoesNotExist');
         this.message = this.formatMessage(answerId, questionId);
     }
 

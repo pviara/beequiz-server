@@ -27,6 +27,8 @@ function configureCorsPolicy(app: INestApplication): void {
     const logger = new Logger('CORS');
 
     if (isAppInProductionMode(app)) {
+        logger.log('Configured CORS policy for production mode');
+
         corsOptions.origin = (origin, callback) => {
             const allowedOrigin = getAllowedOrigin(app);
             const isOriginAllowed = allowedOrigin === origin;

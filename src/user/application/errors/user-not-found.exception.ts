@@ -1,10 +1,10 @@
-import { Exception, ExceptionCode } from '../../../application/exception';
+import { Exception } from '../../../application/exception';
 
 export class UserNotFoundException extends Exception {
     readonly message: string;
 
     constructor(username: string, key: 'id' | 'username') {
-        super(ExceptionCode.UserNotFound);
+        super('UserNotFound');
         this.message = this.formatMessage(username, key);
     }
 

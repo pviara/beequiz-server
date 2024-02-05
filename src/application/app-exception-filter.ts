@@ -12,13 +12,13 @@ enum HttpStatus {
 @Catch(Exception)
 export class AppExceptionFilter implements ExceptionFilter {
     private exceptionMapping: Record<ExceptionCode, HttpStatus> = {
-        [ExceptionCode.ProblemOccurredWithOpenAI]: HttpStatus.FailedDependency,
-        [ExceptionCode.QuizAnswerDoesNotExist]: HttpStatus.UnprocessableEntity,
-        [ExceptionCode.QuizQuestionNotFound]: HttpStatus.NotFound,
-        [ExceptionCode.QuizThemeNotFound]: HttpStatus.NotFound,
-        [ExceptionCode.StillOnGoingQuizGame]: HttpStatus.Conflict,
-        [ExceptionCode.UserAlreadyExists]: HttpStatus.Conflict,
-        [ExceptionCode.UserNotFound]: HttpStatus.NotFound,
+        ProblemOccurredWithOpenAI: HttpStatus.FailedDependency,
+        QuizAnswerDoesNotExist: HttpStatus.UnprocessableEntity,
+        QuizQuestionNotFound: HttpStatus.NotFound,
+        QuizThemeNotFound: HttpStatus.NotFound,
+        StillOnGoingQuizGame: HttpStatus.Conflict,
+        UserAlreadyExists: HttpStatus.Conflict,
+        UserNotFound: HttpStatus.NotFound,
     };
 
     catch(exception: Exception, host: ArgumentsHost): void {

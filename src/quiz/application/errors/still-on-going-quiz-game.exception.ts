@@ -1,10 +1,10 @@
-import { Exception, ExceptionCode } from '../../../application/exception';
+import { Exception } from '../../../application/exception';
 
 export class StillOnGoingQuizGameException extends Exception {
     readonly message: string;
 
     constructor(userId: string) {
-        super(ExceptionCode.StillOnGoingQuizGame);
+        super('StillOnGoingQuizGame');
         this.message = this.formatMessage(userId);
     }
 
