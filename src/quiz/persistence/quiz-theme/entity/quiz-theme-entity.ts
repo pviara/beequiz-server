@@ -3,10 +3,10 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema({ collection: 'quiz-theme' })
 export class QuizThemeDocument extends Document {
-    @Prop({ required: true })
+    @Prop({ type: String, required: true })
     code!: string;
 
-    @Prop({ required: true })
+    @Prop({ type: String, required: true })
     label!: string;
 }
 

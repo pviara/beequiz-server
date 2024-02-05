@@ -3,6 +3,7 @@ import {
     APP_ENVIRONMENT,
     APP_PORT,
 } from './configuration/application-configuration';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { AppConfigServiceImpl } from './app-config-service.impl';
 import { ConfigService } from '@nestjs/config';
 import {

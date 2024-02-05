@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { QuizThemesParser } from './quiz-themes-parser';
 
 describe('QuizThemesParser', () => {

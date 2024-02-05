@@ -1,10 +1,10 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import { ParsedQuizTheme } from './model/parsed-quiz-theme';
-import { QuizAnswer, QuizQuestion } from '../../domain/quiz-question';
-import { QuizParserImpl } from './quiz-parser.impl';
 import {
     ParsedQuizAnswer,
     ParsedQuizQuestion,
 } from './model/parsed-quiz-question';
+import { QuizParserImpl } from './quiz-parser.impl';
 
 describe('QuizParserImpl', () => {
     let sut: QuizParserImpl;

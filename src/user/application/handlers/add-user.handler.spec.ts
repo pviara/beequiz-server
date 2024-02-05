@@ -1,13 +1,13 @@
 import { AddUserCommand, AddUserHandler } from '../handlers/add-user.handler';
 import { AddUserRepoDTO } from '../../persistence/dto/add-user-repo.dto';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PasswordHasher } from '../../domain/password-hasher';
 import { stubGetByUsername } from '../test/user-repository.spy';
 import { User } from '../../domain/user';
 import { UserAlreadyExistsException } from '../errors/user-already-exists.exception';
 import { UserRepositorySpy } from '../test/user-repository.spy';
-import * as bcrypt from 'bcrypt';
 
-jest.mock('bcrypt');
+vi.mock('bcrypt');
 
 describe('AddUserHandler', () => {
     let sut: AddUserHandler;
@@ -15,7 +15,7 @@ describe('AddUserHandler', () => {
 
     beforeEach(() => {
         userRepositorySpy = new UserRepositorySpy();
-        jest.resetAllMocks();
+        vi.resetAllMocks();
 
         sut = new AddUserHandler(userRepositorySpy);
     });

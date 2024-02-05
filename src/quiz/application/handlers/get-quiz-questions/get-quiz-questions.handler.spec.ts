@@ -2,6 +2,7 @@ import {
     ApiServiceSpy,
     stubCannotGenerateQuizQuestions,
 } from '../test/api-service.spy';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { ExceededAPIQuotaException } from '../../../../open-ai/application/errors/exceeded-api-quota.exception';
 import {
     GetQuizQuestionsCommand,

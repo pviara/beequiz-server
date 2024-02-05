@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import { User } from '../../domain/user';
 import { UserNotFoundException } from '../errors/user-not-found.exception';
 import { UserRepositorySpy, stubGetById } from '../test/user-repository.spy';

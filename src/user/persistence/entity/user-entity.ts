@@ -3,22 +3,24 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema({ _id: false })
 export class UserPasswordDocument {
-    @Prop({ required: true })
+    @Prop({ type: String, required: true })
     hash!: string;
 
-    @Prop({ required: true })
+    @Prop({ type: String, required: true })
     salt!: string;
 }
 
+const userPasswordSchema = SchemaFactory.createForClass(UserPasswordDocument);
+
 @Schema()
 export class UserDocument extends Document {
-    @Prop({ required: true })
+    @Prop({ type: String, required: true })
     username!: string;
 
-    @Prop({ required: true })
+    @Prop({ type: userPasswordSchema, required: true })
     password!: UserPasswordDocument;
 
-    @Prop({ required: false })
+    @Prop({ type: Boolean, required: false })
     hasBeenWelcomed?: boolean;
 }
 

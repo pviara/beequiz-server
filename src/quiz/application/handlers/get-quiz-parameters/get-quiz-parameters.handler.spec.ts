@@ -2,19 +2,20 @@ import {
     ApiServiceSpy,
     stubCannotGenerateQuizThemes,
 } from '../test/api-service.spy';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { GetQuizParametersHandler } from './get-quiz-parameters.handler';
+import {
+    mapToQuizThemes,
+    QuizThemeRepositorySpy,
+    stubGetQuizThemes,
+    stubSaveGeneratedThemes,
+} from '../test/quiz-theme-repository.spy';
 import {
     OpenAIServiceSpy,
     stubGenerateThemesForQuiz,
 } from '../test/open-ai-api-service.spy';
 import { ParsedQuizTheme } from '../../quiz-parser/model/parsed-quiz-theme';
 import { QuizTheme } from '../../../domain/quiz-parameters';
-import {
-    QuizThemeRepositorySpy,
-    mapToQuizThemes,
-    stubGetQuizThemes,
-    stubSaveGeneratedThemes,
-} from '../test/quiz-theme-repository.spy';
 
 describe('GetQuizParametersHandler', () => {
     let sut: GetQuizParametersHandler;

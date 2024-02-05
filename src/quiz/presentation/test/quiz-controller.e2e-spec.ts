@@ -1,12 +1,13 @@
 import { AppExceptionFilter } from '../../../application/app-exception-filter';
 import { DatabaseTestingModule } from '../../../infrastructure/database/test/database.testing-module';
+import { describe, expect, it } from 'vitest';
 import { DummyOpenAIServiceImpl } from '../../../open-ai/application/services/open-ai/test/dummy-open-ai-service.impl';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { OPENAI_SERVICE_TOKEN } from '../../../open-ai/application/services/open-ai/open-ai-service.provider';
 import { QuizTestingModule } from './quiz.testing-module';
 import { RouterModule } from '@nestjs/core';
 import { Test, TestingModuleBuilder } from '@nestjs/testing';
-import * as request from 'supertest';
+import request from 'supertest';
 
 describe('QuizController', () => {
     let app: INestApplication;

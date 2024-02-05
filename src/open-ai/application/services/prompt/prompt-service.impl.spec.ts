@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import { NUMBER_OF_THEMES, PromptServiceImpl } from './prompt-service.impl';
 import { QuizQuestion } from '../../../../quiz/domain/quiz-question';
 import { QuizTheme } from '../../../../quiz/domain/quiz-parameters';

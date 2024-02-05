@@ -4,11 +4,12 @@ import {
     QUIZ_THEMES_REQUEST_INFO_PATH,
     RequestInfo,
 } from './api-service.impl';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DateTimeService } from '../../../../shared/date-time-service/datetime-service';
 import { resolve } from 'path';
 import * as fs from 'fs';
 
-jest.mock('fs');
+vi.mock('fs');
 const fsMock = fs as jest.Mocked<typeof fs>;
 
 describe('ApiServiceImpl', () => {
@@ -17,7 +18,7 @@ describe('ApiServiceImpl', () => {
 
     beforeEach(() => {
         dateTimeServiceSpy = new DateTimeServiceSpy();
-        jest.resetAllMocks();
+        vi.resetAllMocks();
 
         sut = new ApiServiceImpl(dateTimeServiceSpy);
     });

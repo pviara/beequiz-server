@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
 import { ExceededAPIQuotaException } from '../../errors/exceeded-api-quota.exception';
 import { GPT_VERSION, OpenAIServiceImpl } from './open-ai-service.impl';

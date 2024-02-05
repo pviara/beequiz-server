@@ -2,6 +2,7 @@ import {
     AnswerQuestionCommand,
     AnswerQuestionHandler,
 } from './answer-question.handler';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { QuizAnswer, QuizQuestion } from '../../../domain/quiz-question';
 import { QuizAnswerDoesNotExistException } from '../../errors/quiz-answer-does-not-exist-in-question.exception';
 import { QuizQuestionNotFoundException } from '../../errors/quiz-question-not-found.exception';

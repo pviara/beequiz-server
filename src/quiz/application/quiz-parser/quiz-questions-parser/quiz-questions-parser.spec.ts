@@ -1,4 +1,4 @@
-import { ProblemOccurredWithOpenAIException } from '../../errors/problem-occurred-with-openai.exception';
+import { describe, expect, it } from 'vitest';
 import { QuizQuestionsParser } from './quiz-questions-parser';
 
 describe('QuizQuestionsParser', () => {

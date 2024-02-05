@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { QuizParameters, QuizTheme } from './quiz-parameters';
 
 describe('QuizParameters', () => {
