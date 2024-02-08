@@ -1,11 +1,20 @@
 import { AuthService } from '../application/auth-service';
 import { AUTH_SERVICE_TOKEN } from '../application/auth-service.provider';
-import { Controller, Get, Inject, Request, Response, UseGuards } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Inject,
+    Request,
+    Response,
+    UseGuards,
+} from '@nestjs/common';
 import { GoogleAuthGuard } from './guards/google-auth-guard';
-import { Request as ExpressRequest, Response as ExpressResponse } from 'express';
-import { User } from '../../user/domain/user';
 import { JwtAuthGuard } from './guards/jwt-auth-guard';
-import { SignedInUser } from '../domain/signed-in-user';
+import {
+    Request as ExpressRequest,
+    Response as ExpressResponse,
+} from 'express';
+import { User } from '../../user/domain/user';
 
 type SignedInRequest = ExpressRequest & {
     user: User;
@@ -30,12 +39,10 @@ export class AuthController {
 
     @UseGuards(JwtAuthGuard)
     @Get()
-    async getUserFromToken(
-        @Request() req: SignedInRequest,
-    ): Promise<User> {
+    async getUserFromToken(@Request() req: SignedInRequest): Promise<User> {
         return req.user;
     }
-    
+
     @UseGuards(GoogleAuthGuard)
     @Get('google')
     async signInWithGoogle(): Promise<void> {}

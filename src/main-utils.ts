@@ -31,7 +31,7 @@ function configureCorsPolicy(app: INestApplication): void {
 
         corsOptions.origin = (origin, callback) => {
             const allowedOrigin = getAllowedOrigin(app);
-            const isOriginAllowed = allowedOrigin === origin;
+            const isOriginAllowed = !origin || allowedOrigin === origin;
 
             if (isOriginAllowed) {
                 callback(null, true);
