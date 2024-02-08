@@ -10,7 +10,12 @@ import {
     DATABASE_URI,
     TEST_DATABASE_URI,
 } from './configuration/database-configuration';
-import { JWT_SECRET } from './configuration/authentication-configuration';
+import {
+    JWT_SECRET,
+    OAUTH_CLIENT,
+    OAUTH_REDIRECT_URL,
+    OAUTH_SECRET,
+} from './configuration/authentication-configuration';
 import { OPENAI_API_KEY } from './configuration/openai-configuration';
 
 describe('AppConfigServiceImpl', () => {
@@ -23,15 +28,15 @@ describe('AppConfigServiceImpl', () => {
     });
 
     describe('getAppConfig', () => {
-        it("should throw an error when allowed origin couldn't be found", () => {
+        it("should throw an error when app config couldn't be retrieved", () => {
             const returnedValue = undefined as unknown as string;
             stubConfigServiceGet(configServiceSpy, returnedValue);
 
             expect(() => sut.getAppConfig()).toThrow();
         });
 
-        it('should get allowed origin using NestJS ConfigService', () => {
-            const returnedValue = 'fake_allowed_origin';
+        it('should get app config using NestJS ConfigService', () => {
+            const returnedValue = 'app_config_fake_key';
             stubConfigServiceGet(configServiceSpy, returnedValue);
 
             const result = sut.getAppConfig();
@@ -49,27 +54,35 @@ describe('AppConfigServiceImpl', () => {
     });
 
     describe('getAuthConfig', () => {
-        it("should throw an error when jwt secret couldn't be found", () => {
+        it("should throw an error when auth config couldn't be retrieved", () => {
             const returnedValue = undefined as unknown as string;
             stubConfigServiceGet(configServiceSpy, returnedValue);
 
             expect(() => sut.getAuthConfig()).toThrow();
         });
 
-        it('should get jwt secret using NestJS ConfigService', () => {
-            const returnedValue = 'fake_jwt_secret';
+        it('should get auth config using NestJS ConfigService', () => {
+            const returnedValue = 'auth_config_fake_key';
             stubConfigServiceGet(configServiceSpy, returnedValue);
 
             const result = sut.getAuthConfig();
 
-            expect(configServiceSpy.callCountToGet).toBe(1);
-            expect(configServiceSpy.callHistoryToGet).toContain(JWT_SECRET);
+            expect(configServiceSpy.callCountToGet).toBe(4);
+            expect(configServiceSpy.callHistoryToGet).toEqual([
+                JWT_SECRET,
+                OAUTH_CLIENT,
+                OAUTH_REDIRECT_URL,
+                OAUTH_SECRET,
+            ]);
             expect(result).toHaveProperty(JWT_SECRET);
+            expect(result).toHaveProperty(OAUTH_CLIENT);
+            expect(result).toHaveProperty(OAUTH_REDIRECT_URL);
+            expect(result).toHaveProperty(OAUTH_SECRET);
         });
     });
 
     describe('getDatabaseConfig', () => {
-        it("should throw an error when database URI couldn't be found", () => {
+        it("should throw an error when database config couldn't be retrieved", () => {
             const returnedValue = undefined as unknown as string;
             stubConfigServiceGet(configServiceSpy, returnedValue);
 
@@ -93,7 +106,7 @@ describe('AppConfigServiceImpl', () => {
     });
 
     describe('getOpenAIConfig', () => {
-        it("should throw an error when OpenAI API key couldn't be found", () => {
+        it("should throw an error when OpenAI config couldn't be retrieved", () => {
             const returnedValue = undefined as unknown as string;
             stubConfigServiceGet(configServiceSpy, returnedValue);
 
