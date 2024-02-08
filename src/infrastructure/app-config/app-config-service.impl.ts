@@ -8,6 +8,9 @@ import { AppConfigService } from './app-config-service';
 import {
     AuthenticationConfiguration,
     JWT_SECRET,
+    OAUTH_CLIENT,
+    OAUTH_REDIRECT_URL,
+    OAUTH_SECRET,
 } from './configuration/authentication-configuration';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -30,7 +33,12 @@ export class AppConfigServiceImpl implements AppConfigService {
     }
 
     getAuthConfig(): AuthenticationConfiguration {
-        return this.getConfiguration(JWT_SECRET);
+        return this.getConfiguration(
+            JWT_SECRET,
+            OAUTH_CLIENT,
+            OAUTH_REDIRECT_URL,
+            OAUTH_SECRET,
+        );
     }
 
     getDatabaseConfig(): DatabaseConfiguration {
