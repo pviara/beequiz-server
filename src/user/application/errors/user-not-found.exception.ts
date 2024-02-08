@@ -3,12 +3,12 @@ import { Exception } from '../../../application/exception';
 export class UserNotFoundException extends Exception {
     readonly message: string;
 
-    constructor(username: string, key: 'id' | 'username') {
+    constructor(value: string, key: 'id' | 'email') {
         super('UserNotFound');
-        this.message = this.formatMessage(username, key);
+        this.message = this.formatMessage(value, key);
     }
 
-    private formatMessage(username: string, key: string): string {
-        return `No user was found with given ${key} "${username}".`;
+    private formatMessage(value: string, key: string): string {
+        return `No user was found with given ${key} "${value}".`;
     }
 }

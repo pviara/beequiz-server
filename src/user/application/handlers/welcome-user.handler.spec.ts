@@ -41,11 +41,7 @@ describe('WelcomeUserHandler', () => {
 
             const hasBeenWelcomed = true;
             expect(userRepoSpy.calls.history.update).toContainEqual(
-                new User(
-                    existingUser.id,
-                    existingUser.username,
-                    hasBeenWelcomed,
-                ),
+                new User(existingUser.id, existingUser.email, hasBeenWelcomed),
             );
         });
     });

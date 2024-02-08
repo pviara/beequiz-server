@@ -3,10 +3,10 @@ import { AppConfigService } from '../infrastructure/app-config/app-config-servic
 import { AuthController } from './presentation/auth-controller';
 import { AuthServiceProvider } from './application/auth-service.provider';
 import { APP_CONFIG_SERVICE_TOKEN } from '../infrastructure/app-config/app-config-service.provider';
+import { GoogleStrategy } from './application/strategy/google-strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './application/strategy/jwt-strategy';
 import { JWT_SECRET } from '../infrastructure/app-config/configuration/authentication-configuration';
-import { LocalStrategy } from './application/strategy/local-strategy';
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { UserModule } from '../user/user.module';
@@ -28,6 +28,6 @@ import { UserModule } from '../user/user.module';
         PassportModule,
         UserModule,
     ],
-    providers: [AuthServiceProvider, JwtStrategy, LocalStrategy],
+    providers: [AuthServiceProvider, GoogleStrategy, JwtStrategy],
 })
 export class AuthModule {}
