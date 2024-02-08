@@ -13,16 +13,12 @@ export class MongoDbUserRepository implements UserRepository {
 
     async add(userToAdd: AddUserRepoDTO): Promise<void> {
         await this.model.create({
-            username: userToAdd.username,
-            password: {
-                hash: userToAdd.hashedPassword.hash,
-                salt: userToAdd.hashedPassword.salt,
-            },
+            email: userToAdd.email,
         });
     }
 
-    async getByUsername(username: string): Promise<User | null> {
-        const entity = await this.model.findOne({ username });
+    async getByEmail(email: string): Promise<User | null> {
+        const entity = await this.model.findOne({ email });
         if (entity) {
             return this.mapToUser(entity);
         }
@@ -41,12 +37,11 @@ export class MongoDbUserRepository implements UserRepository {
 
     async update({ id, ...propsToUpdate }: User): Promise<void> {
         await this.model.findByIdAndUpdate(id, {
-            username: propsToUpdate.username,
             hasBeenWelcomed: propsToUpdate.hasBeenWelcomed,
         });
     }
 
     private mapToUser(entity: UserEntity): User {
-        return new User(entity.id, entity.username, entity.hasBeenWelcomed);
+        return new User(entity.id, entity.email, entity.hasBeenWelcomed);
     }
 }

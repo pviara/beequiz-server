@@ -8,7 +8,7 @@ import { UserRepository } from '../../../user/persistence/repository/user-reposi
 import { USER_REPO_TOKEN } from '../../../user/persistence/repository/user-repository.provider';
 
 type JwtAuthPayload = {
-    username: string;
+    email: string;
     iat: number;
     exp: number;
 };
@@ -26,14 +26,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
             secretOrKey: configService.getAuthConfig().JWT_SECRET,
+            usernameField: 'email',
         });
     }
 
     async validate(payload: JwtAuthPayload): Promise<User> {
-        const user = await this.userRepository.getByUsername(payload.username);
+        const user = await this.userRepository.getByEmail(payload.email);
         if (!user) {
             throw new UnauthorizedException(
-                `User with username ${payload.username} has not been found during JWT validation.`,
+                `User with email ${payload.email} has not been found during JWT validation.`,
             );
         }
 

@@ -1,8 +1,3 @@
-import { PasswordHash } from '../../domain/password-hash';
-
 export class AddUserRepoDTO {
-    constructor(
-        readonly username: string,
-        readonly hashedPassword: PasswordHash,
-    ) {}
+    constructor(readonly email: string) {}
 }
