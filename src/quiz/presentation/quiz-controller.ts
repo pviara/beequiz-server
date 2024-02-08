@@ -46,7 +46,6 @@ export class QuizController {
         );
     }
 
-    @UseGuards(JwtAuthGuard)
     @Get('parameters')
     async getParameters(): Promise<QuizParameters> {
         const command = new GetQuizParametersTempCommand();
