@@ -81,7 +81,7 @@ export class QuizController {
             ReturnType<GetQuizQuestionsHandler['execute']>
         >(command);
 
-        return result;
+        return this.mapToQuestionsDTO(result);
     }
 
     private mapToQuestionsDTO(questions: QuizQuestion[]): QuizQuestionDTO[] {
