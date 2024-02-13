@@ -12,7 +12,13 @@ import {
     Query,
     UseGuards,
 } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import {
+    CommandBus,
+    ICommand,
+    ICommandHandler,
+    IQuery,
+    IQueryHandler,
+} from '@nestjs/cqrs';
 import {
     GetQuizParametersTempCommand,
     GetQuizParametersTempHandler,
@@ -41,19 +47,14 @@ export class QuizController {
     ): Promise<AnswerStatementDTO> {
         const command = new AnswerQuestionCommand(dto.answerId, dto.questionId);
 
-        return this.commandBus.execute<typeof command, AnswerStatementDTO>(
-            command,
-        );
+        return this.execute<AnswerQuestionHandler>(command);
     }
 
     @Get('parameters')
     async getParameters(): Promise<QuizParameters> {
         const command = new GetQuizParametersTempCommand();
 
-        return this.commandBus.execute<
-            typeof command,
-            ReturnType<GetQuizParametersTempHandler['execute']>
-        >(command);
+        return this.execute<GetQuizParametersTempHandler>(command);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -76,12 +77,18 @@ export class QuizController {
 
         const command = new GetQuizQuestionsCommand(+amount, themeId);
 
-        const result = await this.commandBus.execute<
-            typeof command,
-            ReturnType<GetQuizQuestionsHandler['execute']>
-        >(command);
+        const result = await this.execute<GetQuizQuestionsHandler>(command);
 
         return this.mapToQuestionsDTO(result);
+    }
+
+    private execute<T extends ICommandHandler | IQueryHandler>(
+        command: ICommand | IQuery,
+    ) {
+        return this.commandBus.execute<
+            typeof command,
+            ReturnType<T['execute']>
+        >(command);
     }
 
     private mapToQuestionsDTO(questions: QuizQuestion[]): QuizQuestionDTO[] {

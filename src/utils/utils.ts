@@ -43,6 +43,7 @@ export function isInvalidStructure(
     }
     return false;
 }
+
 export function isParsedStringNaN(str: string): boolean {
     const parsedStr = parseInt(str);
     return isNaN(parsedStr);
