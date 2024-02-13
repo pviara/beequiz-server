@@ -52,7 +52,7 @@ export class AnswerQuestionHandler
         answerId,
         questionId,
     }: AnswerQuestionCommand): Promise<AnswerStatement> {
-        await this.getGame(userId);
+        await this.getOnGoingGameFor(userId);
 
         this.answerId = answerId;
 
@@ -74,7 +74,7 @@ export class AnswerQuestionHandler
         };
     }
 
-    private async getGame(userId: string): Promise<void> {
+    private async getOnGoingGameFor(userId: string): Promise<void> {
         const game = await this.gameRepo.getOnGoingGame(userId);
         if (!game) {
             throw new QuizGameDoestNotExistException(userId);

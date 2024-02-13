@@ -17,7 +17,6 @@ import {
 } from '../test/quiz-question-repository.spy';
 import { QuizGameDoestNotExistException } from '../../errors/quiz-game-does-not-exist.exception';
 import { EventBusSpy } from '../test/event-bus.spy';
-import { EventBus } from '@nestjs/cqrs';
 import { CorrectAnswerGivenEvent } from '../../events/correct-answer-given.event';
 
 describe('AnswerQuestionHandler', () => {
