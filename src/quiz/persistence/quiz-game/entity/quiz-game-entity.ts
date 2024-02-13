@@ -1,19 +1,19 @@
 import { Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { QuizQuestionDocument } from '../quiz-question/entity/quiz-question-entity';
+import { QuizQuestionDocument } from '../../quiz-question/entity/quiz-question-entity';
 
 @Schema({ collection: 'quiz-game' })
 export class QuizGameDocument extends Document {
-    @Prop({ required: true })
+    @Prop({ type: String, required: true })
     userId!: string;
 
-    @Prop({ required: true, type: [QuizQuestionDocument] })
+    @Prop({ type: [QuizQuestionDocument], required: true })
     questions!: QuizQuestionDocument[];
 
-    @Prop({ required: true })
+    @Prop({ type: String, required: true })
     currentQuestionId!: string;
 
-    @Prop({ default: 0, required: true })
+    @Prop({ type: Number, default: 0, required: true })
     score!: number;
 }
 
