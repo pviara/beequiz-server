@@ -1,8 +1,8 @@
 import { QuizGame } from '../../../domain/quiz-game';
-import { QuizQuestion } from '../../../domain/quiz-question';
 
 export interface QuizGameRepository {
-    createGame(userId: string, questions: QuizQuestion[]): QuizGame;
-    deleteGame(gameId: string): void;
-    updateGame(game: QuizGame): void;
+    getOnGoingGame(userId: string): Promise<QuizGame | null>;
+    createGame(userId: string, questionIds: string[]): Promise<void>;
+    deleteGame(gameId: string): Promise<void>;
+    updateGame(game: QuizGame): Promise<void>;
 }

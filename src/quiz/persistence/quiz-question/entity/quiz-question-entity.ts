@@ -20,7 +20,7 @@ export class QuizQuestionDocument extends Document {
     @Prop({ type: String, required: true })
     label!: string;
 
-    @Prop({ type: [quizAnswerSchema], required: true, default: [] })
+    @Prop({ type: [quizAnswerSchema], default: [] })
     answers!: QuizAnswerDocument[];
 }
 
