@@ -45,7 +45,11 @@ export class QuizController {
     async answerQuestion(
         @Body() dto: AnswerQuestionDTO,
     ): Promise<AnswerStatementDTO> {
-        const command = new AnswerQuestionCommand(dto.answerId, dto.questionId);
+        const command = new AnswerQuestionCommand(
+            dto.userId,
+            dto.answerId,
+            dto.questionId,
+        );
 
         return this.execute<AnswerQuestionHandler>(command);
     }

@@ -14,6 +14,7 @@ export class AppExceptionFilter implements ExceptionFilter {
     private exceptionMapping: Record<ExceptionCode, HttpStatus> = {
         ProblemOccurredWithOpenAI: HttpStatus.FailedDependency,
         QuizAnswerDoesNotExist: HttpStatus.UnprocessableEntity,
+        QuizGameNotFound: HttpStatus.NotFound,
         QuizQuestionNotFound: HttpStatus.NotFound,
         QuizThemeNotFound: HttpStatus.NotFound,
         StillOnGoingQuizGame: HttpStatus.Conflict,

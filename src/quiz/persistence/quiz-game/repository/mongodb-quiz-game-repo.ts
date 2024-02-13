@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { QuizGame } from 'src/quiz/domain/quiz-game';
 import { QuizGameRepository } from './quiz-game-repository';
-import { QuizQuestion } from 'src/quiz/domain/quiz-question';
 
 @Injectable()
 export class MongoDbQuizGameRepo implements QuizGameRepository {
-    createGame(userId: string, questions: QuizQuestion[]): QuizGame {
+    getOnGoingGame(userId: string): Promise<QuizGame | null> {
         throw new Error('Method not implemented.');
     }
-    deleteGame(gameId: string): void {
+    createGame(userId: string, questionIds: string[]): Promise<void> {
         throw new Error('Method not implemented.');
     }
-    updateGame(game: QuizGame): void {
+    deleteGame(gameId: string): Promise<void> {
+        throw new Error('Method not implemented.');
+    }
+    updateGame(game: QuizGame): Promise<void> {
         throw new Error('Method not implemented.');
     }
 }

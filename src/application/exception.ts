@@ -1,6 +1,7 @@
 export type ExceptionCode =
     | 'ProblemOccurredWithOpenAI'
     | 'QuizAnswerDoesNotExist'
+    | 'QuizGameNotFound'
     | 'QuizQuestionNotFound'
     | 'QuizThemeNotFound'
     | 'StillOnGoingQuizGame'

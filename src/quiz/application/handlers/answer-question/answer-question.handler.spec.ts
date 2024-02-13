@@ -5,14 +5,26 @@ import {
 import { beforeEach, describe, expect, it } from 'vitest';
 import { QuizAnswer, QuizQuestion } from '../../../domain/quiz-question';
 import { QuizAnswerDoesNotExistException } from '../../errors/quiz-answer-does-not-exist-in-question.exception';
+import { QuizGame } from '../../../domain/quiz-game';
+import {
+    QuizGameRepositorySpy,
+    stubGetOnGoingGameQuestion,
+} from '../test/quiz-game-repository.spy';
 import { QuizQuestionNotFoundException } from '../../errors/quiz-question-not-found.exception';
 import {
     QuizQuestionRepositorySpy,
     stubGetQuizQuestion,
 } from '../test/quiz-question-repository.spy';
+import { QuizGameDoestNotExistException } from '../../errors/quiz-game-does-not-exist.exception';
+import { EventBusSpy } from '../test/event-bus.spy';
+import { EventBus } from '@nestjs/cqrs';
+import { CorrectAnswerGivenEvent } from '../../events/correct-answer-given.event';
 
 describe('AnswerQuestionHandler', () => {
     let sut: AnswerQuestionHandler;
+
+    let eventBusSpy: EventBusSpy;
+    let quizGameRepoSpy: QuizGameRepositorySpy;
     let quizQuestionRepoSpy: QuizQuestionRepositorySpy;
 
     const existingAnswers: QuizAnswer[] = [
@@ -22,86 +34,144 @@ describe('AnswerQuestionHandler', () => {
         new QuizAnswer('id4', 'label4', false),
     ];
     const existingQuestion = new QuizQuestion('id1', 'label1', existingAnswers);
+    const existingGame = new QuizGame(
+        'id',
+        'userId',
+        [],
+        'currentQuestionId',
+        0,
+    );
 
     beforeEach(() => {
+        eventBusSpy = new EventBusSpy();
+        quizGameRepoSpy = new QuizGameRepositorySpy();
         quizQuestionRepoSpy = new QuizQuestionRepositorySpy();
-        sut = new AnswerQuestionHandler(quizQuestionRepoSpy);
+
+        sut = new AnswerQuestionHandler(
+            eventBusSpy,
+            quizGameRepoSpy,
+            quizQuestionRepoSpy,
+        );
     });
 
     describe('execute', () => {
-        const existingAnswer = existingAnswers[0];
-        const [, , correctAnswer] = existingAnswers;
+        describe('no ongoing game could be found', () => {
+            it('should throw an error when no on going game exists for given params', async () => {
+                const command = new AnswerQuestionCommand(
+                    'not_existing_userId',
+                    'answerId',
+                    'questionId',
+                );
 
-        it('should retrieve quiz related question using given question', async () => {
-            const command = new AnswerQuestionCommand(
-                existingAnswer.id,
-                existingQuestion.id,
-            );
+                stubGetOnGoingGameQuestion(quizGameRepoSpy, null);
 
-            stubGetQuizQuestion(quizQuestionRepoSpy, existingQuestion);
-
-            await sut.execute(command);
-
-            expect(quizQuestionRepoSpy.calls.getQuizQuestion.count).toBe(1);
-            expect(quizQuestionRepoSpy.calls.getQuizQuestion.history).toContain(
-                command.questionId,
-            );
+                await expect(sut.execute(command)).rejects.toThrow(
+                    QuizGameDoestNotExistException,
+                );
+            });
         });
 
-        it('should throw an error when no quiz related question is found', async () => {
-            const command = new AnswerQuestionCommand(
-                existingAnswer.id,
-                existingQuestion.id,
-            );
+        describe('an ongoing game exists', () => {
+            beforeEach(() => {
+                stubGetOnGoingGameQuestion(quizGameRepoSpy, existingGame);
+            });
 
-            stubGetQuizQuestion(quizQuestionRepoSpy, null);
+            const existingAnswer = existingAnswers[0];
+            const [, , correctAnswer] = existingAnswers;
 
-            await expect(sut.execute(command)).rejects.toThrow(
-                QuizQuestionNotFoundException,
-            );
-        });
+            it('should retrieve quiz related question using given question', async () => {
+                const command = new AnswerQuestionCommand(
+                    existingGame.userId,
+                    existingAnswer.id,
+                    existingQuestion.id,
+                );
 
-        it('should throw an error when given answer does not match any question answers', async () => {
-            const command = new AnswerQuestionCommand(
-                'not_existing_answerId',
-                existingQuestion.id,
-            );
+                stubGetQuizQuestion(quizQuestionRepoSpy, existingQuestion);
 
-            stubGetQuizQuestion(quizQuestionRepoSpy, existingQuestion);
+                await sut.execute(command);
 
-            await expect(sut.execute(command)).rejects.toThrow(
-                QuizAnswerDoesNotExistException,
-            );
-        });
+                expect(quizQuestionRepoSpy.calls.getQuizQuestion.count).toBe(1);
+                expect(
+                    quizQuestionRepoSpy.calls.getQuizQuestion.history,
+                ).toContain(command.questionId);
+            });
 
-        it('should return a negative statement when given answer is incorrect', async () => {
-            const incorrectAnswer = existingAnswer;
+            it('should throw an error when no quiz related question is found', async () => {
+                const command = new AnswerQuestionCommand(
+                    existingGame.userId,
+                    existingAnswer.id,
+                    existingQuestion.id,
+                );
 
-            const command = new AnswerQuestionCommand(
-                incorrectAnswer.id,
-                existingQuestion.id,
-            );
+                stubGetQuizQuestion(quizQuestionRepoSpy, null);
 
-            stubGetQuizQuestion(quizQuestionRepoSpy, existingQuestion);
+                await expect(sut.execute(command)).rejects.toThrow(
+                    QuizQuestionNotFoundException,
+                );
+            });
 
-            const result = await sut.execute(command);
+            it('should throw an error when given answer does not match any question answers', async () => {
+                const command = new AnswerQuestionCommand(
+                    existingGame.userId,
+                    'not_existing_answerId',
+                    existingQuestion.id,
+                );
 
-            expect(result.isCorrect).toBe(false);
-            expect(result.correctAnswerId).toBe(correctAnswer.id);
-        });
+                stubGetQuizQuestion(quizQuestionRepoSpy, existingQuestion);
 
-        it('should return a positive statement when given answer is correct', async () => {
-            const command = new AnswerQuestionCommand(
-                correctAnswer.id,
-                existingQuestion.id,
-            );
+                await expect(sut.execute(command)).rejects.toThrow(
+                    QuizAnswerDoesNotExistException,
+                );
+            });
 
-            stubGetQuizQuestion(quizQuestionRepoSpy, existingQuestion);
+            it('should return a negative statement when given answer is incorrect', async () => {
+                const incorrectAnswer = existingAnswer;
 
-            const result = await sut.execute(command);
+                const command = new AnswerQuestionCommand(
+                    existingGame.userId,
+                    incorrectAnswer.id,
+                    existingQuestion.id,
+                );
 
-            expect(result.isCorrect).toBe(true);
-            expect(result.correctAnswerId).not.toBeDefined();
+                stubGetQuizQuestion(quizQuestionRepoSpy, existingQuestion);
+
+                const result = await sut.execute(command);
+
+                expect(result.isCorrect).toBe(false);
+                expect(result.correctAnswerId).toBe(correctAnswer.id);
+            });
+
+            it('should return a positive statement when given answer is correct', async () => {
+                const command = new AnswerQuestionCommand(
+                    existingGame.userId,
+                    correctAnswer.id,
+                    existingQuestion.id,
+                );
+
+                stubGetQuizQuestion(quizQuestionRepoSpy, existingQuestion);
+
+                const result = await sut.execute(command);
+
+                expect(result.isCorrect).toBe(true);
+                expect(result.correctAnswerId).not.toBeDefined();
+            });
+
+            it('should fire an event when given answer is correct', async () => {
+                const command = new AnswerQuestionCommand(
+                    existingGame.userId,
+                    correctAnswer.id,
+                    existingQuestion.id,
+                );
+
+                stubGetQuizQuestion(quizQuestionRepoSpy, existingQuestion);
+
+                await sut.execute(command);
+
+                expect(eventBusSpy.calls.publish.count).toBe(1);
+
+                const event = new CorrectAnswerGivenEvent(existingGame.id);
+                expect(eventBusSpy.calls.publish.history).toContainEqual(event);
+            });
         });
     });
 });
