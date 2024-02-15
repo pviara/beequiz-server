@@ -5,7 +5,7 @@ import { QuizGameRepository } from '../../../persistence/quiz-game/repository/qu
 import { QUIZ_GAME_REPO_TOKEN } from '../../../persistence/quiz-game/repository/quiz-game-repository.provider';
 
 @EventsHandler(CorrectAnswerGivenEvent)
-export class CorrectAnswerGivenEventHandler
+export class CorrectAnswerGivenHandler
     implements IEventHandler<CorrectAnswerGivenEvent>
 {
     constructor(

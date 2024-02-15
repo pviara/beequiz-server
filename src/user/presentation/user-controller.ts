@@ -1,8 +1,7 @@
-import { Controller, Patch, Request, UseGuards } from '@nestjs/common';
+import { AuthenticatedRequest } from '../../auth/presentation/model/authenticated-request';
 import { CommandBus } from '@nestjs/cqrs';
+import { Controller, Patch, Request, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth-guard';
-import { Request as ExpressRequest } from 'express';
-import { User } from '../domain/user';
 import { WelcomeUserCommand } from '../application/handlers/welcome-user.handler';
 
 @Controller()
@@ -11,9 +10,7 @@ export class UserController {
 
     @UseGuards(JwtAuthGuard)
     @Patch('welcome')
-    async welcomeUser(
-        @Request() req: ExpressRequest & { user: User },
-    ): Promise<void> {
+    async welcomeUser(@Request() req: AuthenticatedRequest): Promise<void> {
         const command = new WelcomeUserCommand(req.user.id);
         await this.commandBus.execute(command);
     }

@@ -1,8 +1,12 @@
 import { QuizGameRepository } from '../../../persistence/quiz-game/repository/quiz-game-repository';
-import { QuizGame } from 'src/quiz/domain/quiz-game';
+import { QuizGame } from '../../../domain/quiz-game';
 
 export class QuizGameRepositorySpy implements QuizGameRepository {
     calls = {
+        createGame: {
+            count: 0,
+            history: [] as [string, string[]][],
+        },
         getOnGoingGame: {
             count: 0,
             history: [] as string[],
@@ -13,8 +17,9 @@ export class QuizGameRepositorySpy implements QuizGameRepository {
         },
     };
 
-    createGame(userId: string, questionIds: string[]): Promise<void> {
-        throw new Error('Method not implemented.');
+    async createGame(userId: string, questionIds: string[]): Promise<void> {
+        this.calls.createGame.count++;
+        this.calls.createGame.history.push([userId, questionIds]);
     }
 
     deleteGame(gameId: string): Promise<void> {
