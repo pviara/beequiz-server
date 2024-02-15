@@ -36,6 +36,7 @@ import {
 } from '../test/quiz-theme-repository.spy';
 import { QuizGame } from 'src/quiz/domain/quiz-game';
 import { QuestionsRetrievedEvent } from '../../events/questions-retrieved.event';
+import { StillOnGoingQuizGameException } from '../../errors/still-on-going-quiz-game.exception';
 
 describe('GetQuizQuestionsHandler', () => {
     let sut: GetQuizQuestionsHandler;
@@ -89,7 +90,21 @@ describe('GetQuizQuestionsHandler', () => {
 
     describe('execute', () => {
         beforeEach(() => {
+            stubGetOnGoingGameQuestion(quizGameRepoSpy, null);
+        });
+
+        it('should throw an error when an going game already exists', async () => {
+            const command = new GetQuizQuestionsCommand(
+                'userId',
+                5,
+                existingTheme.id,
+            );
+
             stubGetOnGoingGameQuestion(quizGameRepoSpy, existingGame);
+
+            await expect(sut.execute(command)).rejects.toThrow(
+                StillOnGoingQuizGameException,
+            );
         });
 
         it('should retrieve quiz related theme using given themeId', async () => {
