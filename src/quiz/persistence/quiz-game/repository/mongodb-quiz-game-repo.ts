@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import { ObjectIds } from '../object-ids';
 import { QuizGame } from 'src/quiz/domain/quiz-game';
 import { QuizGameRepository } from './quiz-game-repository';
 import { QUIZ_GAME_MODEL, QuizGameEntity } from '../entity/quiz-game-entity';
@@ -23,8 +24,21 @@ export class MongoDbQuizGameRepo implements QuizGameRepository {
         throw new Error('Method not implemented.');
     }
 
-    getOnGoingGame(userId: string): Promise<QuizGame | null> {
-        throw new Error('Method not implemented.');
+    async getOnGoingGame(userId: string): Promise<QuizGame | null> {
+        const entity = await this.model.findOne({
+            userId: new Types.ObjectId(userId),
+        });
+        if (entity) {
+            const questionIds = new ObjectIds(entity.questionIds).toStrings();
+
+            return new QuizGame(
+                entity.id,
+                entity.userId,
+                questionIds,
+                entity.score,
+            );
+        }
+        return null;
     }
 
     increaseGameScore(gameId: string): Promise<void> {

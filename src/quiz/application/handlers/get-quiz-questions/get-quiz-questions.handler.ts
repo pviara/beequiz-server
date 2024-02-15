@@ -22,8 +22,8 @@ import { QUIZ_GAME_REPO_TOKEN } from '../../../persistence/quiz-game/repository/
 import { QUIZ_QUESTION_REPO_TOKEN } from '../../../persistence/quiz-question/repository/quiz-question-repository.provider';
 import { QUIZ_THEME_REPO_TOKEN } from '../../../persistence/quiz-theme/repository/quiz-theme-repository.provider';
 import { ProblemOccurredWithOpenAIException } from '../../errors/problem-occurred-with-openai.exception';
-import { QuizGameDoestNotExistException } from '../../errors/quiz-game-does-not-exist.exception';
 import { QuestionsRetrievedEvent } from '../../events/questions-retrieved.event';
+import { StillOnGoingQuizGameException } from '../../errors/still-on-going-quiz-game.exception';
 
 export class GetQuizQuestionsCommand implements ICommand {
     constructor(
@@ -38,7 +38,6 @@ export class GetQuizQuestionsHandler
     implements ICommandHandler<GetQuizQuestionsCommand>
 {
     private existingQuestions: QuizQuestion[] = [];
-    private game!: QuizGame;
     private generatedQuestions: ParsedQuizQuestion[] = [];
     private numberOfQuestions!: number;
     private savedQuestions: QuizQuestion[] = [];
@@ -72,6 +71,7 @@ export class GetQuizQuestionsHandler
         this.numberOfQuestions = numberOfQuestions;
         this.userId = userId;
 
+        await this.checkNoOnGoingGame();
         await this.getTheme(themeId);
         await this.getExistingQuestions();
 
@@ -98,35 +98,11 @@ export class GetQuizQuestionsHandler
         return this.existingQuestions;
     }
 
-    private prepareExistingQuestions(): QuizQuestion[] {
-        this.publishQuestionsRetrievedEvent('existing');
-        return this.existingQuestions;
-    }
-
-    private prepareSavedQuestions(): QuizQuestion[] {
-        this.publishQuestionsRetrievedEvent('saved');
-        return this.savedQuestions;
-    }
-
-    private publishQuestionsRetrievedEvent(questions: 'existing' | 'saved') {
-        const retrievedQuestions =
-            questions === 'existing'
-                ? this.getExistingQuestionIds()
-                : this.getSavedQuestionIds();
-
-        const event = new QuestionsRetrievedEvent(
-            this.userId,
-            retrievedQuestions,
-        );
-        this.eventBus.publish(event);
-    }
-
-    private async getOnGoingGame(): Promise<void> {
-        const game = await this.gameRepo.getOnGoingGame(this.userId);
-        if (!game) {
-            throw new QuizGameDoestNotExistException(this.userId);
+    private async checkNoOnGoingGame(): Promise<void> {
+        const onGoingGame = await this.gameRepo.getOnGoingGame(this.userId);
+        if (onGoingGame) {
+            throw new StillOnGoingQuizGameException(this.userId);
         }
-        this.game = game;
     }
 
     private async getTheme(themeId: string): Promise<QuizTheme> {
@@ -151,6 +127,24 @@ export class GetQuizQuestionsHandler
             this.areEnoughExistingQuestions() &&
             this.apiService.cannotGenerateQuizQuestions()
         );
+    }
+
+    private prepareExistingQuestions(): QuizQuestion[] {
+        this.publishQuestionsRetrievedEvent('existing');
+        return this.existingQuestions;
+    }
+
+    private publishQuestionsRetrievedEvent(questions: 'existing' | 'saved') {
+        const retrievedQuestions =
+            questions === 'existing'
+                ? this.getExistingQuestionIds()
+                : this.getSavedQuestionIds();
+
+        const event = new QuestionsRetrievedEvent(
+            this.userId,
+            retrievedQuestions,
+        );
+        this.eventBus.publish(event);
     }
 
     private getExistingQuestionIds(): string[] {
@@ -181,6 +175,11 @@ export class GetQuizQuestionsHandler
             this.generatedQuestions,
             this.theme.id,
         );
+    }
+
+    private prepareSavedQuestions(): QuizQuestion[] {
+        this.publishQuestionsRetrievedEvent('saved');
+        return this.savedQuestions;
     }
 
     private hasNoQuestionBeenGeneratedYet(): boolean {
