@@ -1,22 +1,33 @@
 import { ApiService } from '../../../../open-ai/application/services/api/api-service';
 import { API_SERVICE_TOKEN } from '../../../../open-ai/application/services/api/api-service.provider';
-import { CommandHandler, ICommand, ICommandHandler } from '@nestjs/cqrs';
+import {
+    CommandHandler,
+    EventBus,
+    ICommand,
+    ICommandHandler,
+} from '@nestjs/cqrs';
 import { ExceededAPIQuotaException } from '../../../../open-ai/application/errors/exceeded-api-quota.exception';
 import { Inject } from '@nestjs/common';
 import { OpenAIService } from '../../../../open-ai/application/services/open-ai/open-ai-service';
 import { OPENAI_SERVICE_TOKEN } from '../../../../open-ai/application/services/open-ai/open-ai-service.provider';
 import { ParsedQuizQuestion } from '../../quiz-parser/model/parsed-quiz-question';
+import { QuizGame } from '../../../domain/quiz-game';
+import { QuizGameRepository } from '../../../persistence/quiz-game/repository/quiz-game-repository';
 import { QuizQuestion } from '../../../domain/quiz-question';
 import { QuizQuestionRepository } from '../../../persistence/quiz-question/repository/quiz-question-repository';
 import { QuizThemeRepository } from '../../../persistence/quiz-theme/repository/quiz-theme-repository';
 import { QuizThemeNotFoundException } from '../../errors/quiz-theme-not-found.exception';
 import { QuizTheme } from '../../../domain/quiz-parameters';
+import { QUIZ_GAME_REPO_TOKEN } from '../../../persistence/quiz-game/repository/quiz-game-repository.provider';
 import { QUIZ_QUESTION_REPO_TOKEN } from '../../../persistence/quiz-question/repository/quiz-question-repository.provider';
 import { QUIZ_THEME_REPO_TOKEN } from '../../../persistence/quiz-theme/repository/quiz-theme-repository.provider';
 import { ProblemOccurredWithOpenAIException } from '../../errors/problem-occurred-with-openai.exception';
+import { QuizGameDoestNotExistException } from '../../errors/quiz-game-does-not-exist.exception';
+import { QuestionsRetrievedEvent } from '../../events/questions-retrieved.event';
 
 export class GetQuizQuestionsCommand implements ICommand {
     constructor(
+        readonly userId: string,
         readonly numberOfQuestions: number,
         readonly themeId: string,
     ) {}
@@ -27,17 +38,24 @@ export class GetQuizQuestionsHandler
     implements ICommandHandler<GetQuizQuestionsCommand>
 {
     private existingQuestions: QuizQuestion[] = [];
+    private game!: QuizGame;
     private generatedQuestions: ParsedQuizQuestion[] = [];
     private numberOfQuestions!: number;
     private savedQuestions: QuizQuestion[] = [];
     private theme!: QuizTheme;
+    private userId!: string;
 
     constructor(
         @Inject(API_SERVICE_TOKEN)
         private apiService: ApiService,
 
+        private eventBus: EventBus,
+
         @Inject(OPENAI_SERVICE_TOKEN)
         private openAIService: OpenAIService,
+
+        @Inject(QUIZ_GAME_REPO_TOKEN)
+        private gameRepo: QuizGameRepository,
 
         @Inject(QUIZ_QUESTION_REPO_TOKEN)
         private questionRepo: QuizQuestionRepository,
@@ -47,36 +65,68 @@ export class GetQuizQuestionsHandler
     ) {}
 
     async execute({
+        userId,
         numberOfQuestions,
         themeId,
     }: GetQuizQuestionsCommand): Promise<QuizQuestion[]> {
         this.numberOfQuestions = numberOfQuestions;
+        this.userId = userId;
 
-        const theme = await this.getTheme(themeId);
-
-        await this.getExistingQuestionsFor(theme.id);
+        await this.getTheme(themeId);
+        await this.getExistingQuestions();
 
         if (this.cannotGenerateQuizQuestions()) {
-            return this.existingQuestions;
+            return this.prepareExistingQuestions();
         }
 
         do {
             try {
                 await this.generateQuestions();
                 await this.saveGeneratedQuestions();
-                return this.savedQuestions;
+                return this.prepareSavedQuestions();
             } catch (error: unknown) {
                 if (this.areEnoughExistingQuestions()) {
-                    return this.existingQuestions;
+                    return this.prepareExistingQuestions();
                 }
 
                 if (error instanceof ExceededAPIQuotaException) {
                     throw new ProblemOccurredWithOpenAIException();
                 }
             }
-        } while (this.hasNoQuestionBeenRetrievedYet());
+        } while (this.hasNoQuestionBeenGeneratedYet());
 
         return this.existingQuestions;
+    }
+
+    private prepareExistingQuestions(): QuizQuestion[] {
+        this.publishQuestionsRetrievedEvent('existing');
+        return this.existingQuestions;
+    }
+
+    private prepareSavedQuestions(): QuizQuestion[] {
+        this.publishQuestionsRetrievedEvent('saved');
+        return this.savedQuestions;
+    }
+
+    private publishQuestionsRetrievedEvent(questions: 'existing' | 'saved') {
+        const retrievedQuestions =
+            questions === 'existing'
+                ? this.getExistingQuestionIds()
+                : this.getSavedQuestionIds();
+
+        const event = new QuestionsRetrievedEvent(
+            this.userId,
+            retrievedQuestions,
+        );
+        this.eventBus.publish(event);
+    }
+
+    private async getOnGoingGame(): Promise<void> {
+        const game = await this.gameRepo.getOnGoingGame(this.userId);
+        if (!game) {
+            throw new QuizGameDoestNotExistException(this.userId);
+        }
+        this.game = game;
     }
 
     private async getTheme(themeId: string): Promise<QuizTheme> {
@@ -89,10 +139,10 @@ export class GetQuizQuestionsHandler
         return theme;
     }
 
-    private async getExistingQuestionsFor(themeId: string): Promise<void> {
+    private async getExistingQuestions(): Promise<void> {
         this.existingQuestions = await this.questionRepo.getQuizQuestions(
             this.numberOfQuestions,
-            themeId,
+            this.theme.id,
         );
     }
 
@@ -101,6 +151,14 @@ export class GetQuizQuestionsHandler
             this.areEnoughExistingQuestions() &&
             this.apiService.cannotGenerateQuizQuestions()
         );
+    }
+
+    private getExistingQuestionIds(): string[] {
+        return this.existingQuestions.map((question) => question.id);
+    }
+
+    private getSavedQuestionIds(): string[] {
+        return this.savedQuestions.map((question) => question.id);
     }
 
     private areEnoughExistingQuestions(): boolean {
@@ -125,7 +183,7 @@ export class GetQuizQuestionsHandler
         );
     }
 
-    private hasNoQuestionBeenRetrievedYet(): boolean {
+    private hasNoQuestionBeenGeneratedYet(): boolean {
         return this.generatedQuestions.length === 0;
     }
 }

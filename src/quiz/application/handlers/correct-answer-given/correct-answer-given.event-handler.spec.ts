@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { CorrectAnswerGivenEventHandler } from './correct-answer-given.event-handler';
+import { CorrectAnswerGivenHandler } from './correct-answer-given.event-handler';
 import { QuizGameRepositorySpy } from '../test/quiz-game-repository.spy';
 import { CorrectAnswerGivenEvent } from '../../events/correct-answer-given.event';
 
-describe('CorrectAnswerGivenEventHandler', () => {
-    let sut: CorrectAnswerGivenEventHandler;
+describe('CorrectAnswerGivenHandler', () => {
+    let sut: CorrectAnswerGivenHandler;
     let gameRepoSpy: QuizGameRepositorySpy;
 
     beforeEach(() => {
         gameRepoSpy = new QuizGameRepositorySpy();
-        sut = new CorrectAnswerGivenEventHandler(gameRepoSpy);
+        sut = new CorrectAnswerGivenHandler(gameRepoSpy);
     });
 
     describe('handle', () => {

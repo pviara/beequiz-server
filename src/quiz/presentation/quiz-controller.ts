@@ -3,6 +3,7 @@ import {
     AnswerQuestionHandler,
 } from '../application/handlers/answer-question/answer-question.handler';
 import { AnswerQuestionDTO } from './dto/answer-question-dto';
+import { AuthenticatedRequest } from '../../auth/presentation/model/authenticated-request';
 import {
     BadRequestException,
     Body,
@@ -10,6 +11,7 @@ import {
     Get,
     Post,
     Query,
+    Request,
     UseGuards,
 } from '@nestjs/common';
 import {
@@ -64,6 +66,7 @@ export class QuizController {
     @UseGuards(JwtAuthGuard)
     @Get('questions')
     async getQuestions(
+        @Request() req: AuthenticatedRequest,
         @Query('amount') amount: string,
         @Query('themeId') themeId: string,
     ): Promise<QuizQuestionDTO[]> {
@@ -79,7 +82,11 @@ export class QuizController {
             );
         }
 
-        const command = new GetQuizQuestionsCommand(+amount, themeId);
+        const command = new GetQuizQuestionsCommand(
+            req.user.id,
+            +amount,
+            themeId,
+        );
 
         const result = await this.execute<GetQuizQuestionsHandler>(command);
 

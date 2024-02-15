@@ -3,6 +3,7 @@ import {
     stubCannotGenerateQuizQuestions,
 } from '../test/api-service.spy';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { EventBusSpy } from '../test/event-bus.spy';
 import { ExceededAPIQuotaException } from '../../../../open-ai/application/errors/exceeded-api-quota.exception';
 import {
     GetQuizQuestionsCommand,
@@ -21,6 +22,11 @@ import {
 } from '../test/quiz-question-repository.spy';
 import { ParsedQuizQuestion } from '../../quiz-parser/model/parsed-quiz-question';
 import { ProblemOccurredWithOpenAIException } from '../../errors/problem-occurred-with-openai.exception';
+import { QuizGameDoestNotExistException } from '../../errors/quiz-game-does-not-exist.exception';
+import {
+    QuizGameRepositorySpy,
+    stubGetOnGoingGameQuestion,
+} from '../test/quiz-game-repository.spy';
 import { QuizQuestion } from '../../../domain/quiz-question';
 import { QuizTheme } from '../../../domain/quiz-parameters';
 import { QuizThemeNotFoundException } from '../../errors/quiz-theme-not-found.exception';
@@ -28,14 +34,26 @@ import {
     QuizThemeRepositorySpy,
     stubGetQuizTheme,
 } from '../test/quiz-theme-repository.spy';
+import { QuizGame } from 'src/quiz/domain/quiz-game';
+import { QuestionsRetrievedEvent } from '../../events/questions-retrieved.event';
 
 describe('GetQuizQuestionsHandler', () => {
     let sut: GetQuizQuestionsHandler;
 
     let apiServiceSpy: ApiServiceSpy;
+    let eventBusSpy: EventBusSpy;
     let openAIServiceSpy: OpenAIServiceSpy;
+    let quizGameRepoSpy: QuizGameRepositorySpy;
     let quizQuestionRepoSpy: QuizQuestionRepositorySpy;
     let quizThemeRepoSpy: QuizThemeRepositorySpy;
+
+    const existingGame = new QuizGame(
+        'gameId',
+        'userId',
+        [],
+        'currentQuestionId',
+        0,
+    );
 
     const existingQuestions: QuizQuestion[] = [
         new QuizQuestion('id1', 'label1', []),
@@ -53,21 +71,33 @@ describe('GetQuizQuestionsHandler', () => {
 
     beforeEach(() => {
         apiServiceSpy = new ApiServiceSpy();
+        eventBusSpy = new EventBusSpy();
         openAIServiceSpy = new OpenAIServiceSpy();
+        quizGameRepoSpy = new QuizGameRepositorySpy();
         quizQuestionRepoSpy = new QuizQuestionRepositorySpy();
         quizThemeRepoSpy = new QuizThemeRepositorySpy();
 
         sut = new GetQuizQuestionsHandler(
             apiServiceSpy,
+            eventBusSpy,
             openAIServiceSpy,
+            quizGameRepoSpy,
             quizQuestionRepoSpy,
             quizThemeRepoSpy,
         );
     });
 
     describe('execute', () => {
+        beforeEach(() => {
+            stubGetOnGoingGameQuestion(quizGameRepoSpy, existingGame);
+        });
+
         it('should retrieve quiz related theme using given themeId', async () => {
-            const command = new GetQuizQuestionsCommand(5, existingTheme.id);
+            const command = new GetQuizQuestionsCommand(
+                'userId',
+                5,
+                existingTheme.id,
+            );
 
             stubGetQuizTheme(quizThemeRepoSpy, existingTheme);
 
@@ -80,7 +110,11 @@ describe('GetQuizQuestionsHandler', () => {
         });
 
         it('should throw an error when no quiz related theme is found', async () => {
-            const command = new GetQuizQuestionsCommand(5, 'theme_id');
+            const command = new GetQuizQuestionsCommand(
+                'userId',
+                5,
+                'theme_id',
+            );
 
             stubGetQuizTheme(quizThemeRepoSpy, null);
 
@@ -90,7 +124,11 @@ describe('GetQuizQuestionsHandler', () => {
         });
 
         it('should retrieve existing quiz questions from database anyway', async () => {
-            const command = new GetQuizQuestionsCommand(5, existingTheme.id);
+            const command = new GetQuizQuestionsCommand(
+                'userId',
+                5,
+                existingTheme.id,
+            );
 
             stubGetQuizTheme(quizThemeRepoSpy, existingTheme);
 
@@ -110,6 +148,7 @@ describe('GetQuizQuestionsHandler', () => {
 
             it('should directly return existing questions', async () => {
                 const command = new GetQuizQuestionsCommand(
+                    'userId',
                     existingQuestions.length,
                     existingTheme.id,
                 );
@@ -123,10 +162,20 @@ describe('GetQuizQuestionsHandler', () => {
                 ).toBe(1);
 
                 expect(result).toEqual(existingQuestions);
+
+                expect(eventBusSpy.calls.publish.count).toBe(1);
+
+                const questionIds = existingQuestions.map((q) => q.id);
+                const event = new QuestionsRetrievedEvent(
+                    command.userId,
+                    questionIds,
+                );
+                expect(eventBusSpy.calls.publish.history).toContainEqual(event);
             });
 
             it('should still generate new quiz questions when there are not enough', async () => {
                 const command = new GetQuizQuestionsCommand(
+                    'userId',
                     3,
                     existingTheme.id,
                 );
@@ -134,6 +183,10 @@ describe('GetQuizQuestionsHandler', () => {
                 const slicedQuestions = existingQuestions.slice(2);
 
                 stubGetQuizQuestions(quizQuestionRepoSpy, slicedQuestions);
+                stubSaveGeneratedQuestions(
+                    quizQuestionRepoSpy,
+                    existingQuestions,
+                );
 
                 await sut.execute(command);
 
@@ -152,6 +205,15 @@ describe('GetQuizQuestionsHandler', () => {
                 expect(apiServiceSpy.calls.flagQuizQuestionRequest.count).toBe(
                     1,
                 );
+
+                expect(eventBusSpy.calls.publish.count).toBe(1);
+
+                const questionIds = existingQuestions.map((q) => q.id);
+                const event = new QuestionsRetrievedEvent(
+                    command.userId,
+                    questionIds,
+                );
+                expect(eventBusSpy.calls.publish.history).toContainEqual(event);
             });
         });
 
@@ -164,6 +226,7 @@ describe('GetQuizQuestionsHandler', () => {
 
             it('should save generated questions', async () => {
                 const command = new GetQuizQuestionsCommand(
+                    'userId',
                     existingQuestions.length,
                     existingTheme.id,
                 );
@@ -171,6 +234,10 @@ describe('GetQuizQuestionsHandler', () => {
                 stubGenerateQuestionsForQuiz(
                     openAIServiceSpy,
                     generatedQuestions,
+                );
+                stubSaveGeneratedQuestions(
+                    quizQuestionRepoSpy,
+                    existingQuestions,
                 );
 
                 await sut.execute(command);
@@ -182,10 +249,20 @@ describe('GetQuizQuestionsHandler', () => {
                 expect(
                     quizQuestionRepoSpy.calls.saveGeneratedQuestions.history,
                 ).toContainEqual([generatedQuestions, existingTheme.id]);
+
+                expect(eventBusSpy.calls.publish.count).toBe(1);
+
+                const questionIds = existingQuestions.map((q) => q.id);
+                const event = new QuestionsRetrievedEvent(
+                    command.userId,
+                    questionIds,
+                );
+                expect(eventBusSpy.calls.publish.history).toContainEqual(event);
             });
 
             it('should indicate that an OpenAI API request has been made', async () => {
                 const command = new GetQuizQuestionsCommand(
+                    'userId',
                     existingQuestions.length,
                     existingTheme.id,
                 );
@@ -199,6 +276,7 @@ describe('GetQuizQuestionsHandler', () => {
 
             it('should only return generated questions', async () => {
                 const command = new GetQuizQuestionsCommand(
+                    'userId',
                     existingQuestions.length,
                     existingTheme.id,
                 );
@@ -227,6 +305,7 @@ describe('GetQuizQuestionsHandler', () => {
                     );
 
                     const command = new GetQuizQuestionsCommand(
+                        'userId',
                         existingQuestions.length,
                         existingTheme.id,
                     );
@@ -234,6 +313,17 @@ describe('GetQuizQuestionsHandler', () => {
                     const result = await sut.execute(command);
 
                     expect(result).toEqual(existingQuestions);
+
+                    expect(eventBusSpy.calls.publish.count).toBe(1);
+
+                    const questionIds = existingQuestions.map((q) => q.id);
+                    const event = new QuestionsRetrievedEvent(
+                        command.userId,
+                        questionIds,
+                    );
+                    expect(eventBusSpy.calls.publish.history).toContainEqual(
+                        event,
+                    );
                 });
 
                 it('should throw an error when caught error from OpenAI service is exceeded quota', async () => {
@@ -244,6 +334,7 @@ describe('GetQuizQuestionsHandler', () => {
                     );
 
                     const command = new GetQuizQuestionsCommand(
+                        'userId',
                         existingQuestions.length + 10,
                         existingTheme.id,
                     );
@@ -263,6 +354,7 @@ describe('GetQuizQuestionsHandler', () => {
                     );
 
                     const command = new GetQuizQuestionsCommand(
+                        'userId',
                         existingQuestions.length + 10,
                         existingTheme.id,
                     );
