@@ -10,7 +10,7 @@ export class CorrectAnswerGivenHandler
 {
     constructor(
         @Inject(QUIZ_GAME_REPO_TOKEN)
-        readonly repository: QuizGameRepository,
+        private repository: QuizGameRepository,
     ) {}
 
     async handle({ gameId }: CorrectAnswerGivenEvent): Promise<void> {

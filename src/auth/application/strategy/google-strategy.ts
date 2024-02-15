@@ -22,7 +22,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         configService: AppConfigService,
 
         @Inject(USER_REPO_TOKEN)
-        private readonly userRepository: UserRepository,
+        private userRepository: UserRepository,
     ) {
         const authConfig = configService.getAuthConfig();
 
