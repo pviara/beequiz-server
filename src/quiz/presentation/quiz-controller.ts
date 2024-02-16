@@ -45,10 +45,11 @@ export class QuizController {
     @UseGuards(JwtAuthGuard)
     @Post('answer')
     async answerQuestion(
+        @Request() req: AuthenticatedRequest,
         @Body() dto: AnswerQuestionDTO,
     ): Promise<AnswerStatementDTO> {
         const command = new AnswerQuestionCommand(
-            dto.userId,
+            req.user.id,
             dto.answerId,
             dto.questionId,
         );

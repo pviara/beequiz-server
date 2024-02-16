@@ -41,8 +41,13 @@ export class MongoDbQuizGameRepo implements QuizGameRepository {
         return null;
     }
 
-    increaseGameScore(gameId: string): Promise<void> {
-        throw new Error('Method not implemented.');
+    async increaseGameScore(gameId: string): Promise<void> {
+        const entity = await this.model.findById(gameId);
+        if (entity) {
+            await this.model.findByIdAndUpdate(gameId, {
+                score: entity.score + 1,
+            });
+        }
     }
 
     private mapToObjectId(id: string): Types.ObjectId {
