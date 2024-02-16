@@ -38,7 +38,7 @@ export class QuizGameRepositorySpy implements QuizGameRepository {
     }
 }
 
-export function stubGetOnGoingGameQuestion(
+export function stubGetOnGoingGame(
     quizGameRepoSpy: QuizGameRepositorySpy,
     returnedValue: QuizGame | null,
 ): void {

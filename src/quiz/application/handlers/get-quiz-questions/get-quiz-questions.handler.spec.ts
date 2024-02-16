@@ -25,7 +25,7 @@ import { ProblemOccurredWithOpenAIException } from '../../errors/problem-occurre
 import { QuizGameDoestNotExistException } from '../../errors/quiz-game-does-not-exist.exception';
 import {
     QuizGameRepositorySpy,
-    stubGetOnGoingGameQuestion,
+    stubGetOnGoingGame,
 } from '../test/quiz-game-repository.spy';
 import { QuizQuestion } from '../../../domain/quiz-question';
 import { QuizTheme } from '../../../domain/quiz-parameters';
@@ -90,7 +90,7 @@ describe('GetQuizQuestionsHandler', () => {
 
     describe('execute', () => {
         beforeEach(() => {
-            stubGetOnGoingGameQuestion(quizGameRepoSpy, null);
+            stubGetOnGoingGame(quizGameRepoSpy, null);
         });
 
         it('should throw an error when an going game already exists', async () => {
@@ -100,7 +100,7 @@ describe('GetQuizQuestionsHandler', () => {
                 existingTheme.id,
             );
 
-            stubGetOnGoingGameQuestion(quizGameRepoSpy, existingGame);
+            stubGetOnGoingGame(quizGameRepoSpy, existingGame);
 
             await expect(sut.execute(command)).rejects.toThrow(
                 StillOnGoingQuizGameException,
