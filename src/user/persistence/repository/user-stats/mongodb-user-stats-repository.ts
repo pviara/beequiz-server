@@ -25,6 +25,12 @@ export class MongoDbUserStatsRepository implements UserStatsRepository {
                 score: entity.score + stats.points,
                 answers: entity.answers + stats.answers,
             });
+        } else {
+            await this.model.create({
+                userId,
+                score: stats.points,
+                answers: stats.answers,
+            });
         }
     }
 }
