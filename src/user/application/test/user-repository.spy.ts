@@ -1,6 +1,6 @@
 import { AddUserRepoDTO } from '../../persistence/dto/add-user-repo.dto';
 import { User } from '../../domain/user';
-import { UserRepository } from '../../persistence/repository/user-repository';
+import { UserRepository } from '../../persistence/repository/user/user-repository';
 
 export class UserRepositorySpy implements UserRepository {
     calls = {

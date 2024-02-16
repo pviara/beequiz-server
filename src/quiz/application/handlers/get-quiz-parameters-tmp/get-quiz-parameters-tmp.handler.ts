@@ -21,7 +21,7 @@ export class GetQuizParametersTempHandler implements ICommandHandler {
 
     async execute(): Promise<QuizParameters> {
         await this.getThemes();
-        return this.createQuizParameters(this.existingThemes);
+        return this.prepareQuizParameters(this.existingThemes);
     }
 
     private async getThemes(): Promise<void> {
@@ -32,7 +32,7 @@ export class GetQuizParametersTempHandler implements ICommandHandler {
         }
     }
 
-    private createQuizParameters(themes: QuizTheme[]): QuizParameters {
+    private prepareQuizParameters(themes: QuizTheme[]): QuizParameters {
         return new QuizParameters(themes, DEFAULT_NUMBER_OF_QUESTIONS);
     }
 }

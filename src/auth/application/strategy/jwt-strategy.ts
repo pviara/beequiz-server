@@ -4,8 +4,8 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { User } from '../../../user/domain/user';
-import { UserRepository } from '../../../user/persistence/repository/user-repository';
-import { USER_REPO_TOKEN } from '../../../user/persistence/repository/user-repository.provider';
+import { UserRepository } from '../../../user/persistence/repository/user/user-repository';
+import { USER_REPO_TOKEN } from '../../../user/persistence/repository/user/user-repository.provider';
 
 type JwtAuthPayload = {
     email: string;

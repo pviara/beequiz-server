@@ -179,7 +179,7 @@ describe('AnswerQuestionHandler', () => {
             });
 
             it('should publish an event when last game question has been answered', async () => {
-                const [gameLastQuestionId] = existingGame.questions.slice(-1);
+                const [gameLastQuestionId] = existingGame.questionIds.slice(-1);
 
                 const command = new AnswerQuestionCommand(
                     existingGame.userId,
@@ -198,14 +198,14 @@ describe('AnswerQuestionHandler', () => {
                 expect(eventBusSpy.calls.publish.count).toBe(1);
 
                 const event = new GameLastQuestionAnsweredEvent(
-                    existingGame.id,
+                    existingGame,
                     existingGame.score,
                 );
                 expect(eventBusSpy.calls.publish.history).toContainEqual(event);
             });
 
             it('should not publish a correct answer given event when it is last game question', async () => {
-                const [gameLastQuestionId] = existingGame.questions.slice(-1);
+                const [gameLastQuestionId] = existingGame.questionIds.slice(-1);
 
                 const command = new AnswerQuestionCommand(
                     existingGame.userId,

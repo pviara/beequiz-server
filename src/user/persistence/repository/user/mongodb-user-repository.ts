@@ -1,9 +1,9 @@
-import { AddUserRepoDTO } from '../dto/add-user-repo.dto';
+import { AddUserRepoDTO } from '../../dto/add-user-repo.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from '../../domain/user';
+import { User } from '../../../domain/user';
 import { UserRepository } from './user-repository';
-import { USER_MODEL, UserEntity } from '../entity/user-entity';
+import { USER_MODEL, UserEntity } from '../../entity/user-entity';
 
 export class MongoDbUserRepository implements UserRepository {
     constructor(

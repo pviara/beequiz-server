@@ -9,8 +9,8 @@ import {
 } from '../../../infrastructure/app-config/configuration/authentication-configuration';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth2';
-import { UserRepository } from '../../../user/persistence/repository/user-repository';
-import { USER_REPO_TOKEN } from '../../../user/persistence/repository/user-repository.provider';
+import { UserRepository } from '../../../user/persistence/repository/user/user-repository';
+import { USER_REPO_TOKEN } from '../../../user/persistence/repository/user/user-repository.provider';
 import { User } from 'src/user/domain/user';
 
 type GoogleProfile = { email: string };

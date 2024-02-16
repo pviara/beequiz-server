@@ -36,13 +36,13 @@ export class GetQuizParametersHandler implements ICommandHandler {
         await this.getThemes();
 
         if (this.apiService.cannotGenerateQuizThemes()) {
-            return this.createQuizParameters(this.existingThemes);
+            return this.prepareQuizParameters(this.existingThemes);
         }
 
         await this.generateThemes();
         await this.saveGeneratedThemes();
 
-        return this.createQuizParameters([
+        return this.prepareQuizParameters([
             ...this.existingThemes,
             ...this.savedThemes,
         ]);
@@ -52,7 +52,7 @@ export class GetQuizParametersHandler implements ICommandHandler {
         this.existingThemes = await this.repository.getQuizThemes();
     }
 
-    private createQuizParameters(themes: QuizTheme[]): QuizParameters {
+    private prepareQuizParameters(themes: QuizTheme[]): QuizParameters {
         return new QuizParameters(themes, DEFAULT_NUMBER_OF_QUESTIONS);
     }
 
