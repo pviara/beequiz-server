@@ -88,8 +88,8 @@ export class AnswerQuestionHandler
 
     private isCurrentQuestionTheLastOne(): boolean {
         return (
-            this.game.questions.indexOf(this.question.id) ===
-            this.game.questions.length - 1
+            this.game.questionIds.indexOf(this.question.id) ===
+            this.game.questionIds.length - 1
         );
     }
 
@@ -101,7 +101,7 @@ export class AnswerQuestionHandler
         const finalScore = this.calculateGameFinalScore();
 
         this.eventBus.publish(
-            new GameLastQuestionAnsweredEvent(this.game.id, finalScore),
+            new GameLastQuestionAnsweredEvent(this.game, finalScore),
         );
     }
 

@@ -2,7 +2,7 @@ export class QuizGame {
     constructor(
         readonly id: string,
         readonly userId: string,
-        readonly questions: string[],
+        readonly questionIds: string[],
         readonly score: number,
     ) {}
 }

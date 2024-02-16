@@ -44,7 +44,7 @@ export class MongoDbQuizGameRepo implements QuizGameRepository {
     async increaseGameScore(gameId: string): Promise<void> {
         const entity = await this.model.findById(gameId);
         if (entity) {
-            await this.model.findByIdAndUpdate(gameId, {
+            await this.model.findByIdAndUpdate(entity.id, {
                 score: entity.score + 1,
             });
         }

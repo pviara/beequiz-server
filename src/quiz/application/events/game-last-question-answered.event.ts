@@ -1,6 +1,8 @@
+import { QuizGame } from '../../domain/quiz-game';
+
 export class GameLastQuestionAnsweredEvent {
     constructor(
-        readonly gameId: string,
+        readonly game: QuizGame,
         readonly finalScore: number,
     ) {}
 }

@@ -9,7 +9,7 @@ import { JwtStrategy } from './application/strategy/jwt-strategy';
 import { JWT_SECRET } from '../infrastructure/app-config/configuration/authentication-configuration';
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
-import { UserModule } from '../user/user.module';
+import { UserPersistenceModule } from '../user/persistence/user.persistence-module';
 
 @Module({
     controllers: [AuthController],
@@ -26,7 +26,7 @@ import { UserModule } from '../user/user.module';
             },
         }),
         PassportModule,
-        UserModule,
+        UserPersistenceModule,
     ],
     providers: [AuthServiceProvider, GoogleStrategy, JwtStrategy],
 })
