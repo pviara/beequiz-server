@@ -20,8 +20,8 @@ export class MongoDbQuizGameRepo implements QuizGameRepository {
         });
     }
 
-    deleteGame(gameId: string): Promise<void> {
-        throw new Error('Method not implemented.');
+    async deleteGame(gameId: string): Promise<void> {
+        await this.model.findByIdAndDelete(gameId);
     }
 
     async getOnGoingGame(userId: string): Promise<QuizGame | null> {
