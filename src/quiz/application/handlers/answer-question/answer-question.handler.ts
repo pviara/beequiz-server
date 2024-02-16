@@ -15,6 +15,7 @@ import { QuizQuestionRepository } from '../../../persistence/quiz-question/repos
 import { QuizQuestionNotFoundException } from '../../errors/quiz-question-not-found.exception';
 import { QUIZ_GAME_REPO_TOKEN } from 'src/quiz/persistence/quiz-game/repository/quiz-game-repository.provider';
 import { QUIZ_QUESTION_REPO_TOKEN } from '../../../persistence/quiz-question/repository/quiz-question-repository.provider';
+import { GameLastQuestionAnsweredEvent } from '../../events/game-last-question-answered.event';
 
 type AnswerStatement = {
     isCorrect: boolean;
@@ -58,20 +59,19 @@ export class AnswerQuestionHandler
 
         await this.getQuestion(questionId);
 
-        if (this.isGivenAnswerCorrect()) {
-            this.fireCorrectAnswerGivenEvent();
-
-            return {
-                isCorrect: true,
-            };
+        if (this.isCurrentQuestionTheLastOne()) {
+            if (this.isGivenAnswerCorrect()) {
+                const finalScore = this.game.score + 1;
+                this.publishLastGameQuestionAnsweredEvent(finalScore);
+            } else {
+                const finalScore = this.game.score;
+                this.publishLastGameQuestionAnsweredEvent(finalScore);
+            }
+        } else if (this.isGivenAnswerCorrect()) {
+            this.publishCorrectAnswerGivenEvent();
         }
 
-        const correctAnswer = this.getQuestionCorrectAnswer();
-
-        return {
-            isCorrect: false,
-            correctAnswerId: correctAnswer.id,
-        };
+        return this.prepareAnswerStatement();
     }
 
     private async getOnGoingGameFor(userId: string): Promise<void> {
@@ -92,8 +92,21 @@ export class AnswerQuestionHandler
         return question;
     }
 
+    private isCurrentQuestionTheLastOne(): boolean {
+        return (
+            this.game.questions.indexOf(this.question.id) ===
+            this.game.questions.length - 1
+        );
+    }
+
     private isGivenAnswerCorrect(): boolean {
         return this.getQuestionRelatedAnswer().isCorrect;
+    }
+
+    private publishLastGameQuestionAnsweredEvent(finalScore: number): void {
+        this.eventBus.publish(
+            new GameLastQuestionAnsweredEvent(this.game.id, finalScore),
+        );
     }
 
     private getQuestionRelatedAnswer(): QuizAnswer {
@@ -110,9 +123,24 @@ export class AnswerQuestionHandler
         return relatedAnswer;
     }
 
-    private fireCorrectAnswerGivenEvent(): void {
+    private publishCorrectAnswerGivenEvent(): void {
         const event = new CorrectAnswerGivenEvent(this.game.id);
         this.eventBus.publish(event);
+    }
+
+    private prepareAnswerStatement(): AnswerStatement {
+        if (this.isGivenAnswerCorrect()) {
+            return {
+                isCorrect: true,
+            };
+        } else {
+            const correctAnswer = this.getQuestionCorrectAnswer();
+
+            return {
+                isCorrect: false,
+                correctAnswerId: correctAnswer.id,
+            };
+        }
     }
 
     private getQuestionCorrectAnswer(): QuizAnswer {

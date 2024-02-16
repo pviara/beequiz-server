@@ -3,12 +3,14 @@ import {
     AnswerQuestionHandler,
 } from './answer-question.handler';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { CorrectAnswerGivenEvent } from '../../events/correct-answer-given.event';
+import { EventBusSpy } from '../test/event-bus.spy';
 import { QuizAnswer, QuizQuestion } from '../../../domain/quiz-question';
 import { QuizAnswerDoesNotExistException } from '../../errors/quiz-answer-does-not-exist-in-question.exception';
 import { QuizGame } from '../../../domain/quiz-game';
 import {
     QuizGameRepositorySpy,
-    stubGetOnGoingGameQuestion,
+    stubGetOnGoingGame,
 } from '../test/quiz-game-repository.spy';
 import { QuizQuestionNotFoundException } from '../../errors/quiz-question-not-found.exception';
 import {
@@ -16,8 +18,7 @@ import {
     stubGetQuizQuestion,
 } from '../test/quiz-question-repository.spy';
 import { QuizGameDoestNotExistException } from '../../errors/quiz-game-does-not-exist.exception';
-import { EventBusSpy } from '../test/event-bus.spy';
-import { CorrectAnswerGivenEvent } from '../../events/correct-answer-given.event';
+import { GameLastQuestionAnsweredEvent } from '../../events/game-last-question-answered.event';
 
 describe('AnswerQuestionHandler', () => {
     let sut: AnswerQuestionHandler;
@@ -36,8 +37,13 @@ describe('AnswerQuestionHandler', () => {
     const existingGame = new QuizGame(
         'id',
         'userId',
-        [],
-        'currentQuestionId',
+        [
+            'questionId1',
+            'questionId2',
+            'questionId3',
+            'questionId4',
+            'questionId5',
+        ],
         0,
     );
 
@@ -62,7 +68,7 @@ describe('AnswerQuestionHandler', () => {
                     'questionId',
                 );
 
-                stubGetOnGoingGameQuestion(quizGameRepoSpy, null);
+                stubGetOnGoingGame(quizGameRepoSpy, null);
 
                 await expect(sut.execute(command)).rejects.toThrow(
                     QuizGameDoestNotExistException,
@@ -72,7 +78,7 @@ describe('AnswerQuestionHandler', () => {
 
         describe('an ongoing game exists', () => {
             beforeEach(() => {
-                stubGetOnGoingGameQuestion(quizGameRepoSpy, existingGame);
+                stubGetOnGoingGame(quizGameRepoSpy, existingGame);
             });
 
             const existingAnswer = existingAnswers[0];
@@ -155,7 +161,7 @@ describe('AnswerQuestionHandler', () => {
                 expect(result.correctAnswerId).not.toBeDefined();
             });
 
-            it('should fire an event when given answer is correct', async () => {
+            it('should publish an event when given answer is correct', async () => {
                 const command = new AnswerQuestionCommand(
                     existingGame.userId,
                     correctAnswer.id,
@@ -170,6 +176,57 @@ describe('AnswerQuestionHandler', () => {
 
                 const event = new CorrectAnswerGivenEvent(existingGame.id);
                 expect(eventBusSpy.calls.publish.history).toContainEqual(event);
+            });
+
+            it('should publish an event when last game question has been answered', async () => {
+                const [gameLastQuestionId] = existingGame.questions.slice(-1);
+
+                const command = new AnswerQuestionCommand(
+                    existingGame.userId,
+                    existingAnswer.id,
+                    gameLastQuestionId,
+                );
+
+                stubGetQuizQuestion(quizQuestionRepoSpy, {
+                    ...existingQuestion,
+                    id: gameLastQuestionId,
+                });
+                stubGetOnGoingGame(quizGameRepoSpy, existingGame);
+
+                await sut.execute(command);
+
+                expect(eventBusSpy.calls.publish.count).toBe(1);
+
+                const event = new GameLastQuestionAnsweredEvent(
+                    existingGame.id,
+                    existingGame.score,
+                );
+                expect(eventBusSpy.calls.publish.history).toContainEqual(event);
+            });
+
+            it('should not publish a correct answer given event when it is last game question', async () => {
+                const [gameLastQuestionId] = existingGame.questions.slice(-1);
+
+                const command = new AnswerQuestionCommand(
+                    existingGame.userId,
+                    correctAnswer.id,
+                    gameLastQuestionId,
+                );
+
+                stubGetQuizQuestion(quizQuestionRepoSpy, {
+                    ...existingQuestion,
+                    id: gameLastQuestionId,
+                });
+                stubGetOnGoingGame(quizGameRepoSpy, existingGame);
+
+                await sut.execute(command);
+
+                expect(eventBusSpy.calls.publish.count).toBe(1);
+
+                const event = new CorrectAnswerGivenEvent(existingGame.id);
+                expect(eventBusSpy.calls.publish.history).not.toContainEqual(
+                    event,
+                );
             });
         });
     });
