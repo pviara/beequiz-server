@@ -60,8 +60,7 @@ export class AnswerQuestionHandler
         await this.getQuestion(questionId);
 
         if (this.isCurrentQuestionTheLastOne()) {
-            const finalScore = this.calculateGameFinalScore();
-            this.publishLastGameQuestionAnsweredEvent(finalScore);
+            this.publishLastGameQuestionAnsweredEvent();
         } else if (this.isGivenAnswerCorrect()) {
             this.publishCorrectAnswerGivenEvent();
         }
@@ -94,20 +93,22 @@ export class AnswerQuestionHandler
         );
     }
 
-    private calculateGameFinalScore(): number {
-        return this.isGivenAnswerCorrect()
-            ? this.game.score + 1
-            : this.game.score;
-    }
-
     private isGivenAnswerCorrect(): boolean {
         return this.getQuestionRelatedAnswer().isCorrect;
     }
 
-    private publishLastGameQuestionAnsweredEvent(finalScore: number): void {
+    private publishLastGameQuestionAnsweredEvent(): void {
+        const finalScore = this.calculateGameFinalScore();
+
         this.eventBus.publish(
             new GameLastQuestionAnsweredEvent(this.game.id, finalScore),
         );
+    }
+
+    private calculateGameFinalScore(): number {
+        return this.isGivenAnswerCorrect()
+            ? this.game.score + 1
+            : this.game.score;
     }
 
     private getQuestionRelatedAnswer(): QuizAnswer {
