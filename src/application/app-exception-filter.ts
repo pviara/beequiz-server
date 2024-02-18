@@ -5,6 +5,7 @@ import { Response } from 'express';
 enum HttpStatus {
     Conflict = 409,
     FailedDependency = 424,
+    Forbidden = 403,
     NotFound = 404,
     UnprocessableEntity = 422,
 }
@@ -12,6 +13,8 @@ enum HttpStatus {
 @Catch(Exception)
 export class AppExceptionFilter implements ExceptionFilter {
     private exceptionMapping: Record<ExceptionCode, HttpStatus> = {
+        ActorActionIsNotAllowed: HttpStatus.Forbidden,
+        OnGoingQuizGameNotFound: HttpStatus.NotFound,
         ProblemOccurredWithOpenAI: HttpStatus.FailedDependency,
         QuizAnswerDoesNotExist: HttpStatus.UnprocessableEntity,
         QuizGameNotFound: HttpStatus.NotFound,

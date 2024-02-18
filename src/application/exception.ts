@@ -1,4 +1,6 @@
 export type ExceptionCode =
+    | 'ActorActionIsNotAllowed'
+    | 'OnGoingQuizGameNotFound'
     | 'ProblemOccurredWithOpenAI'
     | 'QuizAnswerDoesNotExist'
     | 'QuizGameNotFound'

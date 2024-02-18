@@ -7,6 +7,7 @@ import { GetQuizQuestionsHandler } from './application/handlers/get-quiz-questio
 import { Module } from '@nestjs/common';
 import { OpenAIModule } from '../open-ai/open-ai.module';
 import { QuestionsRetrievedHandler } from './application/handlers/questions-retrieved/questions-retrieved.event-handler';
+import { QuitGameHandler } from './application/handlers/quit-game/quit-game.handler';
 import { QuizController } from './presentation/quiz-controller';
 import { QuizPersistenceModule } from './persistence/quiz-persistence.module';
 import { SharedModule } from '../shared/shared.module';
@@ -19,6 +20,7 @@ export const quizModuleProviders = [
     GetQuizParametersTempHandler,
     GetQuizQuestionsHandler,
     QuestionsRetrievedHandler,
+    QuitGameHandler,
 ];
 
 export const quizModuleImports = [
