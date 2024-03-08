@@ -8,6 +8,7 @@ import { AppConfigServiceImpl } from './app-config-service.impl';
 import { ConfigService } from '@nestjs/config';
 import {
     DATABASE_URI,
+    DEV_DATABASE_URI,
     TEST_DATABASE_URI,
 } from './configuration/database-configuration';
 import {
@@ -95,12 +96,14 @@ describe('AppConfigServiceImpl', () => {
 
             const result = sut.getDatabaseConfig();
 
-            expect(configServiceSpy.callCountToGet).toBe(2);
+            expect(configServiceSpy.callCountToGet).toBe(3);
             expect(configServiceSpy.callHistoryToGet).toEqual([
                 DATABASE_URI,
+                DEV_DATABASE_URI,
                 TEST_DATABASE_URI,
             ]);
             expect(result).toHaveProperty(DATABASE_URI);
+            expect(result).toHaveProperty(DEV_DATABASE_URI);
             expect(result).toHaveProperty(TEST_DATABASE_URI);
         });
     });

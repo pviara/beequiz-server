@@ -1,7 +1,10 @@
 import { AppConfigModule } from '../app-config/app-config.module';
 import { AppConfigService } from '../app-config/app-config-service';
 import { APP_CONFIG_SERVICE_TOKEN } from '../app-config/app-config-service.provider';
-import { DATABASE_URI } from '../app-config/configuration/database-configuration';
+import {
+    DATABASE_URI,
+    DEV_DATABASE_URI,
+} from '../app-config/configuration/database-configuration';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
@@ -11,6 +14,14 @@ import { MongooseModule } from '@nestjs/mongoose';
             imports: [AppConfigModule],
             inject: [APP_CONFIG_SERVICE_TOKEN],
             useFactory: (appConfigService: AppConfigService) => {
+                if (appConfigService.isDevMode()) {
+                    return {
+                        uri: appConfigService.getDatabaseConfig()[
+                            DEV_DATABASE_URI
+                        ],
+                    };
+                }
+
                 return {
                     uri: appConfigService.getDatabaseConfig()[DATABASE_URI],
                 };

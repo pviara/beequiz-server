@@ -8,4 +8,5 @@ export interface AppConfigService {
     getAuthConfig(): AuthenticationConfiguration;
     getDatabaseConfig(): DatabaseConfiguration;
     getOpenAIConfig(): OpenAIConfiguration;
+    isDevMode(): boolean;
 }

@@ -14,8 +14,9 @@ import {
 } from './configuration/authentication-configuration';
 import { ConfigService } from '@nestjs/config';
 import {
-    DATABASE_URI,
     DatabaseConfiguration,
+    DATABASE_URI,
+    DEV_DATABASE_URI,
     TEST_DATABASE_URI,
 } from './configuration/database-configuration';
 import { Injectable } from '@nestjs/common';
@@ -42,11 +43,19 @@ export class AppConfigServiceImpl implements AppConfigService {
     }
 
     getDatabaseConfig(): DatabaseConfiguration {
-        return this.getConfiguration(DATABASE_URI, TEST_DATABASE_URI);
+        return this.getConfiguration(
+            DATABASE_URI,
+            DEV_DATABASE_URI,
+            TEST_DATABASE_URI,
+        );
     }
 
     getOpenAIConfig(): OpenAIConfiguration {
         return this.getConfiguration(OPENAI_API_KEY);
+    }
+
+    isDevMode(): boolean {
+        return this.getAppConfig()[APP_ENVIRONMENT] === 'dev';
     }
 
     private getConfiguration<T>(...keys: string[]): T {
