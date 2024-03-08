@@ -1,10 +1,11 @@
+import { AppConfigService } from './app-config-service';
 import {
     ALLOWED_ORIGIN,
+    AppEnvironment,
+    ApplicationConfiguration,
     APP_ENVIRONMENT,
     APP_PORT,
-    ApplicationConfiguration,
 } from './configuration/application-configuration';
-import { AppConfigService } from './app-config-service';
 import {
     AuthenticationConfiguration,
     JWT_SECRET,
@@ -21,8 +22,8 @@ import {
 } from './configuration/database-configuration';
 import { Injectable } from '@nestjs/common';
 import {
-    OPENAI_API_KEY,
     OpenAIConfiguration,
+    OPENAI_API_KEY,
 } from './configuration/openai-configuration';
 
 @Injectable()
@@ -54,8 +55,16 @@ export class AppConfigServiceImpl implements AppConfigService {
         return this.getConfiguration(OPENAI_API_KEY);
     }
 
-    isDevMode(): boolean {
-        return this.getAppConfig()[APP_ENVIRONMENT] === 'dev';
+    isAppInDevMode(): boolean {
+        return (
+            this.getAppConfig()[APP_ENVIRONMENT] === AppEnvironment.Development
+        );
+    }
+
+    isAppInProductionMode(): boolean {
+        return (
+            this.getAppConfig()[APP_ENVIRONMENT] === AppEnvironment.Production
+        );
     }
 
     private getConfiguration<T>(...keys: string[]): T {

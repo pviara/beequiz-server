@@ -1,10 +1,7 @@
 import { AppModule } from './app.module';
 import {
     ALLOWED_ORIGIN,
-    APP_ENVIRONMENT,
     APP_PORT,
-    AppEnvironment,
-    ApplicationConfiguration,
 } from './infrastructure/app-config/configuration/application-configuration';
 import { AppConfigService } from './infrastructure/app-config/app-config-service';
 import { AppExceptionFilter } from './application/app-exception-filter';
@@ -12,6 +9,8 @@ import { APP_CONFIG_SERVICE_TOKEN } from './infrastructure/app-config/app-config
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { ForbiddenException, INestApplication, Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { QuizThemeRepository } from './quiz/persistence/quiz-theme/repository/quiz-theme-repository';
+import { QUIZ_THEME_REPO_TOKEN } from './quiz/persistence/quiz-theme/repository/quiz-theme-repository.provider';
 
 export async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -19,6 +18,7 @@ export async function bootstrap() {
     configureCorsPolicy(app);
     configureGlobalFilters(app);
 
+    await addDefaultQuizThemes(app);
     await app.listen(getAppPort(app));
 }
 
@@ -52,26 +52,48 @@ function configureCorsPolicy(app: INestApplication): void {
     app.enableCors(corsOptions);
 }
 
-function getAppConfiguration(app: INestApplication): ApplicationConfiguration {
+function getAppConfigService(app: INestApplication): AppConfigService {
     const appConfigService = app.get<AppConfigService>(
         APP_CONFIG_SERVICE_TOKEN,
     );
-    return appConfigService.getAppConfig();
+    return appConfigService;
 }
 
-function isAppInProductionMode(app: INestApplication) {
-    const appConfig = getAppConfiguration(app);
-    return appConfig[APP_ENVIRONMENT] === AppEnvironment.Production;
+function isAppInProductionMode(app: INestApplication): boolean {
+    return getAppConfigService(app).isAppInProductionMode();
 }
 
 function getAllowedOrigin(app: INestApplication): string {
-    const appConfig = getAppConfiguration(app);
-    return appConfig[ALLOWED_ORIGIN];
+    return getAppConfigService(app).getAppConfig()[ALLOWED_ORIGIN];
+}
+
+async function addDefaultQuizThemes(app: INestApplication): Promise<void> {
+    const quizThemeRepo = app.get<QuizThemeRepository>(QUIZ_THEME_REPO_TOKEN);
+    const quizThemes = await quizThemeRepo.getQuizThemes();
+    if (quizThemes.length === 0) {
+        await quizThemeRepo.saveGeneratedThemes([
+            {
+                code: 'sport',
+                label: 'sport',
+            },
+            {
+                code: 'geography',
+                label: 'géographie',
+            },
+            {
+                code: 'cinema',
+                label: 'cinéma',
+            },
+            {
+                code: 'music',
+                label: 'musique',
+            },
+        ]);
+    }
 }
 
 function getAppPort(app: INestApplication): string {
-    const appConfig = getAppConfiguration(app);
-    return appConfig[APP_PORT];
+    return getAppConfigService(app).getAppConfig()[APP_PORT];
 }
 
 function configureGlobalFilters(app: INestApplication): void {

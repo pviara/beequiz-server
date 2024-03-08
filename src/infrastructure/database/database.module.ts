@@ -14,7 +14,7 @@ import { MongooseModule } from '@nestjs/mongoose';
             imports: [AppConfigModule],
             inject: [APP_CONFIG_SERVICE_TOKEN],
             useFactory: (appConfigService: AppConfigService) => {
-                if (appConfigService.isDevMode()) {
+                if (appConfigService.isAppInDevMode()) {
                     return {
                         uri: appConfigService.getDatabaseConfig()[
                             DEV_DATABASE_URI
