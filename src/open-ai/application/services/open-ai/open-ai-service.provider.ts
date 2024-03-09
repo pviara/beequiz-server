@@ -1,5 +1,6 @@
 import { AppConfigService } from '../../../../infrastructure/app-config/app-config-service';
 import { APP_CONFIG_SERVICE_TOKEN } from '../../../../infrastructure/app-config/app-config-service.provider';
+import { FakeOpenAIServiceImpl } from './fake-open-ai-service.impl';
 import { OpenAIObjectFactory } from '../../open-ai-object-factory/open-ai-object-factory';
 import { OpenAIServiceImpl } from './open-ai-service.impl';
 import { OPENAI_OBJECT_FACTORY_TOKEN } from '../../open-ai-object-factory/open-ai-object-factory.provider';
@@ -26,7 +27,7 @@ export const OpenAIServiceProvider: Provider = {
         quizParser: QuizParser,
     ) => {
         if (appConfigService.isAppInDevMode()) {
-            // todo: return new FakeOpenAIServiceImpl(); 
+            return new FakeOpenAIServiceImpl();
         }
         return new OpenAIServiceImpl(objectFactory, promptService, quizParser);
     },
