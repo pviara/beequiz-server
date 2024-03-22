@@ -33,12 +33,7 @@ export class WelcomeUserHandler implements ICommandHandler<WelcomeUserCommand> {
     }
 
     private async welcomeUser(): Promise<void> {
-        const welcomedUser = new User(
-            this.existingUser.id,
-            this.existingUser.email,
-            true,
-        );
-
-        await this.repository.update(welcomedUser);
+        this.existingUser.welcome();
+        await this.repository.update(this.existingUser);
     }
 }

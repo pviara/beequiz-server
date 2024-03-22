@@ -35,9 +35,9 @@ export class MongoDbUserRepository implements UserRepository {
         return null;
     }
 
-    async update({ id, ...propsToUpdate }: User): Promise<void> {
-        await this.model.findByIdAndUpdate(id, {
-            hasBeenWelcomed: propsToUpdate.hasBeenWelcomed,
+    async update(user: User): Promise<void> {
+        await this.model.findByIdAndUpdate(user.id, {
+            hasBeenWelcomed: user.hasBeenWelcomed,
         });
     }
 
