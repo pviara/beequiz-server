@@ -1,5 +1,4 @@
 import { CommandHandler, ICommand, ICommandHandler } from '@nestjs/cqrs';
-import { Inject } from '@nestjs/common';
 import { User } from '../../domain/user';
 import { UserRepository } from '../../persistence/repository/user/user-repository';
 import { UserNotFoundException } from '../errors/user-not-found.exception';

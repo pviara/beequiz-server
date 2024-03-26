@@ -9,7 +9,6 @@ import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.int
 import { ForbiddenException, INestApplication, Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { QuizThemeRepository } from './quiz/persistence/quiz-theme/repository/quiz-theme-repository';
-import { QUIZ_THEME_REPO_TOKEN } from './quiz/persistence/quiz-theme/repository/quiz-theme-repository.provider';
 
 export async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -65,7 +64,7 @@ function getAllowedOrigin(app: INestApplication): string {
 }
 
 async function addDefaultQuizThemes(app: INestApplication): Promise<void> {
-    const quizThemeRepo = app.get<QuizThemeRepository>(QUIZ_THEME_REPO_TOKEN);
+    const quizThemeRepo = app.get(QuizThemeRepository);
     const quizThemes = await quizThemeRepo.getQuizThemes();
     if (quizThemes.length === 0) {
         await quizThemeRepo.saveGeneratedThemes([

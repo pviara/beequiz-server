@@ -6,7 +6,6 @@ import {
     ICommandHandler,
 } from '@nestjs/cqrs';
 import { ExceededAPIQuotaException } from '../../../../open-ai/application/errors/exceeded-api-quota.exception';
-import { Inject } from '@nestjs/common';
 import { OpenAIService } from '../../../../open-ai/application/services/open-ai/open-ai-service';
 import { ParsedQuizQuestion } from '../../quiz-parser/model/parsed-quiz-question';
 import { QuizGameRepository } from '../../../persistence/quiz-game/repository/quiz-game-repository';
@@ -15,7 +14,6 @@ import { QuizQuestionRepository } from '../../../persistence/quiz-question/repos
 import { QuizThemeRepository } from '../../../persistence/quiz-theme/repository/quiz-theme-repository';
 import { QuizThemeNotFoundException } from '../../errors/quiz-theme-not-found.exception';
 import { QuizTheme } from '../../../domain/quiz-parameters';
-import { QUIZ_THEME_REPO_TOKEN } from '../../../persistence/quiz-theme/repository/quiz-theme-repository.provider';
 import { ProblemOccurredWithOpenAIException } from '../../errors/problem-occurred-with-openai.exception';
 import { QuestionsRetrievedEvent } from '../../events/questions-retrieved.event';
 import { StillOnGoingQuizGameException } from '../../errors/still-on-going-quiz-game.exception';
@@ -44,10 +42,7 @@ export class GetQuizQuestionsHandler
         private eventBus: EventBus,
         private openAIService: OpenAIService,
         private gameRepo: QuizGameRepository,
-
         private questionRepo: QuizQuestionRepository,
-
-        @Inject(QUIZ_THEME_REPO_TOKEN)
         private themeRepo: QuizThemeRepository,
     ) {}
 

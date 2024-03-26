@@ -1,9 +1,8 @@
 import { Provider } from '@nestjs/common';
 import { MongoDbUserStatsRepository } from './mongodb-user-stats-repository';
-
-export const USER_STATS_REPO_TOKEN = 'USER_STATS_REPO_TOKEN';
+import { UserStatsRepository } from './user-stats-repository';
 
 export const UserStatsRepoProvider: Provider = {
-    provide: USER_STATS_REPO_TOKEN,
+    provide: UserStatsRepository,
     useClass: MongoDbUserStatsRepository,
 };
