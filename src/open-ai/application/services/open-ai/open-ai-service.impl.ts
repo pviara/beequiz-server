@@ -7,7 +7,6 @@ import { ParsedQuizQuestion } from '../../../../quiz/application/quiz-parser/mod
 import { ParsedQuizTheme } from '../../../../quiz/application/quiz-parser/model/parsed-quiz-theme';
 import { ParsingQuizHasFailedException } from '../../../../quiz/application/errors/parsing-quiz-has-failed.exception';
 import { PromptService } from '../prompt/prompt-service';
-import { PROMPT_SERVICE_TOKEN } from '../prompt/prompt-service.provider';
 import { QuizParser } from '../../../../quiz/application/quiz-parser/quiz-parser';
 import { QuizQuestion } from '../../../../quiz/domain/quiz-question';
 import { QuizTheme } from '../../../../quiz/domain/quiz-parameters';
@@ -19,8 +18,6 @@ export const GPT_VERSION: ChatCompletionCreateParamsBase['model'] =
 export class OpenAIServiceImpl implements OpenAIService {
     constructor(
         private openAIObjectFactory: OpenAIObjectFactory,
-
-        @Inject(PROMPT_SERVICE_TOKEN)
         private promptService: PromptService,
 
         @Inject(QUIZ_PARSER_TOKEN)
