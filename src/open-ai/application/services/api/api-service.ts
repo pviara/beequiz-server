@@ -1,6 +1,6 @@
-export interface ApiService {
-    cannotGenerateQuizQuestions(): boolean;
-    cannotGenerateQuizThemes(): boolean;
-    flagQuizQuestionRequest(): void;
-    flagQuizThemeRequest(): void;
+export abstract class ApiService {
+    abstract cannotGenerateQuizQuestions(): boolean;
+    abstract cannotGenerateQuizThemes(): boolean;
+    abstract flagQuizQuestionRequest(): void;
+    abstract flagQuizThemeRequest(): void;
 }

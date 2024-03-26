@@ -1,5 +1,4 @@
 import { ApiService } from '../../../../open-ai/application/services/api/api-service';
-import { API_SERVICE_TOKEN } from '../../../../open-ai/application/services/api/api-service.provider';
 import {
     CommandHandler,
     EventBus,
@@ -45,7 +44,6 @@ export class GetQuizQuestionsHandler
     private userId!: string;
 
     constructor(
-        @Inject(API_SERVICE_TOKEN)
         private apiService: ApiService,
 
         private eventBus: EventBus,
