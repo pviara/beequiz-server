@@ -1,9 +1,8 @@
 import { MongoDbUserRepository } from './mongodb-user-repository';
 import { Provider } from '@nestjs/common';
-
-export const USER_REPO_TOKEN = 'UserRepository';
+import { UserRepository } from './user-repository';
 
 export const UserRepoProvider: Provider = {
-    provide: USER_REPO_TOKEN,
+    provide: UserRepository,
     useClass: MongoDbUserRepository,
 };

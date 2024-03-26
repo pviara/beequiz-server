@@ -3,7 +3,6 @@ import { Inject } from '@nestjs/common';
 import { User } from '../../domain/user';
 import { UserRepository } from '../../persistence/repository/user/user-repository';
 import { UserNotFoundException } from '../errors/user-not-found.exception';
-import { USER_REPO_TOKEN } from '../../persistence/repository/user/user-repository.provider';
 
 export class WelcomeUserCommand implements ICommand {
     constructor(readonly userId: string) {}
@@ -14,7 +13,6 @@ export class WelcomeUserHandler implements ICommandHandler<WelcomeUserCommand> {
     private existingUser!: User;
 
     constructor(
-        @Inject(USER_REPO_TOKEN)
         private repository: UserRepository,
     ) {}
 

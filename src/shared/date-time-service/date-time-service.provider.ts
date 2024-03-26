@@ -4,5 +4,5 @@ import { Provider } from '@nestjs/common';
 
 export const DateTimeServiceProvider: Provider = {
     provide: DateTimeService,
-    useFactory: () => new DateTimeServiceImpl(),
+    useValue: () => new DateTimeServiceImpl(),
 };

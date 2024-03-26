@@ -9,7 +9,6 @@ import {
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth2';
 import { UserRepository } from '../../../user/persistence/repository/user/user-repository';
-import { USER_REPO_TOKEN } from '../../../user/persistence/repository/user/user-repository.provider';
 import { User } from 'src/user/domain/user';
 
 type GoogleProfile = { email: string };
@@ -18,8 +17,6 @@ type GoogleProfile = { email: string };
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     constructor(
         configService: AppConfigService,
-
-        @Inject(USER_REPO_TOKEN)
         private userRepository: UserRepository,
     ) {
         const authConfig = configService.getAuthConfig();
