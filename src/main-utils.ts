@@ -5,7 +5,6 @@ import {
 } from './infrastructure/app-config/configuration/application-configuration';
 import { AppConfigService } from './infrastructure/app-config/app-config-service';
 import { AppExceptionFilter } from './application/app-exception-filter';
-import { APP_CONFIG_SERVICE_TOKEN } from './infrastructure/app-config/app-config-service.provider';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { ForbiddenException, INestApplication, Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -53,9 +52,7 @@ function configureCorsPolicy(app: INestApplication): void {
 }
 
 function getAppConfigService(app: INestApplication): AppConfigService {
-    const appConfigService = app.get<AppConfigService>(
-        APP_CONFIG_SERVICE_TOKEN,
-    );
+    const appConfigService = app.get(AppConfigService);
     return appConfigService;
 }
 

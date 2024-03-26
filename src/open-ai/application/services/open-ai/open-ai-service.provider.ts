@@ -1,5 +1,4 @@
 import { AppConfigService } from '../../../../infrastructure/app-config/app-config-service';
-import { APP_CONFIG_SERVICE_TOKEN } from '../../../../infrastructure/app-config/app-config-service.provider';
 import { FakeOpenAIServiceImpl } from './fake-open-ai-service.impl';
 import { Logger, Provider } from '@nestjs/common';
 import { OpenAIObjectFactory } from '../../open-ai-object-factory/open-ai-object-factory';
@@ -15,7 +14,7 @@ export const OPENAI_SERVICE_TOKEN = 'OpenAIService';
 export const OpenAIServiceProvider: Provider = {
     provide: OPENAI_SERVICE_TOKEN,
     inject: [
-        APP_CONFIG_SERVICE_TOKEN,
+        AppConfigService,
         OPENAI_OBJECT_FACTORY_TOKEN,
         PROMPT_SERVICE_TOKEN,
         QUIZ_PARSER_TOKEN,
