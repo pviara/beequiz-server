@@ -1,6 +1,5 @@
 import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions';
 import { ExceededAPIQuotaException } from '../../errors/exceeded-api-quota.exception';
-import { Inject } from '@nestjs/common';
 import { OpenAIObjectFactory } from '../../../../open-ai/application/open-ai-object-factory/open-ai-object-factory';
 import { OpenAIService } from './open-ai-service';
 import { ParsedQuizQuestion } from '../../../../quiz/application/quiz-parser/model/parsed-quiz-question';
@@ -10,7 +9,6 @@ import { PromptService } from '../prompt/prompt-service';
 import { QuizParser } from '../../../../quiz/application/quiz-parser/quiz-parser';
 import { QuizQuestion } from '../../../../quiz/domain/quiz-question';
 import { QuizTheme } from '../../../../quiz/domain/quiz-parameters';
-import { QUIZ_PARSER_TOKEN } from '../../../../quiz/application/quiz-parser/quiz-parser.provider';
 
 export const GPT_VERSION: ChatCompletionCreateParamsBase['model'] =
     'gpt-3.5-turbo-1106';
@@ -19,8 +17,6 @@ export class OpenAIServiceImpl implements OpenAIService {
     constructor(
         private openAIObjectFactory: OpenAIObjectFactory,
         private promptService: PromptService,
-
-        @Inject(QUIZ_PARSER_TOKEN)
         private quizParser: QuizParser,
     ) {}
 
