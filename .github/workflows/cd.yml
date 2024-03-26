@@ -29,4 +29,4 @@ jobs:
                     yarn install
                     yarn build
                     pm2 delete beequiz-api
-                    pm2 start dist/main.js --name beequiz-api
+                    pm2 start dist/main.js --namespace beequiz --name beequiz-api
