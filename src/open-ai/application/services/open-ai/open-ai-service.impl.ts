@@ -3,7 +3,6 @@ import { ExceededAPIQuotaException } from '../../errors/exceeded-api-quota.excep
 import { Inject } from '@nestjs/common';
 import { OpenAIObjectFactory } from '../../../../open-ai/application/open-ai-object-factory/open-ai-object-factory';
 import { OpenAIService } from './open-ai-service';
-import { OPENAI_OBJECT_FACTORY_TOKEN } from '../../../../open-ai/application/open-ai-object-factory/open-ai-object-factory.provider';
 import { ParsedQuizQuestion } from '../../../../quiz/application/quiz-parser/model/parsed-quiz-question';
 import { ParsedQuizTheme } from '../../../../quiz/application/quiz-parser/model/parsed-quiz-theme';
 import { ParsingQuizHasFailedException } from '../../../../quiz/application/errors/parsing-quiz-has-failed.exception';
@@ -19,7 +18,6 @@ export const GPT_VERSION: ChatCompletionCreateParamsBase['model'] =
 
 export class OpenAIServiceImpl implements OpenAIService {
     constructor(
-        @Inject(OPENAI_OBJECT_FACTORY_TOKEN)
         private openAIObjectFactory: OpenAIObjectFactory,
 
         @Inject(PROMPT_SERVICE_TOKEN)

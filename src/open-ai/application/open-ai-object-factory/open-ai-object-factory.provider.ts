@@ -1,9 +1,12 @@
+import { AppConfigService } from 'src/infrastructure/app-config/app-config-service';
+import { OpenAIObjectFactory } from './open-ai-object-factory';
 import { OpenAIObjectFactoryImpl } from './open-ai-object-factory.impl';
 import { Provider } from '@nestjs/common';
 
-export const OPENAI_OBJECT_FACTORY_TOKEN = 'OpenAIObjectFactory';
-
 export const OpenAIObjectFactoryProvider: Provider = {
-    provide: OPENAI_OBJECT_FACTORY_TOKEN,
-    useClass: OpenAIObjectFactoryImpl,
+    inject: [AppConfigService],
+    provide: OpenAIObjectFactory,
+    useFactory: (appConfigService: AppConfigService) => {
+        return new OpenAIObjectFactoryImpl(appConfigService);
+    },
 };
