@@ -1,6 +1,8 @@
 import { AddUserRepoDTO } from 'src/user/persistence/dto/add-user-repo.dto';
 import { AppConfigService } from '../../../infrastructure/app-config/app-config-service';
-import { Inject, Injectable } from '@nestjs/common';
+import { AuthenticatedUser } from '../../presentation/model/authenticated-user';
+import { Injectable } from '@nestjs/common';
+import { mapToAuthenticatedUser } from './utils';
 import {
     OAUTH_CLIENT,
     OAUTH_REDIRECT_URL,
@@ -9,7 +11,6 @@ import {
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth2';
 import { UserRepository } from '../../../user/persistence/repository/user/user-repository';
-import { User } from 'src/user/domain/user';
 
 type GoogleProfile = { email: string };
 
@@ -39,7 +40,9 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         done(null, user);
     }
 
-    private async getOrCreateUserFrom(profile: GoogleProfile): Promise<User> {
+    private async getOrCreateUserFrom(
+        profile: GoogleProfile,
+    ): Promise<AuthenticatedUser> {
         const user = await this.userRepository.getByEmail(profile.email);
         if (!user) {
             const userToAdd = new AddUserRepoDTO(profile.email);
@@ -47,7 +50,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
 
             return this.getOrCreateUserFrom(profile);
         }
-
-        return user;
+        return mapToAuthenticatedUser(user);
     }
 }

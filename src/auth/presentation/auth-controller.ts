@@ -15,10 +15,10 @@ import {
     Request as ExpressRequest,
     Response as ExpressResponse,
 } from 'express';
-import { User } from '../../user/domain/user';
+import { AuthenticatedUser } from './model/authenticated-user';
 
 type SignedInRequest = ExpressRequest & {
-    user: User;
+    user: AuthenticatedUser;
 };
 
 @Controller()
@@ -40,7 +40,9 @@ export class AuthController {
 
     @UseGuards(JwtAuthGuard)
     @Get()
-    async getUserFromToken(@Request() req: SignedInRequest): Promise<User> {
+    async getUserFromToken(
+        @Request() req: SignedInRequest,
+    ): Promise<AuthenticatedUser> {
         return req.user;
     }
 
