@@ -12,9 +12,7 @@ export class WelcomeUserCommand implements ICommand {
 export class WelcomeUserHandler implements ICommandHandler<WelcomeUserCommand> {
     private existingUser!: User;
 
-    constructor(
-        private repository: UserRepository,
-    ) {}
+    constructor(private repository: UserRepository) {}
 
     async execute({ userId }: WelcomeUserCommand): Promise<void> {
         await this.getUser(userId);

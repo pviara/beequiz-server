@@ -1,9 +1,8 @@
 import { MongoDbQuizQuestionRepo } from './mongodb-quiz-question-repo';
 import { Provider } from '@nestjs/common';
-
-export const QUIZ_QUESTION_REPO_TOKEN = 'MongoDbQuizQuestionRepo';
+import { QuizQuestionRepository } from './quiz-question-repository';
 
 export const QuizQuestionRepoProvider: Provider = {
-    provide: QUIZ_QUESTION_REPO_TOKEN,
+    provide: QuizQuestionRepository,
     useClass: MongoDbQuizQuestionRepo,
 };

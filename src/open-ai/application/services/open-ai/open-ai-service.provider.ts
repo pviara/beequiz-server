@@ -9,12 +9,7 @@ import { OpenAIService } from './open-ai-service';
 
 export const OpenAIServiceProvider: Provider = {
     provide: OpenAIService,
-    inject: [
-        AppConfigService,
-        OpenAIObjectFactory,
-        PromptService,
-        QuizParser,
-    ],
+    inject: [AppConfigService, OpenAIObjectFactory, PromptService, QuizParser],
     useFactory: (
         appConfigService: AppConfigService,
         objectFactory: OpenAIObjectFactory,

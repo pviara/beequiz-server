@@ -3,11 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ParsedQuizQuestion } from '../../../application/quiz-parser/model/parsed-quiz-question';
 import { QuizAnswer, QuizQuestion } from '../../../domain/quiz-question';
-import { QuizQuestionRepository } from './quiz-question-repository';
 import {
     QuizQuestionEntity,
     QUIZ_QUESTION_MODEL,
 } from '../entity/quiz-question-entity';
+import { QuizQuestionRepository } from './quiz-question-repository';
 
 @Injectable()
 export class MongoDbQuizQuestionRepo implements QuizQuestionRepository {

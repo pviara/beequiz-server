@@ -15,8 +15,6 @@ import { QuizQuestionRepository } from '../../../persistence/quiz-question/repos
 import { QuizThemeRepository } from '../../../persistence/quiz-theme/repository/quiz-theme-repository';
 import { QuizThemeNotFoundException } from '../../errors/quiz-theme-not-found.exception';
 import { QuizTheme } from '../../../domain/quiz-parameters';
-import { QUIZ_GAME_REPO_TOKEN } from '../../../persistence/quiz-game/repository/quiz-game-repository.provider';
-import { QUIZ_QUESTION_REPO_TOKEN } from '../../../persistence/quiz-question/repository/quiz-question-repository.provider';
 import { QUIZ_THEME_REPO_TOKEN } from '../../../persistence/quiz-theme/repository/quiz-theme-repository.provider';
 import { ProblemOccurredWithOpenAIException } from '../../errors/problem-occurred-with-openai.exception';
 import { QuestionsRetrievedEvent } from '../../events/questions-retrieved.event';
@@ -45,11 +43,8 @@ export class GetQuizQuestionsHandler
         private apiService: ApiService,
         private eventBus: EventBus,
         private openAIService: OpenAIService,
-
-        @Inject(QUIZ_GAME_REPO_TOKEN)
         private gameRepo: QuizGameRepository,
 
-        @Inject(QUIZ_QUESTION_REPO_TOKEN)
         private questionRepo: QuizQuestionRepository,
 
         @Inject(QUIZ_THEME_REPO_TOKEN)

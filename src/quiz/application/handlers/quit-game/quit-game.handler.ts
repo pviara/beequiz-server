@@ -1,10 +1,8 @@
 import { ActorActionIsNotAllowedException } from '../../errors/actor-action-is-not-allowed.exception';
 import { CommandHandler, ICommand, ICommandHandler } from '@nestjs/cqrs';
-import { Inject } from '@nestjs/common';
 import { OnGoingQuizGameNotFoundException } from '../../errors/on-going-quiz-game-not-found.exception';
 import { QuizGame } from '../../../domain/quiz-game';
 import { QuizGameRepository } from '../../../persistence/quiz-game/repository/quiz-game-repository';
-import { QUIZ_GAME_REPO_TOKEN } from '../../../persistence/quiz-game/repository/quiz-game-repository.provider';
 
 export class QuitGameCommand implements ICommand {
     constructor(
@@ -17,10 +15,7 @@ export class QuitGameCommand implements ICommand {
 export class QuitGameHandler implements ICommandHandler<QuitGameCommand> {
     private game!: QuizGame;
 
-    constructor(
-        @Inject(QUIZ_GAME_REPO_TOKEN)
-        private repository: QuizGameRepository,
-    ) {}
+    constructor(private repository: QuizGameRepository) {}
 
     async execute({ actorId, userId }: QuitGameCommand): Promise<void> {
         const isActorFraud = actorId !== userId;
