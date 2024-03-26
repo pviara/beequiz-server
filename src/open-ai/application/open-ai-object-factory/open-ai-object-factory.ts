@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
 
-export interface OpenAIObjectFactory {
-    createOpenAIObject(): OpenAI;
+export abstract class OpenAIObjectFactory {
+    abstract createOpenAIObject(): OpenAI;
 }
