@@ -9,7 +9,7 @@ export abstract class OpenAIService {
         numberOfQuestions: number,
         themeLabel: string,
     ): Promise<ParsedQuizQuestion[]>;
-    
+
     abstract generateThemesForQuiz(
         existingThemes: QuizTheme[],
     ): Promise<ParsedQuizTheme[]>;

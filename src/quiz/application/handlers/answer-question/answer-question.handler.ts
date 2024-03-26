@@ -5,7 +5,6 @@ import {
     ICommandHandler,
 } from '@nestjs/cqrs';
 import { CorrectAnswerGivenEvent } from '../../events/correct-answer-given.event';
-import { Inject } from '@nestjs/common';
 import { QuizAnswer, QuizQuestion } from '../../../domain/quiz-question';
 import { QuizAnswerDoesNotExistException } from '../../errors/quiz-answer-does-not-exist-in-question.exception';
 import { QuizGame } from '../../../domain/quiz-game';
@@ -13,8 +12,6 @@ import { QuizGameDoestNotExistException } from '../../errors/quiz-game-does-not-
 import { QuizGameRepository } from '../../../persistence/quiz-game/repository/quiz-game-repository';
 import { QuizQuestionRepository } from '../../../persistence/quiz-question/repository/quiz-question-repository';
 import { QuizQuestionNotFoundException } from '../../errors/quiz-question-not-found.exception';
-import { QUIZ_GAME_REPO_TOKEN } from 'src/quiz/persistence/quiz-game/repository/quiz-game-repository.provider';
-import { QUIZ_QUESTION_REPO_TOKEN } from '../../../persistence/quiz-question/repository/quiz-question-repository.provider';
 import { GameLastQuestionAnsweredEvent } from '../../events/game-last-question-answered.event';
 
 type AnswerStatement = {
@@ -40,11 +37,7 @@ export class AnswerQuestionHandler
 
     constructor(
         private eventBus: EventBus,
-
-        @Inject(QUIZ_GAME_REPO_TOKEN)
         private gameRepo: QuizGameRepository,
-
-        @Inject(QUIZ_QUESTION_REPO_TOKEN)
         private questionRepo: QuizQuestionRepository,
     ) {}
 

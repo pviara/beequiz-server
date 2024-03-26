@@ -2,7 +2,6 @@ import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { GameLastQuestionAnsweredEvent } from '../../events/game-last-question-answered.event';
 import { Inject } from '@nestjs/common';
 import { QuizGameRepository } from '../../../persistence/quiz-game/repository/quiz-game-repository';
-import { QUIZ_GAME_REPO_TOKEN } from '../../../persistence/quiz-game/repository/quiz-game-repository.provider';
 import { UserStatsRepository } from '../../../../user/persistence/repository/user-stats/user-stats-repository';
 import { USER_STATS_REPO_TOKEN } from '../../../../user/persistence/repository/user-stats/user-stats-repository.provider';
 
@@ -11,7 +10,6 @@ export class GameLastQuestionAnsweredHandler
     implements IEventHandler<GameLastQuestionAnsweredEvent>
 {
     constructor(
-        @Inject(QUIZ_GAME_REPO_TOKEN)
         private gameRepo: QuizGameRepository,
 
         @Inject(USER_STATS_REPO_TOKEN)
