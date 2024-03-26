@@ -1,7 +1,7 @@
+import { ALLOWED_ORIGIN } from '../../infrastructure/app-config/configuration/application-configuration';
 import { AppConfigService } from '../../infrastructure/app-config/app-config-service';
 import { APP_CONFIG_SERVICE_TOKEN } from '../../infrastructure/app-config/app-config-service.provider';
 import { AuthService } from '../application/auth-service';
-import { AUTH_SERVICE_TOKEN } from '../application/auth-service.provider';
 import {
     Controller,
     Get,
@@ -17,7 +17,6 @@ import {
     Response as ExpressResponse,
 } from 'express';
 import { User } from '../../user/domain/user';
-import { ALLOWED_ORIGIN } from 'src/infrastructure/app-config/configuration/application-configuration';
 
 type SignedInRequest = ExpressRequest & {
     user: User;
@@ -26,7 +25,6 @@ type SignedInRequest = ExpressRequest & {
 @Controller()
 export class AuthController {
     constructor(
-        @Inject(AUTH_SERVICE_TOKEN)
         private authService: AuthService,
 
         @Inject(APP_CONFIG_SERVICE_TOKEN)

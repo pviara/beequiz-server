@@ -1,9 +1,12 @@
+import { AuthService } from './auth-service';
 import { AuthServiceImpl } from './auth-service.impl';
+import { JwtService } from '@nestjs/jwt';
 import { Provider } from '@nestjs/common';
 
-export const AUTH_SERVICE_TOKEN = 'AuthService';
-
 export const AuthServiceProvider: Provider = {
-    provide: AUTH_SERVICE_TOKEN,
-    useClass: AuthServiceImpl,
+    inject: [JwtService],
+    provide: AuthService,
+    useFactory: (jwtService: JwtService) => {
+        return new AuthServiceImpl(jwtService);
+    },
 };
