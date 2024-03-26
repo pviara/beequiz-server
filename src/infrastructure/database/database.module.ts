@@ -1,6 +1,5 @@
 import { AppConfigModule } from '../app-config/app-config.module';
 import { AppConfigService } from '../app-config/app-config-service';
-import { APP_CONFIG_SERVICE_TOKEN } from '../app-config/app-config-service.provider';
 import {
     DATABASE_URI,
     DEV_DATABASE_URI,
@@ -12,7 +11,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     imports: [
         MongooseModule.forRootAsync({
             imports: [AppConfigModule],
-            inject: [APP_CONFIG_SERVICE_TOKEN],
+            inject: [AppConfigService],
             useFactory: (appConfigService: AppConfigService) => {
                 if (appConfigService.isAppInDevMode()) {
                     return {

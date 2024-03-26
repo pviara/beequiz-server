@@ -1,6 +1,5 @@
 import { AddUserRepoDTO } from 'src/user/persistence/dto/add-user-repo.dto';
 import { AppConfigService } from '../../../infrastructure/app-config/app-config-service';
-import { APP_CONFIG_SERVICE_TOKEN } from '../../../infrastructure/app-config/app-config-service.provider';
 import { Inject, Injectable } from '@nestjs/common';
 import {
     OAUTH_CLIENT,
@@ -18,7 +17,6 @@ type GoogleProfile = { email: string };
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     constructor(
-        @Inject(APP_CONFIG_SERVICE_TOKEN)
         configService: AppConfigService,
 
         @Inject(USER_REPO_TOKEN)

@@ -3,11 +3,11 @@ import { AuthenticationConfiguration } from './configuration/authentication-conf
 import { DatabaseConfiguration } from './configuration/database-configuration';
 import { OpenAIConfiguration } from './configuration/openai-configuration';
 
-export interface AppConfigService {
-    getAppConfig(): ApplicationConfiguration;
-    getAuthConfig(): AuthenticationConfiguration;
-    getDatabaseConfig(): DatabaseConfiguration;
-    getOpenAIConfig(): OpenAIConfiguration;
-    isAppInDevMode(): boolean;
-    isAppInProductionMode(): boolean;
+export abstract class AppConfigService {
+    abstract getAppConfig(): ApplicationConfiguration;
+    abstract getAuthConfig(): AuthenticationConfiguration;
+    abstract getDatabaseConfig(): DatabaseConfiguration;
+    abstract getOpenAIConfig(): OpenAIConfiguration;
+    abstract isAppInDevMode(): boolean;
+    abstract isAppInProductionMode(): boolean;
 }
