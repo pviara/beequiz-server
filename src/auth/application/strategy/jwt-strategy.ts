@@ -1,10 +1,9 @@
 import { AppConfigService } from '../../../infrastructure/app-config/app-config-service';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { User } from '../../../user/domain/user';
 import { UserRepository } from '../../../user/persistence/repository/user/user-repository';
-import { USER_REPO_TOKEN } from '../../../user/persistence/repository/user/user-repository.provider';
 
 type JwtAuthPayload = {
     email: string;
@@ -16,8 +15,6 @@ type JwtAuthPayload = {
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(
         configService: AppConfigService,
-
-        @Inject(USER_REPO_TOKEN)
         private userRepository: UserRepository,
     ) {
         super({
