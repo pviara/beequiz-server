@@ -1,7 +1,5 @@
 import { ApiService } from './api-service';
 import { DateTimeService } from '../../../../shared/date-time-service/datetime-service';
-import { DATE_TIME_SERVICE_TOKEN } from '../../../../shared/date-time-service/date-time-service.provider';
-import { Inject } from '@nestjs/common';
 import { readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
@@ -16,10 +14,7 @@ export const QUIZ_THEMES_REQUEST_INFO_PATH =
     'src/open-ai/application/services/api/last-quiz-theme-request-date.json';
 
 export class ApiServiceImpl implements ApiService {
-    constructor(
-        @Inject(DATE_TIME_SERVICE_TOKEN)
-        private dateTimeService: DateTimeService,
-    ) {}
+    constructor(private dateTimeService: DateTimeService) {}
 
     cannotGenerateQuizQuestions(): boolean {
         const requestInfo = this.retrieveRequestInfo('questions');

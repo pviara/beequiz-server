@@ -1,9 +1,8 @@
-import { Provider } from '@nestjs/common';
+import { DateTimeService } from './datetime-service';
 import { DateTimeServiceImpl } from './date-time-service.impl';
-
-export const DATE_TIME_SERVICE_TOKEN = 'DateTimeService';
+import { Provider } from '@nestjs/common';
 
 export const DateTimeServiceProvider: Provider = {
-    provide: DATE_TIME_SERVICE_TOKEN,
-    useClass: DateTimeServiceImpl,
+    provide: DateTimeService,
+    useFactory: () => new DateTimeServiceImpl(),
 };

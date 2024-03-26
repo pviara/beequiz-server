@@ -1,3 +1,3 @@
-export interface DateTimeService {
-    getNow(): Date;
+export abstract class DateTimeService {
+    abstract getNow(): Date;
 }

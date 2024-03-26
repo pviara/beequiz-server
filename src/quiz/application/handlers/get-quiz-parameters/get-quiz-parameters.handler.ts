@@ -1,5 +1,4 @@
 import { ApiService } from '../../../../open-ai/application/services/api/api-service';
-import { API_SERVICE_TOKEN } from '../../../../open-ai/application/services/api/api-service.provider';
 import { CommandHandler, ICommand, ICommandHandler } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import { OpenAIService } from '../../../../open-ai/application/services/open-ai/open-ai-service';
@@ -22,7 +21,6 @@ export class GetQuizParametersHandler implements ICommandHandler {
     private savedThemes: QuizTheme[] = [];
 
     constructor(
-        @Inject(API_SERVICE_TOKEN)
         private apiService: ApiService,
 
         @Inject(OPENAI_SERVICE_TOKEN)
