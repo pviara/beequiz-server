@@ -4,7 +4,6 @@ import { Logger, Provider } from '@nestjs/common';
 import { OpenAIObjectFactory } from '../../open-ai-object-factory/open-ai-object-factory';
 import { OpenAIServiceImpl } from './open-ai-service.impl';
 import { PromptService } from '../prompt/prompt-service';
-import { PROMPT_SERVICE_TOKEN } from '../prompt/prompt-service.provider';
 import { QuizParser } from '../../../../quiz/application/quiz-parser/quiz-parser';
 import { QUIZ_PARSER_TOKEN } from '../../../../quiz/application/quiz-parser/quiz-parser.provider';
 import { OpenAIService } from './open-ai-service';
@@ -14,7 +13,7 @@ export const OpenAIServiceProvider: Provider = {
     inject: [
         AppConfigService,
         OpenAIObjectFactory,
-        PROMPT_SERVICE_TOKEN,
+        PromptService,
         QUIZ_PARSER_TOKEN,
     ],
     useFactory: (
