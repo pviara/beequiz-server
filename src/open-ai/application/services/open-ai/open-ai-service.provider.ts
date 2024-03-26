@@ -5,7 +5,6 @@ import { OpenAIObjectFactory } from '../../open-ai-object-factory/open-ai-object
 import { OpenAIServiceImpl } from './open-ai-service.impl';
 import { PromptService } from '../prompt/prompt-service';
 import { QuizParser } from '../../../../quiz/application/quiz-parser/quiz-parser';
-import { QUIZ_PARSER_TOKEN } from '../../../../quiz/application/quiz-parser/quiz-parser.provider';
 import { OpenAIService } from './open-ai-service';
 
 export const OpenAIServiceProvider: Provider = {
@@ -14,7 +13,7 @@ export const OpenAIServiceProvider: Provider = {
         AppConfigService,
         OpenAIObjectFactory,
         PromptService,
-        QUIZ_PARSER_TOKEN,
+        QuizParser,
     ],
     useFactory: (
         appConfigService: AppConfigService,
