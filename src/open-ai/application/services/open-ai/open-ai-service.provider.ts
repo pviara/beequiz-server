@@ -8,11 +8,10 @@ import { PromptService } from '../prompt/prompt-service';
 import { PROMPT_SERVICE_TOKEN } from '../prompt/prompt-service.provider';
 import { QuizParser } from '../../../../quiz/application/quiz-parser/quiz-parser';
 import { QUIZ_PARSER_TOKEN } from '../../../../quiz/application/quiz-parser/quiz-parser.provider';
-
-export const OPENAI_SERVICE_TOKEN = 'OpenAIService';
+import { OpenAIService } from './open-ai-service';
 
 export const OpenAIServiceProvider: Provider = {
-    provide: OPENAI_SERVICE_TOKEN,
+    provide: OpenAIService,
     inject: [
         AppConfigService,
         OPENAI_OBJECT_FACTORY_TOKEN,

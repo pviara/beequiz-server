@@ -3,13 +3,14 @@ import { ParsedQuizTheme } from '../../../../quiz/application/quiz-parser/model/
 import { QuizQuestion } from '../../../../quiz/domain/quiz-question';
 import { QuizTheme } from '../../../../quiz/domain/quiz-parameters';
 
-export interface OpenAIService {
-    generateQuestionsForQuiz(
+export abstract class OpenAIService {
+    abstract generateQuestionsForQuiz(
         existingQuestions: QuizQuestion[],
         numberOfQuestions: number,
         themeLabel: string,
     ): Promise<ParsedQuizQuestion[]>;
-    generateThemesForQuiz(
+    
+    abstract generateThemesForQuiz(
         existingThemes: QuizTheme[],
     ): Promise<ParsedQuizTheme[]>;
 }
