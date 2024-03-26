@@ -8,9 +8,7 @@ import {
 import { ExceededAPIQuotaException } from '../../../../open-ai/application/errors/exceeded-api-quota.exception';
 import { Inject } from '@nestjs/common';
 import { OpenAIService } from '../../../../open-ai/application/services/open-ai/open-ai-service';
-import { OPENAI_SERVICE_TOKEN } from '../../../../open-ai/application/services/open-ai/open-ai-service.provider';
 import { ParsedQuizQuestion } from '../../quiz-parser/model/parsed-quiz-question';
-import { QuizGame } from '../../../domain/quiz-game';
 import { QuizGameRepository } from '../../../persistence/quiz-game/repository/quiz-game-repository';
 import { QuizQuestion } from '../../../domain/quiz-question';
 import { QuizQuestionRepository } from '../../../persistence/quiz-question/repository/quiz-question-repository';
@@ -45,10 +43,7 @@ export class GetQuizQuestionsHandler
 
     constructor(
         private apiService: ApiService,
-
         private eventBus: EventBus,
-
-        @Inject(OPENAI_SERVICE_TOKEN)
         private openAIService: OpenAIService,
 
         @Inject(QUIZ_GAME_REPO_TOKEN)

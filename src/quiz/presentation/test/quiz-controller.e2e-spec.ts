@@ -1,9 +1,9 @@
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AppExceptionFilter } from '../../../application/app-exception-filter';
 import { DatabaseTestingModule } from '../../../infrastructure/database/test/database.testing-module';
-import { describe, expect, it } from 'vitest';
 import { DummyOpenAIServiceImpl } from '../../../open-ai/application/services/open-ai/test/dummy-open-ai-service.impl';
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import { OPENAI_SERVICE_TOKEN } from '../../../open-ai/application/services/open-ai/open-ai-service.provider';
+import { OpenAIService } from '../../../open-ai/application/services/open-ai/open-ai-service';
 import { QuizTestingModule } from './quiz.testing-module';
 import { RouterModule } from '@nestjs/core';
 import { Test, TestingModuleBuilder } from '@nestjs/testing';
@@ -71,6 +71,6 @@ function overrideOpenAIService(
     module: TestingModuleBuilder,
 ): TestingModuleBuilder {
     return module
-        .overrideProvider(OPENAI_SERVICE_TOKEN)
+        .overrideProvider(OpenAIService)
         .useClass(DummyOpenAIServiceImpl);
 }
