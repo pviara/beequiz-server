@@ -1,10 +1,13 @@
 import { ALLOWED_ORIGIN } from '../../infrastructure/app-config/configuration/application-configuration';
 import { AppConfigService } from '../../infrastructure/app-config/app-config-service';
+import { AuthenticatedUser } from './model/authenticated-user';
 import { AuthService } from '../application/auth-service';
 import {
     Controller,
     Get,
-    Inject,
+    HttpRedirectResponse,
+    HttpStatus,
+    Redirect,
     Request,
     Response,
     UseGuards,
@@ -15,7 +18,6 @@ import {
     Request as ExpressRequest,
     Response as ExpressResponse,
 } from 'express';
-import { AuthenticatedUser } from './model/authenticated-user';
 
 type SignedInRequest = ExpressRequest & {
     user: AuthenticatedUser;
@@ -29,13 +31,13 @@ export class AuthController {
     ) {}
 
     @UseGuards(GoogleAuthGuard)
+    @Redirect()
     @Get('google-redirect')
     async catchGoogleRedirect(
         @Request() req: SignedInRequest,
-        @Response() res: ExpressResponse,
-    ): Promise<void> {
+    ): Promise<HttpRedirectResponse> {
         const { token } = this.authService.signIn(req.user);
-        this.redirectToClientApp(res, token);
+        return this.redirectToClientApp(token);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -50,10 +52,13 @@ export class AuthController {
     @Get('google')
     async signInWithGoogle(): Promise<void> {}
 
-    private redirectToClientApp(res: ExpressResponse, token: string): void {
+    private redirectToClientApp(token: string): HttpRedirectResponse {
         const redirectionUrl =
             this.configService.getAppConfig()[ALLOWED_ORIGIN];
 
-        res.redirect(`${redirectionUrl}?token=${token}`);
+        return {
+            url: `${redirectionUrl}?token=${token}`,
+            statusCode: HttpStatus.PERMANENT_REDIRECT,
+        };
     }
 }
