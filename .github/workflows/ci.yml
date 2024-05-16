@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      mongodb:
+      mongo:
         image: mongo:latest
         ports:
-          - 24000:27017
+          - 27017:27017
         options: >-
           --health-cmd "echo 'db.runCommand(\"ping\").ok' | mongo localhost:27017/testdb --quiet"
           --health-interval 10s
