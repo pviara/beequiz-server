@@ -33,6 +33,9 @@ jobs:
       - name: 🧑‍🔬 Run unit tests
         run: yarn test
 
+      - name: 🧑‍🔬 Run e2e tests
+        run: yarn test:e2e
+
       - name: 🐳 Stop containers
         run: |
           docker-compose -f docker/docker-compose.ci.yml down
