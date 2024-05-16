@@ -1,4 +1,4 @@
-name: 'mongodb_beequiz-server'
+x-name: 'mongodb_beequiz-server'
 
 services:
   mongodb:
