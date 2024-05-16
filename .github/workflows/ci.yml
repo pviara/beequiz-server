@@ -33,6 +33,21 @@ jobs:
       - name: 🧑‍🔬 Run unit tests
         run: yarn test
 
+      - name: 🧑‍🔬 Run e2e tests
+        run: yarn test:e2e
+        env:
+          ALLOWED_ORIGIN: 'ALLOWED_ORIGIN'
+          APP_ENVIRONMENT: 'dev'
+          APP_PORT: '24000'
+          DATABASE_URI: 'DATABASE_URI'
+          DEV_DATABASE_URI: 'DEV_DATABASE_URI'
+          TEST_DATABASE_URI: 'mongodb://localhost:27017/beequiz_test'
+          OPENAI_API_KEY: 'OPEN_API_KEY'
+          JWT_SECRET: 'MY_SECRET'
+          OAUTH_CLIENT: 'OAUTH_CLIENT'
+          OAUTH_REDIRECT_URL: 'OAUTH_REDIRECT_URL'
+          OAUTH_SECRET: 'OAUTH_SECRET'
+
       - name: 🐳 Stop containers
         run: |
           docker-compose -f docker/docker-compose.ci.yml down
