@@ -24,7 +24,9 @@ jobs:
         run: |
           docker-compose -f docker/docker-compose.ci.yml up -d
 
+
   build:
+    needs: init
     runs-on: ubuntu-latest
 
     steps:
@@ -35,6 +37,7 @@ jobs:
         run: yarn build
 
   tests:
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
