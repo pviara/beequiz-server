@@ -1,7 +1,3 @@
-version: '3.8'
-
-name: 'mongodb_beequiz-server'
-
 services:
   mongodb:
     image: mongo:latest
