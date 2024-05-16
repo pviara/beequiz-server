@@ -1,5 +1,3 @@
-x-name: 'mongodb_beequiz-server'
-
 services:
   mongodb:
     image: mongo:latest

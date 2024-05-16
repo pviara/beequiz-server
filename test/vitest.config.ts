@@ -5,7 +5,6 @@ export default defineConfig({
     test: {
         globals: true,
         root: './',
-        reporters: ['verbose'],
     },
     plugins: [
         swc.vite({
