@@ -1,6 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 import { Exception, ExceptionCode } from './exception';
-import { Response } from 'express';
+import { Response } from 'express'
 
 enum HttpStatus {
     Conflict = 409,
