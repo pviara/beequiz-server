@@ -11,7 +11,7 @@ import { QuizQuestion } from '../../../../quiz/domain/quiz-question';
 import { QuizTheme } from '../../../../quiz/domain/quiz-parameters';
 
 export const GPT_VERSION: ChatCompletionCreateParamsBase['model'] =
-    'gpt-3.5-turbo-1106';
+    'gpt-4o-mini';
 
 export class OpenAIServiceImpl implements OpenAIService {
     constructor(
