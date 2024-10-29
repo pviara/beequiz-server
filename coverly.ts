@@ -1,19 +1,23 @@
 import { existsSync, readFileSync } from 'fs';
 import * as path from 'path';
 
-console.log(`Average project percentage: ${formatProjectCoverage()}`);
+logProjectCoverage();
 
 // # functions #
 
-function formatProjectCoverage(): string {
+function logProjectCoverage(): string {
     const report = getCoverageReport();
     const percentage = calcProjectCoverageFrom(report);
+    const fixedPercentage = percentage.toFixed(2);
 
     const MIN_TEST_COVERAGE = 95;
     if (percentage < MIN_TEST_COVERAGE) {
-        throw new Error('Test coverage is under 100%');
+        const message = `Total project coverage percentage of ${fixedPercentage}% is less than minimum of ${MIN_TEST_COVERAGE}%`;
+        error('Result', message);
+        throw new Error(message);
     }
 
+    log('Result', `Satisfying total project coverage of ${fixedPercentage}%`);
     return `${percentage.toFixed(2)}%`;
 }
 
@@ -35,9 +39,24 @@ function calcProjectCoverageFrom(report: CoverageReport): number {
     const files = Object.keys(report);
     return (
         files
-            .map((file) => extractCoverageDataFrom(file, report))
-            .map((coverage) => mapToDetailed(coverage))
-            .map((coverage) => calcAveragePercentageOf(coverage))
+            .map((file) => {
+                log('Extracting coverage data from', file);
+                return {
+                    file,
+                    coverage: extractCoverageDataFrom(file, report),
+                };
+            })
+            .map(({ file, coverage }) => {
+                log('Completing coverage data from', file);
+                return {
+                    file,
+                    coverage: mapToDetailed(coverage),
+                };
+            })
+            .map(({ file, coverage }) => {
+                log('Calculating coverage percetage from', file);
+                return calcAveragePercentageOf(coverage);
+            })
             .reduce((sum, current) => sum + current, 0) / files.length
     );
 }
@@ -102,6 +121,18 @@ function calcAveragePercentageOf({
             branches.coveragePercentage +
             functions.coveragePercentage) /
         3
+    );
+}
+
+function log(context: string, message: string): void {
+    console.log(
+        `> ${context ? `${context} ` : ''}\u001b[36m${message}\u001b[0m`,
+    );
+}
+
+function error(context: string, message: string): void {
+    console.log(
+        `> ${context ? `${context} ` : ''}\u001b[31m${message}\u001b[0m`,
     );
 }
 
