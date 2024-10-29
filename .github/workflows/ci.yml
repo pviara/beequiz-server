@@ -48,7 +48,7 @@ jobs:
           OAUTH_REDIRECT_URL: 'OAUTH_REDIRECT_URL'
           OAUTH_SECRET: 'OAUTH_SECRET'
 
-      - name: 📊 Check Test Coverage
+      - name: 📊 Check test coverage
         run: node dist/coverly.js
 
       - name: 🐳 Stop containers
